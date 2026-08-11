@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Sagar Rajput | Senior IT Associate{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <div class="eyebrow"><span class="pulse"></span> SENIOR IT ASSOCIATE · NOIDA, INDIA</div>
+            <h1>Enterprise IT infrastructure, networking & <span>security.</span></h1>
+            <p class="hero-text">
+                6+ years of experience across enterprise networking, network security,
+                Fortinet firewalls, Cisco infrastructure, Zscaler, VPN technologies,
+                data center operations and network access control.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ url_for('home') }}#contact">Let's Connect</a>
+                <a class="btn btn-secondary" href="{{ url_for('static', filename='Sagar_Rajput_Resume.pdf') }}" target="_blank">Download Resume ↓</a>
+            </div>
+            <div class="hero-stats">
+                <div><strong>6+</strong><span>Years Experience</span></div>
+                <div><strong>3000+</strong><span>IT Assets Managed</span></div>
+                <div><strong>10+</strong><span>Team Members Led</span></div>
+            </div>
+        </div>
+        <div class="hero-card">
+            <div class="avatar photo-avatar"><img src="{{ url_for('static', filename='images/sagar-profile.png') }}" alt="Sagar Rajput"></div>
+            <h2>Sagar Rajput</h2>
+            <p>Senior IT Associate</p>
+            <div class="tag-row">
+                <span>CCNA</span><span>Network Security</span><span>L2 Support</span>
+            </div>
+            <div class="mini-contact">
+                <div>📍 Noida, Uttar Pradesh, India</div>
+                <div>✉ <a href="mailto:sagarraj5684@gmail.com">sagarraj5684@gmail.com</a></div>
+                <div>in <a href="https://www.linkedin.com/in/sagarrajput-ai/" target="_blank" rel="noopener">linkedin.com/in/sagarrajput-ai/</a></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="section">
+    <div class="container two-col">
+        <div>
+            <p class="section-kicker">01 · ABOUT</p>
+            <h2>Infrastructure with an operational mindset.</h2>
+        </div>
+        <div class="section-copy">
+            <p>
+                Senior IT Associate with 6+ years of experience in infrastructure deployment,
+                enterprise networking, network security, Fortinet firewalls, Cisco infrastructure,
+                Zscaler, VPN technologies, data center operations and network access control.
+            </p>
+            <p>
+                Experienced in ServiceNow, Power BI and SAP GUI, with a focus on operational
+                efficiency, audit compliance, change management and stakeholder engagement.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="skills" class="section section-dark">
+    <div class="container">
+        <p class="section-kicker">02 · TECHNICAL SKILLS</p>
+        <h2>Tools I work with</h2>
+        <div class="skills-grid">
+            <article class="skill-card"><span>01</span><h3>Networking</h3><p>Cisco Switching · VLAN · STP/RSTP · EtherChannel · HSRP · OSPF · BGP · High Availability</p></article>
+            <article class="skill-card"><span>02</span><h3>Security</h3><p>Fortinet · Check Point · Cisco ISE · AAA · RADIUS · ACL · NAT · Zscaler ZIA/ZPA</p></article>
+            <article class="skill-card"><span>03</span><h3>VPN</h3><p>IPsec VPN · SSL VPN · Site-to-Site VPN · Client-to-Site VPN</p></article>
+            <article class="skill-card"><span>04</span><h3>Infrastructure</h3><p>AD · DHCP · DNS · TCP/IP · Data Center Operations · Rack Deployment · Structured Cabling</p></article>
+            <article class="skill-card"><span>05</span><h3>Monitoring & Tools</h3><p>PRTG · ServiceNow · NetBox · Skybox · CyberArk · Aruba Central · WLC · DNAC</p></article>
+            <article class="skill-card"><span>06</span><h3>IT Operations</h3><p>ITIL · ISO 20k/27001 · Change Management · CAB · Asset Management · Vendor Coordination</p></article>
+        </div>
+    </div>
+</section>
+
+<section id="experience" class="section">
+    <div class="container">
+        <p class="section-kicker">03 · EXPERIENCE</p>
+        <h2>Career timeline</h2>
+        <div class="timeline">
+            <article class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">JUN 2024 — PRESENT</div>
+                <h3>Senior IT Associate · Infosys Limited</h3>
+                <p>Enterprise infrastructure, secure connectivity, WAN/LAN, network operations, Zscaler, VPN, change management, IT assets and vendor coordination.</p>
+                <div class="timeline-tags"><span>Network</span><span>Security</span><span>ServiceNow</span><span>Change</span></div>
+            </article>
+            <article class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">NOV 2022 — JUN 2024</div>
+                <h3>Senior Network Engineer · Jubilant Foodworks Ltd.</h3>
+                <p>Enterprise security and multi-site network operations using Fortinet, NAT, ACLs, IPsec/SSL VPN, WAN troubleshooting and new-store rollouts.</p>
+                <div class="timeline-tags"><span>Fortinet</span><span>VPN</span><span>WAN</span></div>
+            </article>
+            <article class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">MAR 2021 — SEP 2022</div>
+                <h3>Network Engineer - NOC · FusionNet India</h3>
+                <p>ISP-grade troubleshooting, backbone monitoring, routing, packet loss, latency, field coordination and customer escalations.</p>
+                <div class="timeline-tags"><span>NOC</span><span>PRTG</span><span>Routing</span></div>
+            </article>
+            <article class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">AUG 2020 — JAN 2021</div>
+                <h3>Network Engineer · JAVI Systems India Pvt. Ltd.</h3>
+                <p>Supported the BSNL Hotspot Project, resolving BTS-to-switch connectivity issues and optimizing Wi-Fi AP and media-link connectivity.</p>
+                <div class="timeline-tags"><span>Wi-Fi</span><span>BSNL</span><span>Field Support</span></div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section highlight-section">
+    <div class="container">
+        <p class="section-kicker">04 · KEY ACHIEVEMENTS</p>
+        <div class="achievement-grid">
+            <div><strong>1000+</strong><span>FortiGate firewall environments supported</span></div>
+            <div><strong>3000+</strong><span>IT assets managed through lifecycle</span></div>
+            <div><strong>99%</strong><span>Uptime/service delivery target achieved with team</span></div>
+            <div><strong>15+</strong><span>OEMs & vendors coordinated</span></div>
+            <div><strong>100+</strong><span>CAPEX/OPEX requests processed</span></div>
+            <div><strong>100%</strong><span>Compliance maintained for managed assets</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container project-preview">
+        <div>
+            <p class="section-kicker">05 · PROJECTS</p>
+            <h2>Building beyond the resume.</h2>
+            <p class="section-copy">This portfolio is also becoming a learning lab for Python, Flask, automation and practical IT utilities.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ url_for('projects') }}">View Projects →</a>
+    </div>
+</section>
+
+<section id="contact" class="section contact-section">
+    <div class="container contact-grid">
+        <div>
+            <p class="section-kicker">06 · CONTACT</p>
+            <h2>Let's connect.</h2>
+            <p class="section-copy">For professional opportunities, IT infrastructure discussions, networking projects or collaboration.</p>
+        </div>
+        <div class="contact-card">
+            <a href="mailto:sagarraj5684@gmail.com"><span>Email</span><strong>sagarraj5684@gmail.com</strong></a>
+            <a href="tel:+918650011462"><span>Phone</span><strong>+91 8650011462</strong></a>
+            <a href="https://www.linkedin.com/in/sagarrajput-ai/" target="_blank" rel="noopener"><span>LinkedIn</span><strong>linkedin.com/in/sagarrajput-ai/</strong></a>
+        </div>
+    </div>
+</section>
+{% endblock %}

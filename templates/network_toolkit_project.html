@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Network Toolkit | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-project-hero">
+
+    <div class="container">
+
+        <p class="section-kicker">
+            PYTHON • FLASK • NETWORK ENGINEERING
+        </p>
+
+        <h1>
+            Network
+            <span>Toolkit.</span>
+        </h1>
+
+        <p class="toolkit-project-intro">
+            A browser-based networking toolkit built with Python
+            and Flask to simplify everyday IP planning,
+            subnetting and network troubleshooting tasks.
+        </p>
+
+        <div class="toolkit-project-actions">
+
+            <a
+                class="btn btn-primary"
+                href="{{ url_for('network_toolkit') }}"
+            >
+                Launch Live Toolkit →
+            </a>
+
+            <a
+                class="btn btn-secondary"
+                href="{{ url_for('projects') }}"
+            >
+                ← Back to Projects
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="toolkit-overview">
+
+            <div>
+
+                <p class="section-kicker">
+                    PROJECT OVERVIEW
+                </p>
+
+                <h2>
+                    Practical networking,
+                    <span>in one place.</span>
+                </h2>
+
+            </div>
+
+            <div>
+
+                <p>
+                    Network engineers frequently perform repetitive
+                    IP addressing, subnetting, DNS and connectivity
+                    checks during troubleshooting and network
+                    planning.
+                </p>
+
+                <p>
+                    This project brings several of these everyday
+                    tasks together into a simple browser-based
+                    interface powered by Python and Flask.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOOL COLLECTION -->
+
+        <div class="toolkit-tools">
+
+            <div class="toolkit-tool-card">
+
+                <span class="tool-number">01</span>
+
+                <h3>IP / Subnet Calculator</h3>
+
+                <p>
+                    Calculate network address, broadcast address,
+                    subnet mask, host range and usable hosts.
+                </p>
+
+                <a href="{{ url_for('ip_calculator') }}">
+                    Open Calculator →
+                </a>
+
+            </div>
+
+
+            <div class="toolkit-tool-card">
+
+                <span class="tool-number">02</span>
+
+                <h3>Subnet Planner</h3>
+
+                <p>
+                    Divide an IPv4 network into multiple
+                    equal-sized subnets for network planning.
+                </p>
+
+                <a href="{{ url_for('subnet_planner') }}">
+                    Open Planner →
+                </a>
+
+            </div>
+
+
+            <div class="toolkit-tool-card">
+
+                <span class="tool-number">03</span>
+
+                <h3>IP Range Calculator</h3>
+
+                <p>
+                    Calculate the number of IP addresses between
+                    a starting and ending IPv4 or IPv6 address.
+                </p>
+
+                <a href="{{ url_for('ip_range') }}">
+                    Open Calculator →
+                </a>
+
+            </div>
+
+
+            <div class="toolkit-tool-card">
+
+                <span class="tool-number">04</span>
+
+                <h3>DNS Lookup</h3>
+
+                <p>
+                    Resolve hostnames and retrieve associated
+                    IP addresses using Python socket operations.
+                </p>
+
+                <a href="{{ url_for('dns_lookup') }}">
+                    Open DNS Tool →
+                </a>
+
+            </div>
+
+
+            <div class="toolkit-tool-card">
+
+                <span class="tool-number">05</span>
+
+                <h3>TCP Port Checker</h3>
+
+                <p>
+                    Test TCP connectivity to a hostname or IP
+                    address and determine whether a port is
+                    reachable.
+                </p>
+
+                <a href="{{ url_for('port_checker') }}">
+                    Open Port Checker →
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TECHNOLOGY -->
+
+<section class="toolkit-tech-section">
+
+    <div class="container">
+
+        <div class="toolkit-tech-panel">
+
+            <div>
+
+                <p class="section-kicker">
+                    TECHNOLOGY STACK
+                </p>
+
+                <h2>
+                    Built for practical
+                    <span>network engineering.</span>
+                </h2>
+
+                <p>
+                    The application combines Python networking
+                    libraries with Flask to provide lightweight
+                    browser-based utilities.
+                </p>
+
+            </div>
+
+
+            <div class="toolkit-tech-list">
+
+                <span>Python</span>
+                <span>Flask</span>
+                <span>ipaddress</span>
+                <span>socket</span>
+                <span>IPv4</span>
+                <span>IPv6</span>
+                <span>TCP/IP</span>
+                <span>HTML</span>
+                <span>CSS</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- LEARNING -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="learning-panel">
+
+            <p class="section-kicker">
+                LEARNING OUTCOME
+            </p>
+
+            <h2>
+                From networking concepts
+                to working applications.
+            </h2>
+
+            <p>
+                Building this toolkit provides practical experience
+                with Python programming, Flask routing, HTML/CSS
+                interfaces, IP addressing, subnetting, DNS resolution,
+                socket programming and TCP connectivity testing.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<div class="toolkit-responsible-use">
+
+    <div class="container">
+
+        <strong>
+            ⚠ Responsible Use
+        </strong>
+
+        <p>
+            These tools are intended for learning, network
+            administration and authorized troubleshooting.
+            Only test systems and networks you are permitted
+            to access.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

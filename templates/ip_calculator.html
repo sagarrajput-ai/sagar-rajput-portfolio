@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}IP / Subnet Calculator | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<div class="container tool-back">
+
+    <a href="{{ url_for('network_toolkit') }}">
+        ← Back to Network Toolkit
+    </a>
+
+</div>
+
+<section class="page-hero">
+
+    <div class="container">
+
+        <p class="section-kicker">
+            PYTHON PROJECT · NETWORKING
+        </p>
+
+        <h1>IP / Subnet Calculator</h1>
+
+        <p>
+            Calculate network address, broadcast address,
+            subnet mask, host range and usable hosts.
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="tool-card">
+
+            <p class="section-kicker">
+                01 · IP CALCULATOR
+            </p>
+
+            <h2>Calculate an IPv4 network</h2>
+
+            <p class="section-copy">
+                Enter an IPv4 address in CIDR notation.
+                Example: 192.168.10.0/24
+            </p>
+
+
+            <form method="POST" class="network-form">
+
+                <label for="ip_address">
+                    IP Address / CIDR
+                </label>
+
+                <input
+                    type="text"
+                    id="ip_address"
+                    name="ip_address"
+                    placeholder="192.168.10.0/24"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="margin-top: 25px;"
+                >
+                    Calculate Network
+                </button>
+
+            </form>
+
+
+            {% if error %}
+
+            <div class="error-box">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            {% if result %}
+
+            <div class="results">
+
+                <div class="result-card">
+                    <span>Network Address</span>
+                    <strong>{{ result.network }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>Broadcast Address</span>
+                    <strong>{{ result.broadcast }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>Subnet Mask</span>
+                    <strong>{{ result.netmask }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>Host Mask</span>
+                    <strong>{{ result.hostmask }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>First Usable Host</span>
+                    <strong>{{ result.first_host }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>Last Usable Host</span>
+                    <strong>{{ result.last_host }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>Total Addresses</span>
+                    <strong>{{ result.total_addresses }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>Usable Hosts</span>
+                    <strong>{{ result.usable_hosts }}</strong>
+                </div>
+
+
+                <div class="result-card">
+                    <span>CIDR Prefix</span>
+                    <strong>/{{ result.prefix }}</strong>
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}  

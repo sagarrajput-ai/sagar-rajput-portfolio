@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sagar Rajput — Senior IT Associate, Enterprise Networking, Network Security and Infrastructure.">
+    <title>{% block title %}Sagar Rajput | Senior IT Associate{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="site-header">
+    <nav class="nav container">
+        <a class="brand" href="{{ url_for('home') }}">
+            <span class="brand-mark">SR</span>
+            <span>Sagar Rajput</span>
+        </a>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}#about">About</a>
+            <a href="{{ url_for('home') }}#skills">Skills</a>
+            <a href="{{ url_for('home') }}#experience">Experience</a>
+            <a href="{{ url_for('projects') }}">Projects</a>
+            <a href="{{ url_for('home') }}#contact">Contact</a>
+            <a class="nav-cta" href="{{ url_for('static', filename='Sagar_Rajput_Resume.pdf') }}" target="_blank">Resume ↗</a>
+            <a href="{{ url_for('network_toolkit') }}">Network Toolkit</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <div>
+            <strong>Sagar Rajput</strong>
+            <p>Senior IT Associate · Networking · Network Security · Infrastructure</p>
+        </div>
+        <div class="footer-links">
+            <a href="mailto:sagarraj5684@gmail.com">Email</a>
+            <a href="https://www.linkedin.com/in/sagarrajput-ai/" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+    </div>
+    <div class="container copyright">© 2026 Sagar Rajput. Built with Python & Flask.</div>
+</footer>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

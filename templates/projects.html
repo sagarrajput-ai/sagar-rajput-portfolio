@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Projects | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<section class="projects-hero">
+
+    <div class="container">
+
+        <p class="section-kicker">
+            SELECTED WORK
+        </p>
+
+        <h1>
+            Projects &amp;
+            <span>Applications.</span>
+        </h1>
+
+        <p class="projects-intro">
+            Practical IT and networking projects built to solve
+            real-world problems while strengthening my skills in
+            Python, Flask, networking and infrastructure.
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="section projects-section">
+
+    <div class="container">
+
+        <div class="projects-grid">
+
+
+            <!-- =====================================
+                 PROJECT 01 — NETWORK TOOLKIT
+                 ===================================== -->
+
+            <article class="project-card project-featured">
+
+                <div class="project-card-top">
+
+                    <div class="project-number">
+                        01
+                    </div>
+
+                    <span class="project-status">
+                        ACTIVE
+                    </span>
+
+                </div>
+
+
+                <div class="project-icon">
+                    NET
+                </div>
+
+
+                <h2>
+                    Network Toolkit
+                </h2>
+
+
+                <p>
+                    A practical networking utility built with
+                    Python and Flask for IP addressing, subnet
+                    calculations, network planning, DNS lookup
+                    and TCP connectivity troubleshooting.
+                </p>
+
+
+                <div class="tag-row">
+
+                    <span>Python</span>
+                    <span>Flask</span>
+                    <span>Networking</span>
+                    <span>IPv4</span>
+                    <span>IPv6</span>
+                    <span>Socket</span>
+
+                </div>
+
+
+                <div class="project-features">
+
+                    <span>✓ IP / Subnet Calculator</span>
+                    <span>✓ Subnet Planner</span>
+                    <span>✓ IP Range Calculator</span>
+                    <span>✓ DNS Lookup</span>
+                    <span>✓ TCP Port Checker</span>
+
+                </div>
+
+
+                <div class="project-actions">
+
+                    <a
+                        class="btn btn-primary"
+                        href="{{ url_for('network_toolkit') }}"
+                    >
+                        Launch Toolkit →
+                    </a>
+
+                    <a
+                        class="btn btn-secondary"
+                        href="{{ url_for('network_toolkit_project') }}"
+                    >
+                        View Project →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- =====================================
+                 PROJECT 02 — SUBNET PLANNER
+                 ===================================== -->
+
+            <article class="project-card">
+
+                <div class="project-number">
+                    02
+                </div>
+
+
+                <div class="project-icon">
+                    SUB
+                </div>
+
+
+                <h2>
+                    Subnet Planner
+                </h2>
+
+
+                <p>
+                    A subnetting utility designed to divide an
+                    IPv4 network into multiple equal-sized
+                    subnets for network planning and learning.
+                </p>
+
+
+                <div class="tag-row">
+
+                    <span>Python</span>
+                    <span>IPv4</span>
+                    <span>Subnetting</span>
+                    <span>CIDR</span>
+
+                </div>
+
+
+                <div class="project-actions">
+
+                    <a
+                        class="btn btn-primary"
+                        href="{{ url_for('subnet_planner') }}"
+                    >
+                        Launch Planner →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- =====================================
+                 PROJECT 03 — IP RANGE CALCULATOR
+                 ===================================== -->
+
+            <article class="project-card">
+
+                <div class="project-number">
+                    03
+                </div>
+
+
+                <div class="project-icon">
+                    IP
+                </div>
+
+
+                <h2>
+                    IP Range Calculator
+                </h2>
+
+
+                <p>
+                    Calculate the total number of IPv4 or IPv6
+                    addresses between a starting and ending IP
+                    address.
+                </p>
+
+
+                <div class="tag-row">
+
+                    <span>Python</span>
+                    <span>IPv4</span>
+                    <span>IPv6</span>
+                    <span>Networking</span>
+
+                </div>
+
+
+                <div class="project-actions">
+
+                    <a
+                        class="btn btn-primary"
+                        href="{{ url_for('ip_range') }}"
+                    >
+                        Launch Calculator →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- =====================================
+                 PROJECT 04 — DNS LOOKUP
+                 ===================================== -->
+
+            <article class="project-card">
+
+                <div class="project-number">
+                    04
+                </div>
+
+
+                <div class="project-icon">
+                    DNS
+                </div>
+
+
+                <h2>
+                    DNS Lookup
+                </h2>
+
+
+                <p>
+                    Resolve hostnames and retrieve their
+                    associated IP addresses using Python's
+                    socket library.
+                </p>
+
+
+                <div class="tag-row">
+
+                    <span>Python</span>
+                    <span>DNS</span>
+                    <span>Socket</span>
+                    <span>Networking</span>
+
+                </div>
+
+
+                <div class="project-actions">
+
+                    <a
+                        class="btn btn-primary"
+                        href="{{ url_for('dns_lookup') }}"
+                    >
+                        Launch DNS Tool →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- =====================================
+                 PROJECT 05 — TCP PORT CHECKER
+                 ===================================== -->
+
+            <article class="project-card">
+
+                <div class="project-number">
+                    05
+                </div>
+
+
+                <div class="project-icon">
+                    TCP
+                </div>
+
+
+                <h2>
+                    TCP Port Checker
+                </h2>
+
+
+                <p>
+                    Test TCP connectivity to a hostname or
+                    IP address and determine whether a specified
+                    port is reachable.
+                </p>
+
+
+                <div class="tag-row">
+
+                    <span>Python</span>
+                    <span>TCP</span>
+                    <span>Socket</span>
+                    <span>Connectivity</span>
+
+                </div>
+
+
+                <div class="project-actions">
+
+                    <a
+                        class="btn btn-primary"
+                        href="{{ url_for('port_checker') }}"
+                    >
+                        Launch Port Checker →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     PROJECT TECHNOLOGY
+     ===================================== -->
+
+<section class="project-tech-section">
+
+    <div class="container">
+
+        <div class="project-tech-panel">
+
+            <div>
+
+                <p class="section-kicker">
+                    TECHNOLOGY
+                </p>
+
+                <h2>
+                    Built with Python.
+                </h2>
+
+                <p>
+                    These applications demonstrate practical
+                    programming and networking concepts through
+                    browser-based tools.
+                </p>
+
+            </div>
+
+
+            <div class="project-tech-list">
+
+                <span>Python</span>
+                <span>Flask</span>
+                <span>ipaddress</span>
+                <span>socket</span>
+                <span>IPv4</span>
+                <span>IPv6</span>
+                <span>TCP/IP</span>
+                <span>HTML</span>
+                <span>CSS</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

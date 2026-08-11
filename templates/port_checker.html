@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Port Checker | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<div class="container tool-back">
+
+    <a href="{{ url_for('network_toolkit') }}">
+        ← Back to Network Toolkit
+    </a>
+
+</div>
+
+<section class="page-hero">
+    <div class="container">
+
+        <p class="section-kicker">
+            PYTHON PROJECT · NETWORKING
+        </p>
+
+        <h1>Port Checker</h1>
+
+        <p>
+            Test TCP connectivity to a hostname or IP address.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="tool-card">
+
+            <p class="section-kicker">
+                05 · PORT CHECKER
+            </p>
+
+            <h2>Check TCP connectivity</h2>
+
+            <p class="section-copy">
+                Enter a hostname or IP address and a TCP port.
+            </p>
+
+
+            <form method="POST" class="network-form">
+
+                <label for="host">
+                    Hostname / IP Address
+                </label>
+
+                <input
+                    type="text"
+                    id="host"
+                    name="host"
+                    placeholder="example.com or 192.168.1.1"
+                    required
+                >
+
+
+                <label
+                    for="port"
+                    style="margin-top: 20px;"
+                >
+                    TCP Port
+                </label>
+
+                <input
+                    type="number"
+                    id="port"
+                    name="port"
+                    min="1"
+                    max="65535"
+                    placeholder="443"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="margin-top: 25px;"
+                >
+                    Check Port
+                </button>
+
+            </form>
+
+
+            {% if error %}
+
+            <div class="error-box">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            {% if result %}
+
+            <div class="results">
+
+                <div class="result-card">
+                    <span>Host</span>
+                    <strong>{{ result.host }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>Resolved IP</span>
+                    <strong>{{ result.ip }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>TCP Port</span>
+                    <strong>{{ result.port }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>Status</span>
+                    <strong>{{ result.status }}</strong>
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

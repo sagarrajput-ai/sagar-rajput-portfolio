@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}DNS Lookup | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<div class="container tool-back">
+
+    <a href="{{ url_for('network_toolkit') }}">
+        ← Back to Network Toolkit
+    </a>
+
+</div>
+
+<section class="page-hero">
+    <div class="container">
+
+        <p class="section-kicker">
+            PYTHON PROJECT · NETWORKING
+        </p>
+
+        <h1>DNS Lookup</h1>
+
+        <p>
+            Resolve a hostname and view its DNS-resolved IP addresses.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="tool-card">
+
+            <p class="section-kicker">
+                04 · DNS LOOKUP
+            </p>
+
+            <h2>Resolve a hostname</h2>
+
+            <p class="section-copy">
+                Enter a domain or hostname such as google.com,
+                cloudflare.com, or your own domain.
+            </p>
+
+
+            <form method="POST" class="network-form">
+
+                <label for="hostname">
+                    Hostname / Domain
+                </label>
+
+                <input
+                    type="text"
+                    id="hostname"
+                    name="hostname"
+                    placeholder="google.com"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="margin-top: 25px;"
+                >
+                    Lookup DNS
+                </button>
+
+            </form>
+
+
+            {% if error %}
+
+            <div class="error-box">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            {% if result %}
+
+            <div class="dns-result">
+
+                <div class="dns-header">
+                    <span>Hostname</span>
+                    <strong>{{ result.hostname }}</strong>
+                </div>
+
+
+                <div class="dns-section">
+
+                    <span>Canonical Name</span>
+
+                    <strong>
+                        {{ result.canonical }}
+                    </strong>
+
+                </div>
+
+
+                {% if result.aliases %}
+
+                <div class="dns-section">
+
+                    <span>Aliases</span>
+
+                    {% for alias in result.aliases %}
+
+                    <strong>
+                        {{ alias }}
+                    </strong>
+
+                    {% endfor %}
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="dns-section">
+
+                    <span>Resolved IP Addresses</span>
+
+                    <div class="ip-list">
+
+                        {% for address in result.addresses %}
+
+                        <div class="ip-item">
+                            {{ address }}
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

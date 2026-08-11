@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Resume | Sagar Rajput{% endblock %}
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="section-kicker">RESUME</p>
+        <h1>Sagar Rajput</h1>
+        <p>Senior IT Associate · CCNA · Network Security · Change Management · L2</p>
+        <a class="btn btn-primary" href="{{ url_for('static', filename='Sagar_Rajput_Resume.pdf') }}" target="_blank">Open / Download PDF ↓</a>
+    </div>
+</section>
+<section class="section">
+<div class="container resume-layout">
+    <aside class="resume-sidebar">
+        <div class="resume-box"><h3>Contact</h3><p>Noida, Uttar Pradesh, India</p><p>sagarraj5684@gmail.com</p><p>+91 8650011462</p></div>
+        <div class="resume-box"><h3>Certifications</h3><p>CCNA</p><p>Microsoft Azure Administrator (AZ-104T00-A)</p><p>Fortinet Network Security (NSE) Associate</p><p>ACNS – Aptech Certified Network Specialist</p><p>E-Commerce & Web Development Certification</p></div>
+        <div class="resume-box"><h3>Education</h3><p><strong>BSc – Mathematics & Computer Science</strong><br>CSJMU, 2017–2020</p></div>
+    </aside>
+    <div>
+        <p class="section-kicker">PROFESSIONAL SUMMARY</p>
+        <h2>Senior IT Associate with 6+ years of experience</h2>
+        <p>Infrastructure deployment, enterprise networking, network security, Fortinet firewalls, Cisco infrastructure, Zscaler, VPN technologies, data center operations and network access control.</p>
+        <p>Skilled in Power BI, ServiceNow and SAP GUI, with experience in audit compliance, change management and stakeholder engagement.</p>
+
+        <p class="section-kicker resume-kicker">EXPERIENCE</p>
+        <div class="resume-role"><h3>Senior IT Associate · Infosys Limited</h3><span>June 2024 – Present · Noida</span><ul><li>Manage enterprise network infrastructure including switches, routers, firewalls, WLC and APs.</li><li>Support WAN/LAN connectivity, Zscaler ZIA/ZPA, C2S/S2S VPNs and secure connectivity.</li><li>Lead a team of 10 across L1 application support, network troubleshooting, AD, hardware and asset services.</li><li>Manage 3000+ IT assets and coordinate with Cisco, Dell, Aruba, Fortinet and ISP vendors.</li><li>Serve as change-management SPOC and established/led the weekly CAB process.</li></ul></div>
+        <div class="resume-role"><h3>Senior Network Engineer · Jubilant Foodworks Ltd.</h3><span>November 2022 – June 2024 · Noida</span><ul><li>Managed enterprise security and multi-site operations across large Fortinet environments.</li><li>Implemented NAT, ACLs, firewall policies and IPsec/SSL VPN tunnels.</li><li>Delivered new-store network rollouts and coordinated ISP troubleshooting.</li></ul></div>
+        <div class="resume-role"><h3>Network Engineer - NOC · FusionNet India</h3><span>March 2021 – September 2022 · Noida</span><ul><li>Diagnosed routing issues, path failures, packet loss and latency across backbone networks.</li><li>Monitored live network health using PRTG/NMS and coordinated field troubleshooting.</li><li>Handled ILL customer connectivity and maintained SLA commitments.</li></ul></div>
+        <div class="resume-role"><h3>Network Engineer · JAVI Systems India Pvt. Ltd.</h3><span>August 2020 – January 2021</span><ul><li>Supported BSNL Hotspot Project services as part of the HFCL team.</li><li>Resolved BTS-to-switch connectivity issues and supported hotspot rollout.</li></ul></div>
+    </div>
+</div>
+</section>
+{% endblock %}

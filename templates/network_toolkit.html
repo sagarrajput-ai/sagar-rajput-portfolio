@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}Network Toolkit | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<!-- =========================================
+     TOOLKIT HERO
+     ========================================= -->
+
+<section class="toolkit-hero">
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    PYTHON · FLASK · NETWORK ENGINEERING
+                </div>
+
+                <h1>
+                    Network
+                    <span>Toolkit.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    A practical collection of networking utilities
+                    built with Python and Flask for network planning,
+                    troubleshooting and learning.
+                </p>
+
+                <div class="toolkit-actions">
+
+                    <a
+                        href="#tools"
+                        class="btn btn-primary"
+                    >
+                        Explore Tools ↓
+                    </a>
+
+                    <a
+                        href="{{ url_for('projects') }}"
+                        class="btn btn-secondary"
+                    >
+                        View Projects →
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- Network Status Card -->
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+
+                    <div>
+                        <span class="status-label">
+                            TOOLKIT STATUS
+                        </span>
+
+                        <h3>
+                            Operational
+                        </h3>
+                    </div>
+
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="network-line"></div>
+
+
+                <div class="status-metrics">
+
+                    <div>
+                        <strong>05</strong>
+                        <span>Tools</span>
+                    </div>
+
+                    <div>
+                        <strong>Python</strong>
+                        <span>Backend</span>
+                    </div>
+
+                    <div>
+                        <strong>Flask</strong>
+                        <span>Framework</span>
+                    </div>
+
+                </div>
+
+
+                <div class="network-pattern">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     TOOL STATISTICS
+     ========================================= -->
+
+<section class="toolkit-stats">
+
+    <div class="container">
+
+        <div class="stats-grid">
+
+            <div class="toolkit-stat">
+                <strong>05</strong>
+                <span>Networking Tools</span>
+            </div>
+
+            <div class="toolkit-stat">
+                <strong>02</strong>
+                <span>IP Versions</span>
+            </div>
+
+            <div class="toolkit-stat">
+                <strong>100%</strong>
+                <span>Python Powered</span>
+            </div>
+
+            <div class="toolkit-stat">
+                <strong>01</strong>
+                <span>Unified Dashboard</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     TOOLS
+     ========================================= -->
+
+<section
+    class="section toolkit-tools"
+    id="tools"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="section-kicker">
+                    TOOLKIT V2
+                </p>
+
+                <h2>
+                    Network Engineering Utilities
+                </h2>
+
+            </div>
+
+            <p>
+                Select a tool to begin.
+            </p>
+
+        </div>
+
+
+        <div class="toolkit-grid">
+
+
+            <!-- 01 -->
+
+            <article class="toolkit-card">
+
+                <div class="tool-number">
+                    01
+                </div>
+
+                <div class="tool-content">
+
+                    <div class="tool-icon">
+                        IP
+                    </div>
+
+                    <h3>
+                        IP / Subnet Calculator
+                    </h3>
+
+                    <p>
+                        Calculate network address, broadcast address,
+                        subnet mask, host range and usable hosts.
+                    </p>
+
+                    <div class="tool-tags">
+                        <span>IPv4</span>
+                        <span>CIDR</span>
+                        <span>Subnet</span>
+                    </div>
+
+                    <a
+                        href="{{ url_for('ip_calculator') }}"
+                        class="tool-link"
+                    >
+                        Launch Tool →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- 02 -->
+
+            <article class="toolkit-card">
+
+                <div class="tool-number">
+                    02
+                </div>
+
+                <div class="tool-content">
+
+                    <div class="tool-icon">
+                        SN
+                    </div>
+
+                    <h3>
+                        Subnet Planner
+                    </h3>
+
+                    <p>
+                        Divide an IPv4 network into multiple
+                        equal-sized subnets automatically.
+                    </p>
+
+                    <div class="tool-tags">
+                        <span>Subnetting</span>
+                        <span>IPv4</span>
+                    </div>
+
+                    <a
+                        href="{{ url_for('subnet_planner') }}"
+                        class="tool-link"
+                    >
+                        Launch Tool →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- 03 -->
+
+            <article class="toolkit-card">
+
+                <div class="tool-number">
+                    03
+                </div>
+
+                <div class="tool-content">
+
+                    <div class="tool-icon">
+                        IP
+                    </div>
+
+                    <h3>
+                        IP Range Calculator
+                    </h3>
+
+                    <p>
+                        Calculate the total number of IP addresses
+                        between a starting and ending address.
+                    </p>
+
+                    <div class="tool-tags">
+                        <span>IPv4</span>
+                        <span>IPv6</span>
+                        <span>Range</span>
+                    </div>
+
+                    <a
+                        href="{{ url_for('ip_range') }}"
+                        class="tool-link"
+                    >
+                        Launch Tool →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- 04 -->
+
+            <article class="toolkit-card">
+
+                <div class="tool-number">
+                    04
+                </div>
+
+                <div class="tool-content">
+
+                    <div class="tool-icon">
+                        DNS
+                    </div>
+
+                    <h3>
+                        DNS Lookup
+                    </h3>
+
+                    <p>
+                        Resolve hostnames and retrieve associated
+                        IP addresses using Python socket operations.
+                    </p>
+
+                    <div class="tool-tags">
+                        <span>DNS</span>
+                        <span>Socket</span>
+                    </div>
+
+                    <a
+                        href="{{ url_for('dns_lookup') }}"
+                        class="tool-link"
+                    >
+                        Launch Tool →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <!-- 05 -->
+
+            <article class="toolkit-card toolkit-card-featured">
+
+                <div class="tool-number">
+                    05
+                </div>
+
+                <div class="tool-content">
+
+                    <div class="tool-icon">
+                        TCP
+                    </div>
+
+                    <h3>
+                        TCP Port Checker
+                    </h3>
+
+                    <p>
+                        Test TCP connectivity to a hostname or
+                        IP address and determine whether a port
+                        is reachable.
+                    </p>
+
+                    <div class="tool-tags">
+                        <span>TCP</span>
+                        <span>Socket</span>
+                        <span>Connectivity</span>
+                    </div>
+
+                    <a
+                        href="{{ url_for('port_checker') }}"
+                        class="tool-link"
+                    >
+                        Launch Tool →
+                    </a>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     TECHNOLOGY SECTION
+     ========================================= -->
+
+<section class="toolkit-tech">
+
+    <div class="container">
+
+        <div class="tech-panel">
+
+            <div>
+
+                <p class="section-kicker">
+                    BUILT WITH
+                </p>
+
+                <h2>
+                    Python-powered networking.
+                </h2>
+
+                <p>
+                    The toolkit combines Python networking libraries
+                    with Flask to provide practical browser-based
+                    utilities for IT and network engineering workflows.
+                </p>
+
+            </div>
+
+
+            <div class="tech-stack">
+
+                <span>Python</span>
+                <span>Flask</span>
+                <span>IP Addressing</span>
+                <span>Subnetting</span>
+                <span>DNS</span>
+                <span>TCP</span>
+                <span>Socket Programming</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     NOTICE
+     ========================================= -->
+
+<section class="toolkit-notice">
+
+    <div class="container">
+
+        <div class="notice-box">
+
+            <strong>
+                ⚠ Responsible Use
+            </strong>
+
+            <p>
+                These tools are intended for learning,
+                network administration and authorized
+                troubleshooting. Only test systems and
+                networks you are permitted to access.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}IP Range Calculator | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<div class="container tool-back">
+
+    <a href="{{ url_for('network_toolkit') }}">
+        ← Back to Network Toolkit
+    </a>
+
+</div>
+
+<section class="page-hero">
+    <div class="container">
+
+        <p class="section-kicker">
+            PYTHON PROJECT · NETWORKING
+        </p>
+
+        <h1>IP Range Calculator</h1>
+
+        <p>
+            Calculate the number of IP addresses between two addresses.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="tool-card">
+
+            <p class="section-kicker">
+                03 · IP RANGE CALCULATOR
+            </p>
+
+            <h2>Calculate an IP range</h2>
+
+            <p class="section-copy">
+                Enter a starting IP and ending IP to calculate
+                the total number of addresses.
+            </p>
+
+
+            <form method="POST" class="network-form">
+
+                <label for="start_ip">
+                    Start IP Address
+                </label>
+
+                <input
+                    type="text"
+                    id="start_ip"
+                    name="start_ip"
+                    placeholder="192.168.10.10"
+                    required
+                >
+
+
+                <label
+                    for="end_ip"
+                    style="margin-top: 20px;"
+                >
+                    End IP Address
+                </label>
+
+                <input
+                    type="text"
+                    id="end_ip"
+                    name="end_ip"
+                    placeholder="192.168.10.50"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="margin-top: 25px;"
+                >
+                    Calculate Range
+                </button>
+
+            </form>
+
+
+            {% if error %}
+
+            <div class="error-box">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            {% if result %}
+
+            <div class="results">
+
+                <div class="result-card">
+                    <span>Start IP</span>
+                    <strong>{{ result.start }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>End IP</span>
+                    <strong>{{ result.end }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>Total IP Addresses</span>
+                    <strong>{{ result.total }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>IP Version</span>
+                    <strong>{{ result.version }}</strong>
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

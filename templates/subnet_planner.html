@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Subnet Planner | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<div class="container tool-back">
+
+    <a href="{{ url_for('network_toolkit') }}">
+        ← Back to Network Toolkit
+    </a>
+
+</div>
+
+<section class="page-hero">
+    <div class="container">
+
+        <p class="section-kicker">
+            PYTHON PROJECT · NETWORKING
+        </p>
+
+        <h1>Subnet Planner</h1>
+
+        <p>
+            Divide an IPv4 network into multiple subnets.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="tool-card">
+
+            <p class="section-kicker">
+                02 · SUBNET PLANNER
+            </p>
+
+            <h2>Create your subnets</h2>
+
+            <p class="section-copy">
+                Enter an IPv4 network and the number of subnets you need.
+            </p>
+
+
+            <form method="POST" class="network-form">
+
+                <label for="network">
+                    Network / CIDR
+                </label>
+
+                <input
+                    type="text"
+                    id="network"
+                    name="network"
+                    placeholder="192.168.10.0/24"
+                    required
+                >
+
+
+                <label
+                    for="required_subnets"
+                    style="margin-top: 20px;"
+                >
+                    Required Number of Subnets
+                </label>
+
+                <input
+                    type="number"
+                    id="required_subnets"
+                    name="required_subnets"
+                    min="1"
+                    max="1024"
+                    placeholder="4"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="margin-top: 25px;"
+                >
+                    Generate Subnets
+                </button>
+
+            </form>
+
+
+            {% if error %}
+
+            <div class="error-box">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            {% if subnets %}
+
+            <div class="subnet-results">
+
+                <div class="subnet-summary">
+
+                    <div>
+                        <span>Requested Subnets</span>
+                        <strong>{{ subnets|length }}</strong>
+                    </div>
+
+                    <div>
+                        <span>New Prefix</span>
+                        <strong>/{{ subnets[0].prefix }}</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="subnet-table-wrapper">
+
+                    <table class="subnet-table">
+
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Network</th>
+                                <th>Broadcast</th>
+                                <th>Host Range</th>
+                                <th>Mask</th>
+                                <th>Usable Hosts</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for subnet in subnets %}
+
+                            <tr>
+
+                                <td>
+                                    {{ subnet.number }}
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        {{ subnet.network }}/{{ subnet.prefix }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    {{ subnet.broadcast }}
+                                </td>
+
+                                <td>
+                                    {{ subnet.first_host }}
+                                    -
+                                    {{ subnet.last_host }}
+                                </td>
+
+                                <td>
+                                    {{ subnet.netmask }}
+                                </td>
+
+                                <td>
+                                    {{ subnet.usable_hosts }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
