@@ -1255,10 +1255,7 @@ a{color:inherit}
 
 /* Tools */
 
-.toolkit-tools {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+
 }
 
 .toolkit-tool-card {
