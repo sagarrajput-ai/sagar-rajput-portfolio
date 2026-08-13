@@ -9,22 +9,36 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Sagar Rajput",
-  "url": "https://sagarrajput.com/",
-  "image": "https://sagarrajput.com/static/images/sagar-profile.png",
-  "jobTitle": "IT Professional",
-  "sameAs": [
-  "https://github.com/sagarrajput-ai",
-  "https://www.linkedin.com/in/sagarrajput-ai/",
-  "https://www.instagram.com/sagarrajput_ai/",
-  "https://www.youtube.com/@sagarrajput_ai",
-  "https://www.reddit.com/user/sagarrajput_ai/",
-  "https://x.com/sagarrajput_ai",
-  "https://www.facebook.com/sagarrajput_ai/",
-  "https://www.threads.net/@sagarrajput_ai",
-  "https://www.pinterest.com/sagarrajput_ai/"
- ]
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://sagarrajput.com/#person",
+      "name": "Sagar Rajput",
+      "url": "https://sagarrajput.com/",
+      "image": "https://sagarrajput.com/static/images/sagar-profile.png",
+      "jobTitle": "IT Professional",
+      "sameAs": [
+        "https://www.instagram.com/sagarrajput_ai/",
+        "https://www.youtube.com/@sagarrajput_ai",
+        "https://github.com/sagarrajput-ai",
+        "https://www.linkedin.com/in/sagarrajput-ai/",
+        "https://www.reddit.com/user/sagarrajput_ai/",
+        "https://x.com/sagarrajput_ai",
+        "https://www.facebook.com/sagarrajput_ai/",
+        "https://www.threads.net/@sagarrajput_ai",
+        "https://www.pinterest.com/sagarrajput_ai/"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://sagarrajput.com/#website",
+      "name": "Sagar Rajput",
+      "url": "https://sagarrajput.com/",
+      "publisher": {
+        "@id": "https://sagarrajput.com/#person"
+      }
+    }
+  ]
 }
 </script>
 {% endblock %}
