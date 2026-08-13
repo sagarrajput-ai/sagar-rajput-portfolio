@@ -1,28 +1,270 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response, url_for
 import ipaddress
 import socket
 
 app = Flask(__name__)
+app.config["SITE_URL"] = "https://sagarrajput.com"
+
+# Limit incoming request bodies. These tools only need very small form payloads.
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024  # 16 KB
+
+# ---------------------------------------------------------------------------
+# Security / networking helpers
+# ---------------------------------------------------------------------------
+
+MAX_HOSTNAME_LENGTH = 253
+MAX_SUBNETS = 1024
+SOCKET_TIMEOUT = 3
+
+
+def get_safe_host_addresses(host):
+    """
+    Resolve a hostname/IP and return only globally routable addresses.
+
+    The port checker must never be allowed to connect to localhost, private
+    networks, link-local addresses, multicast, unspecified, or other
+    non-public destinations.
+    """
+    host = host.strip()
+
+    if not host:
+        raise ValueError("Please enter a hostname or IP address.")
+
+    if len(host) > MAX_HOSTNAME_LENGTH:
+        raise ValueError("Hostname is too long.")
+
+    try:
+        # If the input is already an IP address, validate it directly.
+        address = ipaddress.ip_address(host)
+        if not address.is_global:
+            raise ValueError(
+                "For security, the port checker only allows public IP addresses."
+            )
+        return [(socket.AF_INET6 if address.version == 6 else socket.AF_INET,
+                 address.compressed)]
+    except ValueError as exc:
+        # A normal hostname is not an IP address. Preserve our security
+        # rejection message if the input was actually a non-public IP.
+        if "port checker only allows" in str(exc):
+            raise
+
+    # Resolve both IPv4 and IPv6 records. SOCK_STREAM is used because this
+    # tool checks TCP connectivity.
+    try:
+        infos = socket.getaddrinfo(
+            host,
+            None,
+            type=socket.SOCK_STREAM
+        )
+    except socket.gaierror:
+        raise ValueError(
+            "Unable to resolve the hostname. Check the hostname or IP address."
+        )
+
+    public_addresses = []
+    seen = set()
+
+    for family, _, _, _, sockaddr in infos:
+        resolved_ip = sockaddr[0]
+
+        try:
+            address = ipaddress.ip_address(resolved_ip)
+        except ValueError:
+            continue
+
+        # Reject non-global destinations. This blocks private, loopback,
+        # link-local, multicast, unspecified and other special ranges.
+        if not address.is_global:
+            continue
+
+        key = (family, address.compressed)
+        if key not in seen:
+            seen.add(key)
+            public_addresses.append(key)
+
+    if not public_addresses:
+        raise ValueError(
+            "The hostname does not resolve to a public IP address."
+        )
+
+    return public_addresses
+
+
+def first_and_last_host(network):
+    """
+    Return the first/last usable host without materializing every host.
+
+    This avoids memory exhaustion for large IPv4/IPv6 networks.
+    """
+    total = network.num_addresses
+
+    if total == 1:
+        address = str(network.network_address)
+        return address, address, 1
+
+    if network.version == 4:
+        if network.prefixlen >= 31:
+            # /31 has two usable point-to-point addresses.
+            # /32 has one address.
+            return (
+                str(network.network_address),
+                str(network.broadcast_address),
+                total,
+            )
+
+        return (
+            str(network.network_address + 1),
+            str(network.broadcast_address - 1),
+            total - 2,
+        )
+
+    # Python's IPv6 hosts() excludes the subnet-router anycast address
+    # (the first address) for normal IPv6 networks.
+    return (
+        str(network.network_address + 1),
+        str(network.broadcast_address),
+        total - 1,
+    )
+
+
+def subnet_details(subnet):
+    first_host, last_host, usable_hosts = first_and_last_host(subnet)
+
+    return {
+        "network": str(subnet.network_address),
+        "broadcast": str(subnet.broadcast_address),
+        "netmask": str(subnet.netmask),
+        "prefix": subnet.prefixlen,
+        "first_host": first_host,
+        "last_host": last_host,
+        "usable_hosts": usable_hosts,
+    }
+
+
+def normalize_hostname(value):
+    """
+    Normalize normal URL-style hostname input without accepting paths,
+    credentials, ports, or arbitrary URL content.
+    """
+    hostname = value.strip()
+
+    if not hostname:
+        raise ValueError("Please enter a hostname.")
+
+    if len(hostname) > MAX_HOSTNAME_LENGTH:
+        raise ValueError("Hostname is too long.")
+
+    # Permit a user to paste a simple http(s) URL, as the original tool did.
+    if hostname.lower().startswith(("http://", "https://")):
+        hostname = hostname.split("://", 1)[1]
+
+    # DNS lookup is intentionally limited to a hostname, not a URL/path.
+    if "/" in hostname or "@" in hostname:
+        raise ValueError(
+            "Enter a hostname such as example.com, not a full URL or path."
+        )
+
+    # Remove a trailing DNS root dot.
+    hostname = hostname.rstrip(".")
+
+    if not hostname:
+        raise ValueError("Please enter a valid hostname.")
+
+    return hostname
+
+
+# ---------------------------------------------------------------------------
+# Security response headers
+# ---------------------------------------------------------------------------
+
+@app.after_request
+def add_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = (
+        "camera=(), microphone=(), geolocation=()"
+    )
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+
+    # The production site is served over HTTPS through Cloudflare/Render.
+    # We intentionally do not use includeSubDomains until all subdomains
+    # have been verified to be HTTPS-only.
+    response.headers["Strict-Transport-Security"] = "max-age=31536000"
+
+    return response
+
+
+# ---------------------------------------------------------------------------
+# Portfolio pages
+# ---------------------------------------------------------------------------
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
+
+@app.route("/robots.txt")
+def robots_txt():
+    content = "\n".join([
+        "User-agent: *",
+        "Allow: /",
+        f"Sitemap: {app.config['SITE_URL']}/sitemap.xml",
+        ""
+    ])
+    return Response(content, mimetype="text/plain")
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    public_endpoints = [
+        "home",
+        "resume",
+        "projects",
+        "network_toolkit_project",
+        "network_toolkit",
+        "ip_calculator",
+        "subnet_planner",
+        "ip_range",
+        "dns_lookup",
+        "port_checker",
+    ]
+
+    urls = []
+    for endpoint in public_endpoints:
+        urls.append(
+            f"    <url><loc>{app.config['SITE_URL']}{url_for(endpoint)}</loc></url>"
+        )
+
+    xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml += "\n".join(urls)
+    xml += "\n</urlset>\n"
+    return Response(xml, mimetype="application/xml")
+
+
 @app.route("/resume")
 def resume():
     return render_template("resume.html")
+
 
 @app.route("/projects")
 def projects():
     return render_template("projects.html")
 
+
 @app.route("/projects/network-toolkit")
 def network_toolkit_project():
     return render_template("network_toolkit_project.html")
 
+
 @app.route("/network-toolkit", methods=["GET", "POST"])
 def network_toolkit():
     return render_template("network_toolkit.html")
+
+
+# ---------------------------------------------------------------------------
+# Network Engineering Toolkit
+# ---------------------------------------------------------------------------
 
 @app.route("/ip-calculator", methods=["GET", "POST"])
 def ip_calculator():
@@ -33,30 +275,36 @@ def ip_calculator():
         ip_input = request.form.get("ip_address", "").strip()
 
         try:
+            if len(ip_input) > 50:
+                raise ValueError("IP address input is too long.")
+
             network = ipaddress.ip_network(ip_input, strict=False)
+            first_host, last_host, usable_hosts = first_and_last_host(network)
 
             result = {
                 "network": str(network.network_address),
                 "broadcast": str(network.broadcast_address),
                 "netmask": str(network.netmask),
                 "hostmask": str(network.hostmask),
-                "first_host": str(next(network.hosts(), "N/A")),
-                "last_host": str(
-                    list(network.hosts())[-1] if network.num_addresses > 2 else "N/A"
-                ),
+                "first_host": first_host,
+                "last_host": last_host,
                 "total_addresses": network.num_addresses,
-                "usable_hosts": max(network.num_addresses - 2, 0),
-                "prefix": network.prefixlen
+                "usable_hosts": usable_hosts,
+                "prefix": network.prefixlen,
             }
 
         except ValueError:
-            error = "Invalid IP address or CIDR format. Example: 192.168.10.0/24"
+            error = (
+                "Invalid IP address or CIDR format. "
+                "Example: 192.168.10.0/24"
+            )
 
     return render_template(
         "ip_calculator.html",
         result=result,
         error=error
     )
+
 
 @app.route("/subnet-planner", methods=["GET", "POST"])
 def subnet_planner():
@@ -68,17 +316,22 @@ def subnet_planner():
         required_subnets = request.form.get("required_subnets", "").strip()
 
         try:
+            if len(network_input) > 50:
+                raise ValueError("Network input is too long.")
+
             network = ipaddress.ip_network(network_input, strict=False)
             count = int(required_subnets)
 
             if count < 1:
                 raise ValueError("Number of subnets must be at least 1.")
 
-            if count > 1024:
-                raise ValueError("Maximum 1024 subnets are allowed.")
+            if count > MAX_SUBNETS:
+                raise ValueError(
+                    f"Maximum {MAX_SUBNETS} subnets are allowed."
+                )
 
-            # Find the smallest subnet prefix that can create
-            # at least the requested number of subnets.
+            # Find the smallest subnet prefix that can create at least the
+            # requested number of subnets.
             new_prefix = network.prefixlen
 
             while (2 ** (new_prefix - network.prefixlen)) < count:
@@ -89,45 +342,33 @@ def subnet_planner():
                     "The requested number of subnets is too large."
                 )
 
-            subnet_list = list(
-                network.subnets(new_prefix=new_prefix)
-            )
+            # islice-like slicing is not needed because the number of
+            # generated subnet objects is capped at 1024.
+            subnet_list = network.subnets(new_prefix=new_prefix)
 
             subnets = []
 
-            for number, subnet in enumerate(
-                subnet_list[:count], start=1
-            ):
-                hosts = list(subnet.hosts())
+            for number in range(1, count + 1):
+                try:
+                    subnet = next(subnet_list)
+                except StopIteration:
+                    raise ValueError(
+                        "The requested number of subnets could not be generated."
+                    )
 
-                if hosts:
-                    first_host = str(hosts[0])
-                    last_host = str(hosts[-1])
-                    usable_hosts = len(hosts)
-                else:
-                    first_host = "N/A"
-                    last_host = "N/A"
-                    usable_hosts = 0
+                details = subnet_details(subnet)
+                details["number"] = number
+                subnets.append(details)
 
-                subnets.append({
-                    "number": number,
-                    "network": str(subnet.network_address),
-                    "broadcast": str(subnet.broadcast_address),
-                    "netmask": str(subnet.netmask),
-                    "prefix": subnet.prefixlen,
-                    "first_host": first_host,
-                    "last_host": last_host,
-                    "usable_hosts": usable_hosts
-                })
-
-        except ValueError as exc:
-            error = str(exc)
+        except (ValueError, TypeError, OverflowError) as exc:
+            error = str(exc) or "Invalid subnet planner input."
 
     return render_template(
         "subnet_planner.html",
         subnets=subnets,
         error=error
     )
+
 
 @app.route("/ip-range", methods=["GET", "POST"])
 def ip_range():
@@ -139,6 +380,9 @@ def ip_range():
         end_ip = request.form.get("end_ip", "").strip()
 
         try:
+            if len(start_ip) > 50 or len(end_ip) > 50:
+                raise ValueError("IP address input is too long.")
+
             start = ipaddress.ip_address(start_ip)
             end = ipaddress.ip_address(end_ip)
 
@@ -158,7 +402,7 @@ def ip_range():
                 "start": str(start),
                 "end": str(end),
                 "total": total_ips,
-                "version": f"IPv{start.version}"
+                "version": f"IPv{start.version}",
             }
 
         except ValueError as exc:
@@ -170,21 +414,17 @@ def ip_range():
         error=error
     )
 
+
 @app.route("/dns-lookup", methods=["GET", "POST"])
 def dns_lookup():
     result = None
     error = None
 
     if request.method == "POST":
-        hostname = request.form.get("hostname", "").strip()
+        hostname_input = request.form.get("hostname", "")
 
         try:
-            if not hostname:
-                raise ValueError("Please enter a hostname.")
-
-            hostname = hostname.replace("https://", "")
-            hostname = hostname.replace("http://", "")
-            hostname = hostname.split("/")[0]
+            hostname = normalize_hostname(hostname_input)
 
             host_info = socket.gethostbyname_ex(hostname)
 
@@ -196,7 +436,7 @@ def dns_lookup():
                 "hostname": hostname,
                 "canonical": canonical_name,
                 "aliases": aliases,
-                "addresses": addresses
+                "addresses": addresses,
             }
 
         except socket.gaierror:
@@ -214,6 +454,7 @@ def dns_lookup():
         error=error
     )
 
+
 @app.route("/port-checker", methods=["GET", "POST"])
 def port_checker():
     result = None
@@ -224,8 +465,8 @@ def port_checker():
         port_input = request.form.get("port", "").strip()
 
         try:
-            if not host:
-                raise ValueError("Please enter a hostname or IP address.")
+            if len(host) > MAX_HOSTNAME_LENGTH:
+                raise ValueError("Hostname or IP address is too long.")
 
             port = int(port_input)
 
@@ -234,33 +475,49 @@ def port_checker():
                     "Port must be between 1 and 65535."
                 )
 
-            # Resolve hostname first.
-            ip_address = socket.gethostbyname(host)
+            addresses = get_safe_host_addresses(host)
 
-            sock = socket.socket(
-                socket.AF_INET,
-                socket.SOCK_STREAM
-            )
+            connection_result = None
+            successful_ip = None
 
-            sock.settimeout(3)
+            # Try each globally routable address until one succeeds.
+            for family, resolved_ip in addresses:
+                sock = socket.socket(family, socket.SOCK_STREAM)
+                sock.settimeout(SOCKET_TIMEOUT)
 
-            connection_result = sock.connect_ex(
-                (ip_address, port)
-            )
+                try:
+                    if family == socket.AF_INET6:
+                        connection_result = sock.connect_ex(
+                            (resolved_ip, port, 0, 0)
+                        )
+                    else:
+                        connection_result = sock.connect_ex(
+                            (resolved_ip, port)
+                        )
 
-            sock.close()
+                    if connection_result == 0:
+                        successful_ip = resolved_ip
+                        break
 
-            if connection_result == 0:
+                finally:
+                    sock.close()
+
+            if successful_ip:
                 status = "OPEN"
+                display_ip = successful_ip
             else:
                 status = "CLOSED / UNREACHABLE"
+                display_ip = addresses[0][1]
 
             result = {
                 "host": host,
-                "ip": ip_address,
+                "ip": display_ip,
                 "port": port,
-                "status": status
+                "status": status,
             }
+
+        except ValueError as exc:
+            error = str(exc)
 
         except socket.gaierror:
             error = (
@@ -268,13 +525,11 @@ def port_checker():
                 "Check the hostname or IP address."
             )
 
-        except ValueError as exc:
-            error = str(exc)
+        except (socket.timeout, TimeoutError):
+            error = "Connection timed out."
 
-        except socket.error:
-            error = (
-                "Unable to connect to the specified host."
-            )
+        except OSError:
+            error = "Unable to connect to the specified host."
 
     return render_template(
         "port_checker.html",
@@ -282,5 +537,7 @@ def port_checker():
         error=error
     )
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Development-only server. Render uses Gunicorn via the Procfile.
+    app.run()

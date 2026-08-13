@@ -3,9 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sagar Rajput — Senior IT Associate, Enterprise Networking, Network Security and Infrastructure.">
-    <title>{% block title %}Sagar Rajput | Senior IT Associate{% endblock %}</title>
+
+    {% block meta_description %}
+    <meta name="description" content="Sagar Rajput — IT professional and network engineer specializing in enterprise networking, network security, infrastructure and practical technology projects.">
+    {% endblock %}
+
+    <meta name="author" content="Sagar Rajput">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0b1526">
+
+    <link rel="canonical" href="{{ config['SITE_URL'] }}{{ request.path }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sagar Rajput">
+    <meta property="og:title" content="{% block og_title %}Sagar Rajput | IT Professional, Network Engineer & Creator{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Sagar Rajput — IT professional, network engineer and builder of practical technology projects.{% endblock %}">
+    <meta property="og:url" content="{{ config['SITE_URL'] }}{{ request.path }}">
+    <meta property="og:image" content="{{ config['SITE_URL'] }}{{ url_for('static', filename='images/sagar-profile.png') }}">
+    <meta property="og:image:alt" content="Sagar Rajput">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Sagar Rajput | IT Professional, Network Engineer & Creator{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Sagar Rajput — IT professional, network engineer and builder of practical technology projects.{% endblock %}">
+    <meta name="twitter:image" content="{{ config['SITE_URL'] }}{{ url_for('static', filename='images/sagar-profile.png') }}">
+
+    <title>{% block title %}Sagar Rajput | IT Professional, Network Engineer & Creator{% endblock %}</title>
+
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block structured_data %}{% endblock %}
 </head>
 <body>
 <header class="site-header">
@@ -39,7 +66,8 @@
         </div>
         <div class="footer-links">
             <a href="mailto:sagarraj5684@gmail.com">Email</a>
-            <a href="https://www.linkedin.com/in/sagarrajput-ai/" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/sagarrajput-ai/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://github.com/sagarrajput-ai" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
     </div>
     <div class="container copyright">© 2026 Sagar Rajput. Built with Python & Flask.</div>
