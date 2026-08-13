@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}Port Scanner | Network Toolkit{% endblock %}
+
+{% block content %}
+
+<section class="scanner-page">
+
+    <div class="scanner-container">
+
+        <div class="scanner-header">
+
+            <div>
+                <div class="scanner-kicker">
+                    NETWORK TOOLKIT / SECURE SCANNER
+                </div>
+
+                <h1>
+                    TCP Port
+                    <span>Scanner</span>
+                </h1>
+
+                <p>
+                    Scan an authorized hostname or IPv4 address
+                    for reachable TCP services.
+                </p>
+            </div>
+
+
+            <div class="scanner-credit">
+
+                <strong>
+                    {{ pin_record["uses_remaining"] }}
+                </strong>
+
+                scans remaining
+
+            </div>
+
+        </div>
+
+
+        <div class="scanner-card">
+
+            <h2>
+                Start a Scan
+            </h2>
+
+            <p class="scanner-help">
+                Enter a hostname or IPv4 address and the TCP
+                port range you want to test.
+            </p>
+
+
+            {% if error %}
+
+                <div class="scanner-message error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                action="{{ url_for('port_scanner.scanner') }}"
+            >
+
+                <div class="scanner-form-grid">
+
+                    <div class="scanner-field">
+
+                        <label for="target">
+                            Target
+                        </label>
+
+                        <input
+                            type="text"
+                            id="target"
+                            name="target"
+                            placeholder="example.com or 192.168.1.10"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="scanner-field">
+
+                        <label for="start_port">
+                            Start Port
+                        </label>
+
+                        <input
+                            type="number"
+                            id="start_port"
+                            name="start_port"
+                            value="1"
+                            min="1"
+                            max="65535"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="scanner-field">
+
+                        <label for="end_port">
+                            End Port
+                        </label>
+
+                        <input
+                            type="number"
+                            id="end_port"
+                            name="end_port"
+                            value="1024"
+                            min="1"
+                            max="65535"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="scanner-warning">
+
+                    <input
+                        type="checkbox"
+                        id="authorization"
+                        name="authorization"
+                        value="yes"
+                        required
+                    >
+
+                    <label for="authorization">
+                        I confirm that I own this target or have
+                        explicit authorization to perform this
+                        security/network test.
+                    </label>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="scanner-btn"
+                >
+                    Start Port Scan →
+                </button>
+
+            </form>
+
+        </div>
+
+
+        {% if result %}
+
+        <div class="scanner-card scanner-results">
+
+            <div class="results-header">
+
+                <div>
+
+                    <div class="scanner-kicker">
+                        SCAN COMPLETE
+                    </div>
+
+                    <h2>
+                        Scan Results
+                    </h2>
+
+                </div>
+
+                <div class="result-count">
+
+                    <strong>
+                        {{ result["open_ports"]|length }}
+                    </strong>
+
+                    Open
+
+                </div>
+
+            </div>
+
+
+            <div class="result-summary">
+
+                <div>
+                    <span>Target</span>
+                    <strong>
+                        {{ result["target"] }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Resolved IP</span>
+                    <strong>
+                        {{ result["ip"] }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Ports Scanned</span>
+                    <strong>
+                        {{ result["total_scanned"] }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Range</span>
+                    <strong>
+                        {{ result["start_port"] }}
+                        –
+                        {{ result["end_port"] }}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            {% if result["open_ports"] %}
+
+                <div class="port-table-wrapper">
+
+                    <table class="port-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Port</th>
+                                <th>Status</th>
+                                <th>Service</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for port in result["open_ports"] %}
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        {{ port["port"] }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span class="status-open">
+                                        OPEN
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ port["service"] }}
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="no-results">
+
+                    <div>
+                        ✓
+                    </div>
+
+                    <h3>
+                        No open TCP ports found
+                    </h3>
+
+                    <p>
+                        No reachable TCP services were detected
+                        in the selected port range.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="remaining-scans">
+
+                This PIN has
+
+                <strong>
+                    {{ result["remaining"] }}
+                </strong>
+
+                scan(s) remaining.
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="scanner-footer-actions">
+
+            <a
+                href="{{ url_for('port_scanner.logout') }}"
+            >
+                Lock Scanner
+            </a>
+
+            <a
+                href="{{ url_for('network_toolkit') }}"
+            >
+                ← Back to Network Toolkit
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

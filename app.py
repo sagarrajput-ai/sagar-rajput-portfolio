@@ -1,9 +1,24 @@
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
 from flask import Flask, render_template, request, Response, url_for
 import ipaddress
 import socket
+import os
+
+from port_scanner import port_scanner_bp
+
+
+
 
 app = Flask(__name__)
+app.register_blueprint(port_scanner_bp)
 app.config["SITE_URL"] = "https://sagarrajput.com"
+
+app.secret_key = os.environ.get(
+    "FLASK_SECRET_KEY",
+    "change-this-secret-key"
+)
 
 # Limit incoming request bodies. These tools only need very small form payloads.
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024  # 16 KB

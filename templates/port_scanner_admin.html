@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Port Scanner Admin | Sagar Rajput{% endblock %}
+
+{% block content %}
+
+<section class="scanner-page">
+
+    <div class="scanner-container">
+
+        <div class="scanner-kicker">
+            ADMINISTRATION
+        </div>
+
+        <h1>
+            Generate
+            <span>Access PIN</span>
+        </h1>
+
+        <p class="scanner-intro">
+            Generate a temporary access PIN for the secure
+            port scanner.
+        </p>
+
+
+        <div class="scanner-card scanner-login-card">
+
+            {% if generated_pin %}
+
+                <div class="scanner-lock">
+                    🔑
+                </div>
+
+                <h2>
+                    PIN Generated
+                </h2>
+
+                <p>
+                    Share this PIN only with the authorized
+                    person who needs to perform the scan.
+                </p>
+
+
+                <div class="generated-pin">
+                    {{ generated_pin }}
+                </div>
+
+
+                <div class="pin-details">
+
+                    <div>
+                        <span>Allowed scans</span>
+                        <strong>5</strong>
+                    </div>
+
+                    <div>
+                        <span>Expires</span>
+                        <strong>
+                            {{ expires_at }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{{ url_for('port_scanner.admin') }}"
+                    class="scanner-btn"
+                >
+                    Generate Another PIN
+                </a>
+
+            {% else %}
+
+                <div class="scanner-lock">
+                    🔐
+                </div>
+
+                <h2>
+                    Administrator Access
+                </h2>
+
+                <p>
+                    Enter your private administrator key to
+                    generate a 5-use scanner PIN.
+                </p>
+
+
+                {% with messages = get_flashed_messages(
+                    with_categories=true
+                ) %}
+
+                    {% if messages %}
+
+                        {% for category, message in messages %}
+
+                            <div class="scanner-message error">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <form method="POST">
+
+                    <label for="admin_key">
+                        Administrator Key
+                    </label>
+
+                    <input
+                        type="password"
+                        id="admin_key"
+                        name="admin_key"
+                        placeholder="Enter administrator key"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="scanner-btn"
+                    >
+                        Generate 5-Use PIN →
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
