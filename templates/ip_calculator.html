@@ -18,6 +18,31 @@ Use Sagar Rajput's IP Calculator to calculate IPv4 network address, broadcast ad
 Free IPv4 IP calculator for network address, broadcast address, subnet mask, host range and usable hosts.
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput IP Calculator",
+  "url": "https://sagarrajput.com/ip-calculator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "IPv4 IP calculator for calculating network address, broadcast address, subnet mask, host range and usable hosts.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="container tool-back">

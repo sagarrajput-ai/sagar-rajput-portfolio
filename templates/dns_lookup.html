@@ -18,6 +18,31 @@ Use Sagar Rajput's DNS Lookup tool to resolve hostnames and view their IPv4 addr
 Resolve hostnames and check IPv4 addresses with Sagar Rajput's practical DNS Lookup tool for network troubleshooting.
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput DNS Lookup Tool",
+  "url": "https://sagarrajput.com/dns-lookup",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "DNS lookup tool for resolving hostnames and checking IPv4 addresses for network troubleshooting and diagnostics.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="container tool-back">

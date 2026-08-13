@@ -18,6 +18,31 @@ Use Sagar Rajput's IP Range Calculator to calculate the number of IPv4 addresses
 Calculate the number of IPv4 addresses between two IP addresses with Sagar Rajput's practical IP Range Calculator.
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput IP Range Calculator",
+  "url": "https://sagarrajput.com/ip-range",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "IP range calculator for determining the number of IP addresses between two IPv4 addresses and calculating address range size.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="container tool-back">

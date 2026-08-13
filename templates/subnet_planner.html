@@ -18,6 +18,31 @@ Use Sagar Rajput's Subnet Planner to divide IPv4 networks into multiple subnets 
 Practical IPv4 subnet planner by Sagar Rajput for dividing networks into multiple subnets and reviewing subnet ranges.
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput Subnet Planner",
+  "url": "https://sagarrajput.com/subnet-planner",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "IPv4 subnet planning tool for dividing networks into multiple subnets and reviewing subnet ranges.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="container tool-back">
