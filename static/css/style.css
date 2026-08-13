@@ -51,6 +51,28 @@ a{color:inherit}
   .nav-links{display:none;position:absolute;top:76px;left:0;right:0;background:var(--dark);padding:20px;flex-direction:column;align-items:flex-start}.nav-links.open{display:flex}.menu-toggle{display:block}
   .hero-grid,.two-col,.contact-grid,.resume-layout{grid-template-columns:1fr;gap:45px}.hero{padding-top:70px}.hero-card{max-width:520px}.skills-grid{grid-template-columns:1fr 1fr}.project-grid{grid-template-columns:1fr}.project-preview,.footer-inner{align-items:flex-start;flex-direction:column}
 }
+.creator-section{
+  background:#eef3f8;
+}
+
+.creator-section .section-copy{
+  max-width:700px;
+}
+
+.creator-section .hero-actions{
+  margin-top:28px;
+  margin-bottom:0;
+}
+
+.creator-section .btn-secondary{
+  color:var(--ink);
+  border-color:var(--line);
+  background:#fff;
+}
+
+.creator-section .btn-secondary:hover{
+  border-color:var(--accent2);
+}
 @media(max-width:520px){
   .container{width:min(100% - 28px,1120px)}.section{padding:72px 0}.hero h1{font-size:43px}.hero-stats{gap:18px}.hero-stats strong{font-size:21px}.hero-stats span{font-size:10px}.skills-grid{grid-template-columns:1fr}.achievement-grid{grid-template-columns:1fr}.hero-actions{flex-direction:column;align-items:stretch}
 }
