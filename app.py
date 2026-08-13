@@ -218,6 +218,7 @@ def robots_txt():
 def sitemap_xml():
     public_endpoints = [
         "home",
+        "about",
         "resume",
         "projects",
         "network_toolkit_project",
@@ -240,6 +241,11 @@ def sitemap_xml():
     xml += "\n".join(urls)
     xml += "\n</urlset>\n"
     return Response(xml, mimetype="application/xml")
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 
 @app.route("/resume")

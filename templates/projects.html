@@ -18,6 +18,30 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
 Explore technology, networking and IT projects built by Sagar Rajput, including the Network Engineering Toolkit and practical network troubleshooting utilities.
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Projects & Applications | Sagar Rajput",
+  "url": "https://sagarrajput.com/projects",
+  "description": "Technology, networking and IT projects built by Sagar Rajput, including practical networking utilities and infrastructure tools.",
+  "author": {
+    "@type": "Person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "hasPart": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 <section class="projects-hero">
