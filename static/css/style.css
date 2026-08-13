@@ -71,8 +71,57 @@ a{color:inherit}
 }
 
 .creator-section .btn-secondary:hover{
-  border-color:var(--accent2);
+  border-color:var(--accent2); 
 }
+
+.creator-links{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:55px;
+}
+
+.creator-link{
+  display:flex;
+  flex-direction:column;
+  padding:28px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  text-decoration:none;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+
+.creator-link:hover{
+  transform:translateY(-4px);
+  border-color:var(--accent2);
+  box-shadow:0 16px 40px rgba(8,17,31,.08);
+}
+
+.creator-link-label{
+  font:500 11px 'DM Mono',monospace;
+  letter-spacing:.14em;
+  color:var(--accent2);
+}
+
+.creator-link strong{
+  margin-top:14px;
+  font-size:17px;
+}
+
+.creator-link small{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+@media(max-width:850px){
+  .creator-links{
+    grid-template-columns:1fr;
+  }
+}
+
 @media(max-width:520px){
   .container{width:min(100% - 28px,1120px)}.section{padding:72px 0}.hero h1{font-size:43px}.hero-stats{gap:18px}.hero-stats strong{font-size:21px}.hero-stats span{font-size:10px}.skills-grid{grid-template-columns:1fr}.achievement-grid{grid-template-columns:1fr}.hero-actions{flex-direction:column;align-items:stretch}
 }
