@@ -3,19 +3,19 @@
 {% block title %}Projects & Applications | Sagar Rajput{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="Explore technology, networking and IT projects built by Sagar Rajput, including the Network Engineering Toolkit, IP calculators, subnet planning tools, DNS lookup and network troubleshooting utilities.">
+<meta name="description" content="Explore projects by Sagar Rajput, including the Network Engineering Toolkit and Infosys Noida SEZ Network Infrastructure project, covering networking, infrastructure, automation and IT operations.">
 {% endblock %}
 
 {% block og_title %}Projects & Applications | Sagar Rajput{% endblock %}
 
 {% block og_description %}
-Explore technology, networking and IT projects built by Sagar Rajput, including the Network Engineering Toolkit and practical network troubleshooting utilities.
+Explore Sagar Rajput's technology and networking projects, including the Network Engineering Toolkit and Infosys Noida SEZ Network Infrastructure project.
 {% endblock %}
 
 {% block twitter_title %}Projects & Applications | Sagar Rajput{% endblock %}
 
 {% block twitter_description %}
-Explore technology, networking and IT projects built by Sagar Rajput, including the Network Engineering Toolkit and practical network troubleshooting utilities.
+Explore networking, infrastructure and IT projects built and delivered by Sagar Rajput.
 {% endblock %}
 
 {% block structured_data %}
@@ -25,24 +25,35 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
   "@type": "CollectionPage",
   "name": "Projects & Applications | Sagar Rajput",
   "url": "https://sagarrajput.com/projects",
-  "description": "Technology, networking and IT projects built by Sagar Rajput, including practical networking utilities and infrastructure tools.",
+  "description": "Technology, networking and infrastructure projects by Sagar Rajput.",
   "author": {
     "@type": "Person",
     "name": "Sagar Rajput",
     "url": "https://sagarrajput.com/"
   },
-  "hasPart": {
-    "@type": "SoftwareApplication",
-    "name": "Sagar Rajput Network Engineering Toolkit",
-    "url": "https://sagarrajput.com/network-toolkit",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "Web"
-  }
+  "hasPart": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Sagar Rajput Network Engineering Toolkit",
+      "url": "https://sagarrajput.com/projects/network-toolkit",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web"
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Infosys Noida SEZ Network Infrastructure",
+      "url": "https://sagarrajput.com/projects/noida-sez-network"
+    }
+  ]
 }
 </script>
 {% endblock %}
 
 {% block content %}
+
+<!-- =========================================
+     PROJECTS HERO
+     ========================================= -->
 
 <section class="projects-hero">
 
@@ -53,20 +64,24 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
         </p>
 
         <h1>
-            Projects &amp;
+            Projects &
             <span>Applications.</span>
         </h1>
 
         <p class="projects-intro">
-            I build practical technology tools around networking,
-            infrastructure and IT operations — turning real-world
-            technical problems into simple, useful applications.
+            A selection of technology, networking and infrastructure
+            projects focused on solving practical problems and
+            delivering reliable real-world solutions.
         </p>
 
     </div>
 
 </section>
 
+
+<!-- =========================================
+     PROJECTS
+     ========================================= -->
 
 <section class="section projects-section">
 
@@ -76,7 +91,7 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
 
 
             <!-- =====================================
-                 PROJECT 01 — NETWORK TOOLKIT
+                 PROJECT 01 — NETWORK ENGINEERING TOOLKIT
                  ===================================== -->
 
             <article class="project-card project-featured">
@@ -100,15 +115,16 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
 
 
                 <h2>
-                    Network Toolkit
+                    Network Engineering Toolkit
                 </h2>
 
 
                 <p>
-                    A practical networking utility built with
-                    Python and Flask for IP addressing, subnet
-                    calculations, network planning, DNS lookup
-                    and TCP connectivity troubleshooting.
+                    A practical collection of networking utilities
+                    built with Python and Flask to simplify everyday
+                    network planning, troubleshooting and learning.
+                    The toolkit brings multiple networking utilities
+                    together into one browser-based application.
                 </p>
 
 
@@ -119,33 +135,16 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
                     <span>Networking</span>
                     <span>IPv4</span>
                     <span>IPv6</span>
-                    <span>Socket</span>
+                    <span>DNS</span>
+                    <span>TCP</span>
 
                 </div>
 
 
-                <div class="project-features">
-
-                    <span>✓ IP / Subnet Calculator</span>
-                    <span>✓ Subnet Planner</span>
-                    <span>✓ IP Range Calculator</span>
-                    <span>✓ DNS Lookup</span>
-                    <span>✓ TCP Port Checker</span>
-
-                </div>
-
-
-                <div class="project-actions">
+                <div class="project-card-actions">
 
                     <a
                         class="btn btn-primary"
-                        href="{{ url_for('network_toolkit') }}"
-                    >
-                        Launch Toolkit →
-                    </a>
-
-                    <a
-                        class="btn btn-secondary"
                         href="{{ url_for('network_toolkit_project') }}"
                     >
                         View Project →
@@ -157,206 +156,64 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
 
 
             <!-- =====================================
-                 PROJECT 02 — SUBNET PLANNER
+                 PROJECT 02 — INFOSYS NOIDA SEZ
                  ===================================== -->
 
-            <article class="project-card">
+            <article class="project-card project-featured">
 
-                <div class="project-number">
-                    02
+                <div class="project-card-top">
+
+                    <div class="project-number">
+                        02
+                    </div>
+
+                    <span class="project-status">
+                        DELIVERED
+                    </span>
+
                 </div>
 
 
                 <div class="project-icon">
-                    SUB
+                    INF
                 </div>
 
 
                 <h2>
-                    Subnet Planner
+                    Infosys Noida SEZ Network Infrastructure
                 </h2>
 
 
                 <p>
-                    A subnetting utility designed to divide an
-                    IPv4 network into multiple equal-sized
-                    subnets for network planning and learning.
+                    Configured and delivered the LAN/WAN network
+                    infrastructure for the Infosys Noida SEZ site,
+                    covering data center network setup, routing and
+                    switching, infrastructure planning, structured
+                    cabling coordination, rack deployment and
+                    end-to-end site readiness.
                 </p>
 
 
                 <div class="tag-row">
 
-                    <span>Python</span>
-                    <span>IPv4</span>
-                    <span>Subnetting</span>
-                    <span>CIDR</span>
+                    <span>Enterprise Networking</span>
+                    <span>LAN/WAN</span>
+                    <span>Routing</span>
+                    <span>Switching</span>
+                    <span>Data Center</span>
+                    <span>Infrastructure</span>
+                    <span>Vendor Coordination</span>
 
                 </div>
 
 
-                <div class="project-actions">
+                <div class="project-card-actions">
 
                     <a
                         class="btn btn-primary"
-                        href="{{ url_for('subnet_planner') }}"
+                        href="{{ url_for('noida_sez_project') }}"
                     >
-                        Launch Planner →
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <!-- =====================================
-                 PROJECT 03 — IP RANGE CALCULATOR
-                 ===================================== -->
-
-            <article class="project-card">
-
-                <div class="project-number">
-                    03
-                </div>
-
-
-                <div class="project-icon">
-                    IP
-                </div>
-
-
-                <h2>
-                    IP Range Calculator
-                </h2>
-
-
-                <p>
-                    Calculate the total number of IPv4 or IPv6
-                    addresses between a starting and ending IP
-                    address.
-                </p>
-
-
-                <div class="tag-row">
-
-                    <span>Python</span>
-                    <span>IPv4</span>
-                    <span>IPv6</span>
-                    <span>Networking</span>
-
-                </div>
-
-
-                <div class="project-actions">
-
-                    <a
-                        class="btn btn-primary"
-                        href="{{ url_for('ip_range') }}"
-                    >
-                        Launch Calculator →
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <!-- =====================================
-                 PROJECT 04 — DNS LOOKUP
-                 ===================================== -->
-
-            <article class="project-card">
-
-                <div class="project-number">
-                    04
-                </div>
-
-
-                <div class="project-icon">
-                    DNS
-                </div>
-
-
-                <h2>
-                    DNS Lookup
-                </h2>
-
-
-                <p>
-                    Resolve hostnames and retrieve their
-                    associated IP addresses using Python's
-                    socket library.
-                </p>
-
-
-                <div class="tag-row">
-
-                    <span>Python</span>
-                    <span>DNS</span>
-                    <span>Socket</span>
-                    <span>Networking</span>
-
-                </div>
-
-
-                <div class="project-actions">
-
-                    <a
-                        class="btn btn-primary"
-                        href="{{ url_for('dns_lookup') }}"
-                    >
-                        Launch DNS Tool →
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <!-- =====================================
-                 PROJECT 05 — TCP PORT CHECKER
-                 ===================================== -->
-
-            <article class="project-card">
-
-                <div class="project-number">
-                    05
-                </div>
-
-
-                <div class="project-icon">
-                    TCP
-                </div>
-
-
-                <h2>
-                    TCP Port Checker
-                </h2>
-
-
-                <p>
-                    Test TCP connectivity to a hostname or
-                    IP address and determine whether a specified
-                    port is reachable.
-                </p>
-
-
-                <div class="tag-row">
-
-                    <span>Python</span>
-                    <span>TCP</span>
-                    <span>Socket</span>
-                    <span>Connectivity</span>
-
-                </div>
-
-
-                <div class="project-actions">
-
-                    <a
-                        class="btn btn-primary"
-                        href="{{ url_for('port_checker') }}"
-                    >
-                        Launch Port Checker →
+                        View Project →
                     </a>
 
                 </div>
@@ -371,48 +228,94 @@ Explore technology, networking and IT projects built by Sagar Rajput, including 
 </section>
 
 
-<!-- =====================================
-     PROJECT TECHNOLOGY
-     ===================================== -->
+<!-- =========================================
+     PROJECT PHILOSOPHY
+     ========================================= -->
 
-<section class="project-tech-section">
+<section class="section section-dark">
 
-    <div class="container">
+    <div class="container two-col">
 
-        <div class="project-tech-panel">
+        <div>
 
-            <div>
+            <p class="section-kicker">
+                HOW I APPROACH PROJECTS
+            </p>
 
-                <p class="section-kicker">
-                    TECHNOLOGY
-                </p>
+            <h2>
+                Practical technology.
+                <span>Real-world outcomes.</span>
+            </h2>
 
-                <h2>
-                    Built with Python.
-                </h2>
-
-                <p>
-                    These applications demonstrate practical
-                    programming and networking concepts through
-                    browser-based tools.
-                </p>
-
-            </div>
+        </div>
 
 
-            <div class="project-tech-list">
+        <div class="section-copy">
 
-                <span>Python</span>
-                <span>Flask</span>
-                <span>ipaddress</span>
-                <span>socket</span>
-                <span>IPv4</span>
-                <span>IPv6</span>
-                <span>TCP/IP</span>
-                <span>HTML</span>
-                <span>CSS</span>
+            <p>
+                My projects are built around practical technical
+                requirements rather than technology for its own sake.
+                Whether developing a networking utility or delivering
+                enterprise infrastructure, the focus is on reliability,
+                usability and operational readiness.
+            </p>
 
-            </div>
+            <p>
+                I combine hands-on networking experience with
+                infrastructure planning, troubleshooting, automation
+                and IT operations to turn technical requirements into
+                working solutions.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     FUTURE PROJECTS
+     ========================================= -->
+
+<section class="section">
+
+    <div class="container project-preview">
+
+        <div>
+
+            <p class="section-kicker">
+                MORE TO COME
+            </p>
+
+            <h2>
+                More projects are in progress.
+            </h2>
+
+            <p class="section-copy">
+                This portfolio will continue to grow as I build and
+                document more networking, infrastructure, automation
+                and IT projects.
+            </p>
+
+        </div>
+
+
+        <div class="hero-actions">
+
+            <a
+                class="btn btn-primary"
+                href="{{ url_for('about') }}"
+            >
+                About Me →
+            </a>
+
+            <a
+                class="btn btn-secondary"
+                href="{{ url_for('resume') }}"
+            >
+                View Resume →
+            </a>
 
         </div>
 

@@ -237,6 +237,7 @@ def sitemap_xml():
         "resume",
         "projects",
         "network_toolkit_project",
+        "noida_sez_project",
         "network_toolkit",
         "ip_calculator",
         "subnet_planner",
@@ -276,6 +277,11 @@ def projects():
 @app.route("/projects/network-toolkit")
 def network_toolkit_project():
     return render_template("network_toolkit_project.html")
+
+
+@app.route("/projects/noida-sez-network")
+def noida_sez_project():
+    return render_template("noida_sez_project.html")
 
 
 @app.route("/network-toolkit", methods=["GET", "POST"])
