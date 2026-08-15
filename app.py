@@ -288,6 +288,11 @@ def noida_sez_project():
 def network_toolkit():
     return render_template("network_toolkit.html")
 
+@app.route('/healthz')
+def healthz():
+    """Uptime monitoring endpoint to prevent Render free-tier spin-downs."""
+    return {"status": "healthy"}, 200
+
 
 # ---------------------------------------------------------------------------
 # Network Engineering Toolkit
