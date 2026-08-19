@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}
+Subnet & Wildcard Mask Calculator | Sagar Rajput
+{% endblock %}
+
+{% block meta_description %} <meta name="description" content="Calculate IPv4 subnet masks, wildcard masks, network addresses, broadcast addresses, usable host ranges and RFC classifications with Sagar Rajput's networking tool.">
+{% endblock %}
+
+{% block og_title %}
+Subnet & Wildcard Mask Calculator | Sagar Rajput
+{% endblock %}
+
+{% block og_description %}
+A practical IPv4 subnet and wildcard mask calculator for network engineering, Cisco configuration and troubleshooting.
+{% endblock %}
+
+{% block twitter_title %}
+Subnet & Wildcard Mask Calculator | Sagar Rajput
+{% endblock %}
+
+{% block twitter_description %}
+Calculate IPv4 subnet masks, wildcard masks, host ranges and RFC classifications.
+{% endblock %}
+
+{% block structured_data %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Subnet & Wildcard Mask Calculator",
+  "url": "https://sagarrajput.com/subnet-wildcard",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "IPv4 subnet and wildcard mask calculator for network engineering and troubleshooting.",
+  "author": {
+    "@type": "Person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  }
+}
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="tool-page">
+
+```
+<div class="container">
+
+    <!-- =========================================
+         HERO
+         ========================================= -->
+
+    <div class="tool-page-header">
+
+        <div>
+
+            <p class="section-kicker">
+                NETWORK ENGINEERING TOOL
+            </p>
+
+            <h1>
+                Subnet & Wildcard
+                <span>Mask Calculator.</span>
+            </h1>
+
+            <p>
+                Calculate IPv4 network details, subnet masks,
+                Cisco wildcard masks, host ranges, broadcast
+                addresses and RFC classifications from a CIDR
+                network.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('network_toolkit') }}"
+            class="btn btn-secondary"
+        >
+            ← Network Toolkit
+        </a>
+
+    </div>
+
+
+    <!-- =========================================
+         CALCULATOR
+         ========================================= -->
+
+    <div class="tool-calculator">
+
+        <div class="calculator-heading">
+
+            <p class="section-kicker">
+                INPUT
+            </p>
+
+            <h2>
+                Enter an IPv4 network
+            </h2>
+
+            <p>
+                Enter an IPv4 address with CIDR notation.
+                The calculation automatically identifies the
+                network boundary.
+            </p>
+
+        </div>
+
+
+        <form method="POST">
+
+            <div class="form-group">
+
+                <label for="cidr">
+                    IPv4 Address / CIDR
+                </label>
+
+                <input
+                    type="text"
+                    id="cidr"
+                    name="cidr"
+                    placeholder="192.168.10.0/24"
+                    value="{{ request.form.get('cidr', '') }}"
+                    autocomplete="off"
+                    required
+                >
+
+                <small>
+                    Example: 10.20.30.0/24
+                </small>
+
+            </div>
+
+
+            {% if error %}
+
+            <div class="tool-error">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Calculate Network →
+            </button>
+
+        </form>
+
+    </div>
+
+
+    {% if result %}
+
+    <!-- =========================================
+         RESULTS
+         ========================================= -->
+
+    <section class="subnet-results-section">
+
+    <div class="subnet-results-kicker">
+        CALCULATION RESULT
+    </div>
+
+    <div class="subnet-results-heading">
+
+        <h2>
+            IPv4 Network Details
+        </h2>
+
+        {% if result %}
+        <span class="subnet-cidr-badge">
+            {{ result.cidr }}
+        </span>
+        {% endif %}
+
+    </div>
+
+
+    {% if result %}
+
+    <!-- Main results -->
+
+    <div class="subnet-result-grid">
+
+        <div class="subnet-result-card">
+            <span class="subnet-result-label">
+                Network Address
+            </span>
+
+            <div class="subnet-result-value highlight">
+                {{ result.network }}
+            </div>
+        </div>
+
+
+        <div class="subnet-result-card">
+            <span class="subnet-result-label">
+                Broadcast Address
+            </span>
+
+            <div class="subnet-result-value highlight">
+                {{ result.broadcast }}
+            </div>
+        </div>
+
+
+        <div class="subnet-result-card">
+            <span class="subnet-result-label">
+                Subnet Mask
+            </span>
+
+            <div class="subnet-result-value">
+                {{ result.netmask }}
+            </div>
+        </div>
+
+
+        <div class="subnet-result-card">
+            <span class="subnet-result-label">
+                Wildcard Mask (Cisco)
+            </span>
+
+            <div class="subnet-result-value highlight">
+                {{ result.wildcard }}
+            </div>
+        </div>
+
+
+        <div class="subnet-result-card full-width">
+            <span class="subnet-result-label">
+                Usable Host Range
+            </span>
+
+            <div class="subnet-result-value highlight">
+                {{ result.first_host }} - {{ result.last_host }}
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Small metrics -->
+
+    <div class="subnet-metrics-grid">
+
+        <div class="subnet-metric-card">
+            <span class="subnet-result-label">
+                Usable Hosts
+            </span>
+
+            <div class="subnet-result-value highlight">
+                {{ result.usable_hosts }}
+            </div>
+        </div>
+
+
+        <div class="subnet-metric-card">
+            <span class="subnet-result-label">
+                Total Addresses
+            </span>
+
+            <div class="subnet-result-value highlight">
+                {{ result.total_addresses }}
+            </div>
+        </div>
+
+
+        <div class="subnet-metric-card">
+            <span class="subnet-result-label">
+                Prefix Length
+            </span>
+
+            <div class="subnet-result-value highlight">
+                /{{ result.prefix }}
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- RFC Classification -->
+
+    <div class="subnet-rfc-card">
+
+        <div class="subnet-rfc-icon">
+            ✓
+        </div>
+
+        <div>
+
+            <div class="subnet-rfc-label">
+                Address Classification
+            </div>
+
+            <div class="subnet-rfc-title">
+                {{ result.classification }}
+            </div>
+
+            <div class="subnet-rfc-details">
+
+                <span>
+                    {{ result.rfc }}
+                </span>
+
+                <span>•</span>
+
+                <span>
+                    {{ result.classification_range }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+</section>
+
+    {% endif %}
+
+    {% endif %}
+
+
+    <!-- =========================================
+         INFORMATION
+         ========================================= -->
+
+    <div class="tool-info">
+
+        <div class="tool-info-main">
+
+            <p class="section-kicker">
+                NETWORK ENGINEERING
+            </p>
+
+            <h2>
+                Subnet mask vs. wildcard mask
+            </h2>
+
+            <p>
+                A subnet mask identifies which portion of an IPv4
+                address represents the network and which portion
+                represents hosts.
+            </p>
+
+            <p>
+                A wildcard mask is the inverse of the subnet mask.
+                It is commonly used in Cisco IOS configurations,
+                access-control lists and OSPF network statements.
+            </p>
+
+        </div>
+
+
+        <div class="tool-info-list">
+
+            <div>
+
+                <strong>
+                    Subnet Mask
+                </strong>
+
+                <span>
+                    Identifies the network and host portions
+                    of an IPv4 address.
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+                    Wildcard Mask
+                </strong>
+
+                <span>
+                    Inverse of the subnet mask, commonly used
+                    in Cisco networking configurations.
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+                    RFC Classification
+                </strong>
+
+                <span>
+                    Identifies common IPv4 address ranges and
+                    their associated RFC references.
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         RESPONSIBLE USE
+         ========================================= -->
+
+    <div class="toolkit-notice">
+
+        <div class="notice-box">
+
+            <strong>
+                ⚠ Responsible Use
+            </strong>
+
+            <p>
+                This tool is intended for network engineering,
+                education, network administration and authorized
+                troubleshooting.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</section>
+
+{% endblock %}

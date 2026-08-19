@@ -188,6 +188,529 @@ def normalize_hostname(value):
     return hostname
 
 
+def generate_acl_config(
+    vendor,
+    rules,
+):
+    """
+    Generate vendor-specific ACL / firewall configuration
+    from multiple logical rules.
+
+    Each rule supports:
+        - multiple sources
+        - multiple destinations
+        - multiple ports
+        - port ranges
+        - TCP / UDP / ICMP / IP
+        - permit / deny
+    """
+
+    if not rules:
+        raise ValueError("At least one rule is required.")
+
+    generated_rules = []
+
+    for rule in rules:
+
+        action = rule.get("action", "permit").strip().lower()
+        protocol = rule.get("protocol", "ip").strip().lower()
+
+        sources = rule.get("sources", [])
+        destinations = rule.get("destinations", [])
+        ports = rule.get("ports", [])
+
+        description = rule.get(
+            "description",
+            "Generated network access rule"
+        ).strip()
+
+        if action not in {"permit", "deny"}:
+            raise ValueError("Invalid action.")
+
+        if protocol not in {"ip", "tcp", "udp", "icmp"}:
+            raise ValueError("Unsupported protocol.")
+
+        if not sources:
+            sources = ["any"]
+
+        if not destinations:
+            destinations = ["any"]
+
+        if protocol not in {"tcp", "udp"}:
+            ports = ["any"]
+
+        elif not ports:
+            ports = ["any"]
+
+        for source in sources:
+            for destination in destinations:
+                for port in ports:
+
+                    generated_rules.append({
+                        "action": action,
+                        "protocol": protocol,
+                        "source": source,
+                        "destination": destination,
+                        "port": port,
+                        "description": description,
+                    })
+
+    # =========================================================
+    # Cisco IOS / IOS-XE
+    # =========================================================
+
+    if vendor == "cisco_ios":
+
+        def cidr_to_wildcard(value):
+
+            if value.lower() == "any":
+                return "any"
+
+            try:
+                network = ipaddress.ip_network(
+                    value,
+                    strict=False
+                )
+
+                if network.version != 4:
+                    return value
+
+                return (
+                    f"{network.network_address} "
+                    f"{network.hostmask}"
+                )
+
+            except ValueError:
+                return value
+
+        lines = [
+            "ip access-list extended GENERATED-ACL"
+        ]
+
+        for number, rule in enumerate(generated_rules, start=10):
+
+            src = cidr_to_wildcard(rule["source"])
+            dst = cidr_to_wildcard(rule["destination"])
+
+            action = (
+                "permit"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            protocol = rule["protocol"]
+            port = rule["port"]
+
+            if protocol in {"tcp", "udp"}:
+
+                if port.lower() == "any":
+                    port_part = ""
+
+                elif "-" in port:
+                    start, end = port.split("-", 1)
+                    port_part = f" range {start} {end}"
+
+                else:
+                    port_part = f" eq {port}"
+
+                command = (
+                    f" {action} {protocol} "
+                    f"{src} {dst}{port_part}"
+                )
+
+            elif protocol == "icmp":
+
+                command = (
+                    f" {action} icmp "
+                    f"{src} {dst}"
+                )
+
+            else:
+
+                command = (
+                    f" {action} ip "
+                    f"{src} {dst}"
+                )
+
+            lines.append(command)
+
+        return {
+            "vendor": "Cisco IOS / IOS-XE",
+            "config": "\n".join(lines),
+            "rule_count": len(generated_rules),
+        }
+
+    # =========================================================
+    # Cisco ASA
+    # =========================================================
+
+    if vendor == "cisco_asa":
+
+        def asa_network(value):
+
+            if value.lower() == "any":
+                return "any"
+
+            try:
+                network = ipaddress.ip_network(
+                    value,
+                    strict=False
+                )
+
+                if network.version != 4:
+                    return value
+
+                if network.prefixlen == 32:
+                    return (
+                        f"host "
+                        f"{network.network_address}"
+                    )
+
+                return (
+                    f"{network.network_address} "
+                    f"{network.hostmask}"
+                )
+
+            except ValueError:
+                return value
+
+        lines = []
+
+        for rule in generated_rules:
+
+            src = asa_network(rule["source"])
+            dst = asa_network(rule["destination"])
+
+            action = (
+                "permit"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            protocol = rule["protocol"]
+            port = rule["port"]
+
+            if protocol in {"tcp", "udp"}:
+
+                port_part = ""
+
+                if port.lower() != "any":
+
+                    if "-" in port:
+
+                        start, end = port.split("-", 1)
+
+                        port_part = (
+                            f" range {start} {end}"
+                        )
+
+                    else:
+
+                        port_part = f" eq {port}"
+
+                lines.append(
+                    f"access-list GENERATED-ACL extended "
+                    f"{action} {protocol} "
+                    f"{src} {dst}{port_part}"
+                )
+
+            elif protocol == "icmp":
+
+                lines.append(
+                    f"access-list GENERATED-ACL extended "
+                    f"{action} icmp "
+                    f"{src} {dst}"
+                )
+
+            else:
+
+                lines.append(
+                    f"access-list GENERATED-ACL extended "
+                    f"{action} ip "
+                    f"{src} {dst}"
+                )
+
+        return {
+            "vendor": "Cisco ASA",
+            "config": "\n".join(lines),
+            "rule_count": len(generated_rules),
+        }
+
+    # =========================================================
+    # Aruba CX
+    # =========================================================
+
+    if vendor == "aruba_cx":
+
+        lines = [
+            "access-list ip GENERATED-ACL"
+        ]
+
+        for rule in generated_rules:
+
+            action = (
+                "permit"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            command = (
+                f"    {action} "
+                f"{rule['protocol']} "
+                f"{rule['source']} "
+                f"{rule['destination']}"
+            )
+
+            if (
+                rule["protocol"] in {"tcp", "udp"}
+                and rule["port"].lower() != "any"
+            ):
+
+                if "-" in rule["port"]:
+
+                    start, end = rule["port"].split("-", 1)
+
+                    command += (
+                        f" range {start} {end}"
+                    )
+
+                else:
+
+                    command += (
+                        f" eq {rule['port']}"
+                    )
+
+            lines.append(command)
+
+        return {
+            "vendor": "Aruba CX",
+            "config": "\n".join(lines),
+            "rule_count": len(generated_rules),
+        }
+
+    # =========================================================
+    # ArubaOS-Switch
+    # =========================================================
+
+    if vendor == "aruba_os":
+
+        lines = [
+            "ip access-list extended GENERATED-ACL"
+        ]
+
+        for rule in generated_rules:
+
+            action = (
+                "permit"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            command = (
+                f"    {action} "
+                f"{rule['protocol']} "
+                f"{rule['source']} "
+                f"{rule['destination']}"
+            )
+
+            if (
+                rule["protocol"] in {"tcp", "udp"}
+                and rule["port"].lower() != "any"
+            ):
+
+                if "-" in rule["port"]:
+
+                    start, end = rule["port"].split("-", 1)
+
+                    command += (
+                        f" range {start} {end}"
+                    )
+
+                else:
+
+                    command += (
+                        f" eq {rule['port']}"
+                    )
+
+            lines.append(command)
+
+        return {
+            "vendor": "ArubaOS-Switch",
+            "config": "\n".join(lines),
+            "rule_count": len(generated_rules),
+        }
+
+    # =========================================================
+    # Pica8 / PicOS
+    # =========================================================
+
+    if vendor == "pica8":
+
+        lines = [
+            "ip access-list extended GENERATED-ACL"
+        ]
+
+        for rule in generated_rules:
+
+            action = (
+                "permit"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            command = (
+                f" {action} "
+                f"{rule['protocol']} "
+                f"{rule['source']} "
+                f"{rule['destination']}"
+            )
+
+            if (
+                rule["protocol"] in {"tcp", "udp"}
+                and rule["port"].lower() != "any"
+            ):
+
+                if "-" in rule["port"]:
+
+                    start, end = rule["port"].split("-", 1)
+
+                    command += (
+                        f" range {start} {end}"
+                    )
+
+                else:
+
+                    command += (
+                        f" eq {rule['port']}"
+                    )
+
+            lines.append(command)
+
+        return {
+            "vendor": "Pica8 / PicOS",
+            "config": "\n".join(lines),
+            "rule_count": len(generated_rules),
+        }
+
+    # =========================================================
+    # FortiGate
+    # =========================================================
+
+    if vendor == "fortigate":
+
+        lines = [
+            "config firewall policy"
+        ]
+
+        for number, rule in enumerate(
+            generated_rules,
+            start=1
+        ):
+
+            action = (
+                "accept"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            protocol = rule["protocol"]
+            port = rule["port"]
+
+            if protocol == "tcp":
+
+                if port == "443":
+                    service = "HTTPS"
+
+                elif port == "22":
+                    service = "SSH"
+
+                elif port == "80":
+                    service = "HTTP"
+
+                else:
+                    service = "TCP"
+
+            elif protocol == "udp":
+
+                if port == "53":
+                    service = "DNS"
+
+                else:
+                    service = "UDP"
+
+            elif protocol == "icmp":
+
+                service = "PING"
+
+            else:
+
+                service = "ALL"
+
+            lines.extend([
+                f"    edit {number}",
+                f'        set name "{rule["description"]}"',
+                f'        set srcaddr "{rule["source"]}"',
+                f'        set dstaddr "{rule["destination"]}"',
+                f"        set action {action}",
+                f'        set service "{service}"',
+                '        set schedule "always"',
+                "    next",
+            ])
+
+        lines.append("end")
+
+        return {
+            "vendor": "FortiGate",
+            "config": "\n".join(lines),
+            "rule_count": len(generated_rules),
+        }
+
+    # =========================================================
+    # Palo Alto PAN-OS
+    # =========================================================
+
+    if vendor == "paloalto":
+
+        lines = []
+
+        for number, rule in enumerate(
+            generated_rules,
+            start=1
+        ):
+
+            action = (
+                "allow"
+                if rule["action"] == "permit"
+                else "deny"
+            )
+
+            service = (
+                f"{rule['protocol'].upper()}-"
+                f"{rule['port']}"
+                if rule["port"] != "any"
+                else "ANY"
+            )
+
+            lines.extend([
+                f"Rule {number}: "
+                f"{rule['description']}",
+                f"  Source: {rule['source']}",
+                f"  Destination: {rule['destination']}",
+                f"  Protocol: {rule['protocol'].upper()}",
+                f"  Service: {service}",
+                f"  Action: {action}",
+                "",
+            ])
+
+        return {
+            "vendor": "Palo Alto PAN-OS",
+            "config": "\n".join(lines).rstrip(),
+            "rule_count": len(generated_rules),
+        }
+
+    raise ValueError("Unsupported vendor.")
+
+
 # ---------------------------------------------------------------------------
 # Security response headers
 # ---------------------------------------------------------------------------
@@ -336,7 +859,6 @@ def ip_calculator():
         result=result,
         error=error
     )
-
 
 @app.route("/subnet-planner", methods=["GET", "POST"])
 def subnet_planner():
@@ -567,6 +1089,428 @@ def port_checker():
         "port_checker.html",
         result=result,
         error=error
+    )
+
+
+@app.route("/subnet-wildcard", methods=["GET", "POST"])
+def subnet_wildcard():
+    result = None
+    error = None
+
+    # IPv4 special-purpose / reserved address classifications.
+    # Ordered from more specific ranges to broader ranges where needed.
+    ipv4_classifications = [
+        ("0.0.0.0/8", "This Network / Special Purpose", "RFC 6890"),
+        ("10.0.0.0/8", "Private IPv4", "RFC 1918"),
+        ("100.64.0.0/10", "Shared Address Space / CGNAT", "RFC 6598"),
+        ("127.0.0.0/8", "Loopback", "RFC 1122"),
+        ("169.254.0.0/16", "Link-Local", "RFC 3927"),
+        ("172.16.0.0/12", "Private IPv4", "RFC 1918"),
+        ("192.0.0.0/24", "IETF Protocol Assignments / Special Purpose", "RFC 6890"),
+        ("192.0.2.0/24", "Documentation", "RFC 5737"),
+        ("192.168.0.0/16", "Private IPv4", "RFC 1918"),
+        ("198.18.0.0/15", "Benchmarking", "RFC 2544"),
+        ("198.51.100.0/24", "Documentation", "RFC 5737"),
+        ("203.0.113.0/24", "Documentation", "RFC 5737"),
+        ("224.0.0.0/4", "Multicast", "RFC 1112"),
+        ("240.0.0.0/4", "Reserved", "RFC 6890"),
+    ]
+
+    if request.method == "POST":
+        cidr = request.form.get("cidr", "").strip()
+
+        try:
+            if len(cidr) > 50:
+                raise ValueError("CIDR input is too long.")
+
+            network = ipaddress.ip_network(cidr, strict=False)
+
+            if network.version != 4:
+                raise ValueError(
+                    "Only IPv4 networks are supported."
+                )
+
+            first_host, last_host, usable_hosts = first_and_last_host(network)
+
+            network_ip = network.network_address
+
+            # Default classification for ordinary public IPv4 space.
+            classification = "Global Unicast / Public IPv4"
+            rfc = "RFC 6890"
+            classification_range = "Global Unicast"
+
+            # Match the network address against the classification table.
+            for cidr_range, name, rfc_reference in ipv4_classifications:
+                special_network = ipaddress.ip_network(
+                    cidr_range
+                )
+
+                if network_ip in special_network:
+                    classification = name
+                    rfc = rfc_reference
+                    classification_range = cidr_range
+                    break
+
+            # Limited broadcast is a single address rather than a network.
+            if network_ip == ipaddress.ip_address("255.255.255.255"):
+                classification = "Limited Broadcast"
+                rfc = "RFC 1122"
+                classification_range = "255.255.255.255/32"
+
+            result = {
+                "network": str(network.network_address),
+                "cidr": str(network),
+                "prefix": network.prefixlen,
+                "netmask": str(network.netmask),
+                "wildcard": str(network.hostmask),
+                "broadcast": str(network.broadcast_address),
+                "first_host": first_host,
+                "last_host": last_host,
+                "total_addresses": network.num_addresses,
+                "usable_hosts": usable_hosts,
+
+                # Classification information
+                "classification": classification,
+                "rfc": rfc,
+                "classification_range": classification_range,
+            }
+
+        except (ValueError, TypeError, OverflowError) as exc:
+            error = str(exc) or (
+                "Invalid IPv4 address or CIDR format. "
+                "Example: 192.168.10.0/24"
+            )
+
+    return render_template(
+        "subnet_wildcard.html",
+        result=result,
+        error=error
+    )
+
+
+
+
+@app.route("/acl-generator", methods=["GET", "POST"])
+def acl_generator():
+    result = None
+    error = None
+
+    if request.method == "POST":
+
+        vendor = request.form.get("vendor", "").strip()
+
+        try:
+            allowed_vendors = {
+                "cisco_ios",
+                "cisco_asa",
+                "aruba_cx",
+                "aruba_os",
+                "pica8",
+                "fortigate",
+                "paloalto",
+            }
+
+            if vendor not in allowed_vendors:
+                raise ValueError(
+                    "Please select a supported platform."
+                )
+
+            # -------------------------------------------------
+            # Read number of rules
+            # -------------------------------------------------
+
+            rule_count = int(
+                request.form.get("rule_count", "1")
+            )
+
+            if rule_count < 1:
+                raise ValueError(
+                    "At least one rule is required."
+                )
+
+            if rule_count > 20:
+                raise ValueError(
+                    "Maximum 20 rules are allowed."
+                )
+
+            rules = []
+
+            # -------------------------------------------------
+            # Read each logical rule
+            # -------------------------------------------------
+
+            for index in range(rule_count):
+
+                sources_raw = request.form.get(
+                    f"sources_{index}",
+                    ""
+                ).strip()
+
+                destinations_raw = request.form.get(
+                    f"destinations_{index}",
+                    ""
+                ).strip()
+
+                ports_raw = request.form.get(
+                    f"ports_{index}",
+                    ""
+                ).strip()
+
+                protocol = request.form.get(
+                    f"protocol_{index}",
+                    "ip"
+                ).strip().lower()
+
+                action = request.form.get(
+                    f"action_{index}",
+                    "permit"
+                ).strip().lower()
+
+                description = request.form.get(
+                    f"description_{index}",
+                    f"Generated Rule {index + 1}"
+                ).strip()
+
+                if protocol not in {
+                    "ip",
+                    "tcp",
+                    "udp",
+                    "icmp",
+                }:
+                    raise ValueError(
+                        f"Rule {index + 1}: "
+                        "Invalid protocol."
+                    )
+
+                if action not in {
+                    "permit",
+                    "deny",
+                }:
+                    raise ValueError(
+                        f"Rule {index + 1}: "
+                        "Invalid action."
+                    )
+
+                # -------------------------------------------------
+                # Convert textarea lines into lists
+                # -------------------------------------------------
+
+                sources = [
+                    item.strip()
+                    for item in sources_raw.splitlines()
+                    if item.strip()
+                ]
+
+                destinations = [
+                    item.strip()
+                    for item in destinations_raw.splitlines()
+                    if item.strip()
+                ]
+
+                ports = [
+                    item.strip()
+                    for item in ports_raw.splitlines()
+                    if item.strip()
+                ]
+
+                # -------------------------------------------------
+                # Default to ANY
+                # -------------------------------------------------
+
+                if not sources:
+                    sources = ["any"]
+
+                if not destinations:
+                    destinations = ["any"]
+
+                if protocol not in {"tcp", "udp"}:
+                    ports = ["any"]
+
+                elif not ports:
+                    ports = ["any"]
+
+                # -------------------------------------------------
+                # Validate IP networks
+                # -------------------------------------------------
+
+                for source in sources:
+
+                    if source.lower() == "any":
+                        continue
+
+                    try:
+                        network = ipaddress.ip_network(
+                            source,
+                            strict=False
+                        )
+
+                        if network.version != 4:
+                            raise ValueError
+
+                    except ValueError:
+
+                        raise ValueError(
+                            f"Rule {index + 1}: "
+                            f"Invalid source network: {source}"
+                        )
+
+                for destination in destinations:
+
+                    if destination.lower() == "any":
+                        continue
+
+                    try:
+                        network = ipaddress.ip_network(
+                            destination,
+                            strict=False
+                        )
+
+                        if network.version != 4:
+                            raise ValueError
+
+                    except ValueError:
+
+                        raise ValueError(
+                            f"Rule {index + 1}: "
+                            f"Invalid destination network: "
+                            f"{destination}"
+                        )
+
+                # -------------------------------------------------
+                # Validate ports
+                # -------------------------------------------------
+
+                if protocol in {"tcp", "udp"}:
+
+                    for port in ports:
+
+                        if port.lower() == "any":
+                            continue
+
+                        if "-" in port:
+
+                            parts = port.split("-", 1)
+
+                            if len(parts) != 2:
+                                raise ValueError
+
+                            try:
+                                start = int(parts[0])
+                                end = int(parts[1])
+
+                            except ValueError:
+
+                                raise ValueError(
+                                    f"Rule {index + 1}: "
+                                    f"Invalid port range: {port}"
+                                )
+
+                            if (
+                                start < 1
+                                or end > 65535
+                                or start > end
+                            ):
+                                raise ValueError(
+                                    f"Rule {index + 1}: "
+                                    f"Invalid port range: {port}"
+                                )
+
+                        else:
+
+                            try:
+                                port_number = int(port)
+
+                            except ValueError:
+
+                                raise ValueError(
+                                    f"Rule {index + 1}: "
+                                    f"Invalid port: {port}"
+                                )
+
+                            if not (
+                                1 <= port_number <= 65535
+                            ):
+                                raise ValueError(
+                                    f"Rule {index + 1}: "
+                                    f"Port must be between "
+                                    f"1 and 65535."
+                                )
+
+                # -------------------------------------------------
+                # Protect against excessive combinations
+                # -------------------------------------------------
+
+                combinations = (
+                    len(sources)
+                    * len(destinations)
+                    * len(ports)
+                )
+
+                if combinations > 500:
+
+                    raise ValueError(
+                        f"Rule {index + 1} would generate "
+                        f"{combinations} ACL entries. "
+                        "Maximum is 500 per rule."
+                    )
+
+                rules.append({
+                    "sources": sources,
+                    "destinations": destinations,
+                    "ports": ports,
+                    "protocol": protocol,
+                    "action": action,
+                    "description": (
+                        description
+                        or f"Generated Rule {index + 1}"
+                    ),
+                })
+
+            # -------------------------------------------------
+            # Generate vendor configuration
+            # -------------------------------------------------
+
+            result = generate_acl_config(
+                vendor=vendor,
+                rules=rules,
+            )
+
+            # -------------------------------------------------
+            # Additional summary information
+            # -------------------------------------------------
+
+            result["logical_rules"] = len(rules)
+
+            result["source_count"] = sum(
+                len(rule["sources"])
+                for rule in rules
+            )
+
+            result["destination_count"] = sum(
+                len(rule["destinations"])
+                for rule in rules
+            )
+
+            result["port_count"] = sum(
+                len(rule["ports"])
+                for rule in rules
+            )
+
+        except (
+            ValueError,
+            TypeError,
+            OverflowError,
+        ) as exc:
+
+            error = (
+                str(exc)
+                or "Unable to generate ACL configuration."
+            )
+
+    return render_template(
+        "acl_generator.html",
+        result=result,
+        error=error,
     )
 
 

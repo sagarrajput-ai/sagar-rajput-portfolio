@@ -1,0 +1,1047 @@
+{% extends "base.html" %}
+
+{% block title %}
+Multi-Vendor ACL & Firewall Rule Generator | Sagar Rajput
+{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Generate multi-rule ACL and firewall configurations for Cisco IOS-XE, Cisco ASA, Aruba, Pica8, FortiGate and Palo Alto.">
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero">
+
+    <div class="container">
+
+        <p class="section-kicker">
+            NETWORK ENGINEERING TOOL
+        </p>
+
+        <h1>
+            Multi-Vendor ACL
+            <span>& Firewall Generator.</span>
+        </h1>
+
+        <p class="toolkit-lead">
+            Build multiple network access rules with multiple
+            source networks, destinations and ports, then generate
+            vendor-specific configurations.
+        </p>
+
+        <div class="toolkit-actions">
+
+            <a
+                href="{{ url_for('network_toolkit') }}"
+                class="btn btn-secondary"
+            >
+                ← Network Toolkit
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        {% if error %}
+
+        <div class="notice-box" style="margin-bottom: 30px;">
+
+            <strong>
+                Configuration Error
+            </strong>
+
+            <p>
+                {{ error }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="tool-panel">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="section-kicker">
+                        ACL BUILDER
+                    </p>
+
+                    <h2>
+                        Define Network Rules
+                    </h2>
+
+                </div>
+
+                <p>
+                    Build up to 20 logical rules.
+                </p>
+
+            </div>
+
+
+            <form
+                method="POST"
+                id="acl-form"
+            >
+
+                <!-- =========================================
+                     PLATFORM
+                     ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="vendor">
+                        Target Platform
+                    </label>
+
+                    <select
+                        id="vendor"
+                        name="vendor"
+                        required
+                    >
+
+                        <option value="">
+                            Select Platform
+                        </option>
+
+                        <option value="cisco_ios">
+                            Cisco IOS / IOS-XE
+                        </option>
+
+                        <option value="cisco_asa">
+                            Cisco ASA
+                        </option>
+
+                        <option value="aruba_cx">
+                            Aruba CX
+                        </option>
+
+                        <option value="aruba_os">
+                            ArubaOS-Switch
+                        </option>
+
+                        <option value="pica8">
+                            Pica8 / PicOS
+                        </option>
+
+                        <option value="fortigate">
+                            FortiGate
+                        </option>
+
+                        <option value="paloalto">
+                            Palo Alto PAN-OS
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     RULE CONTAINER
+                     ========================================= -->
+
+                <div id="rules-container">
+
+
+                    <!-- RULE 1 -->
+
+                    <div
+                        class="acl-rule"
+                        data-rule-index="0"
+                    >
+
+                        <div class="acl-rule-header">
+
+                            <div>
+
+                                <span class="tool-number">
+                                    01
+                                </span>
+
+                                <h3>
+                                    Access Rule
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Rule Description
+                            </label>
+
+                            <input
+                                type="text"
+                                name="description_0"
+                                placeholder="Allow HTTPS access"
+                                maxlength="120"
+                                value="Allow network access"
+                            >
+
+                        </div>
+
+
+                        <!-- SOURCES -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Source Networks
+                            </label>
+
+                            <textarea
+                                name="sources_0"
+                                rows="4"
+                                placeholder="10.10.10.0/24&#10;10.10.11.0/24&#10;10.10.12.0/24"
+                            ></textarea>
+
+                            <small>
+                                Enter one IPv4 network per line.
+                                Use <strong>any</strong> for all sources.
+                            </small>
+
+                        </div>
+
+
+                        <!-- DESTINATIONS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Destination Networks
+                            </label>
+
+                            <textarea
+                                name="destinations_0"
+                                rows="4"
+                                placeholder="10.20.20.0/24&#10;10.20.30.0/24"
+                            ></textarea>
+
+                            <small>
+                                Enter one IPv4 network per line.
+                                Use <strong>any</strong> for all destinations.
+                            </small>
+
+                        </div>
+
+
+                        <!-- PROTOCOL / ACTION -->
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label>
+                                    Protocol
+                                </label>
+
+                                <select name="protocol_0">
+
+                                    <option value="ip">
+                                        IP
+                                    </option>
+
+                                    <option value="tcp">
+                                        TCP
+                                    </option>
+
+                                    <option value="udp">
+                                        UDP
+                                    </option>
+
+                                    <option value="icmp">
+                                        ICMP
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    Action
+                                </label>
+
+                                <select name="action_0">
+
+                                    <option value="permit">
+                                        Permit / Allow
+                                    </option>
+
+                                    <option value="deny">
+                                        Deny
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PORTS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Destination Ports
+                            </label>
+
+                            <textarea
+                                name="ports_0"
+                                rows="4"
+                                placeholder="443&#10;8443&#10;8000-8100"
+                            ></textarea>
+
+                            <small>
+                                TCP/UDP only. One port or range per line.
+                                Example: 443, 8443 or 8000-8100.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     ADD RULE
+                     ========================================= -->
+
+                <div class="acl-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="add-rule"
+                    >
+                        + Add Another Rule
+                    </button>
+
+                </div>
+
+
+                <!-- =========================================
+                     SUMMARY
+                     ========================================= -->
+
+                <div class="acl-summary">
+
+                    <div>
+                        <strong id="summary-rules">
+                            1
+                        </strong>
+
+                        <span>
+                            Logical Rules
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong id="summary-sources">
+                            0
+                        </strong>
+
+                        <span>
+                            Sources
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong id="summary-destinations">
+                            0
+                        </strong>
+
+                        <span>
+                            Destinations
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong id="summary-ports">
+                            0
+                        </strong>
+
+                        <span>
+                            Ports
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong id="summary-combinations">
+                            0
+                        </strong>
+
+                        <span>
+                            Potential Entries
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <input
+                    type="hidden"
+                    name="rule_count"
+                    id="rule-count"
+                    value="1"
+                >
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Generate Configuration →
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================================
+             GENERATED RESULT
+             ========================================= -->
+
+        {% if result %}
+
+        <div
+            class="tool-result"
+            style="margin-top: 50px;"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="section-kicker">
+                        GENERATED CONFIGURATION
+                    </p>
+
+                    <h2>
+                        {{ result.vendor }}
+                    </h2>
+
+                </div>
+
+                <p>
+                    {{ result.rule_count }} generated entries
+                </p>
+
+            </div>
+
+
+            <div class="acl-summary">
+
+                <div>
+
+                    <strong>
+                        {{ result.logical_rules }}
+                    </strong>
+
+                    <span>
+                        Logical Rules
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ result.source_count }}
+                    </strong>
+
+                    <span>
+                        Sources
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ result.destination_count }}
+                    </strong>
+
+                    <span>
+                        Destinations
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ result.port_count }}
+                    </strong>
+
+                    <span>
+                        Ports
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ result.rule_count }}
+                    </strong>
+
+                    <span>
+                        Generated Entries
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="config-card">
+
+                <div class="config-card-header">
+
+                    <span>
+                        {{ result.vendor }}
+                    </span>
+
+                    <button
+                        type="button"
+                        onclick="copyConfig()"
+                    >
+                        Copy Configuration
+                    </button>
+
+                </div>
+
+
+                <pre id="generated-config"><code>{{ result.config }}</code></pre>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<section class="toolkit-notice">
+
+    <div class="container">
+
+        <div class="notice-box">
+
+            <strong>
+                ⚠ Responsible Use
+            </strong>
+
+            <p>
+                Generated configurations are templates for network
+                engineering, education, administration and authorized
+                troubleshooting. Always review the generated syntax
+                against your platform version and test before deployment.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+
+let ruleIndex = 1;
+
+const rulesContainer =
+    document.getElementById("rules-container");
+
+const addRuleButton =
+    document.getElementById("add-rule");
+
+const ruleCountInput =
+    document.getElementById("rule-count");
+
+
+function createRule(index) {
+
+    const number =
+        String(index + 1).padStart(2, "0");
+
+    return `
+
+        <div
+            class="acl-rule"
+            data-rule-index="${index}"
+        >
+
+            <div class="acl-rule-header">
+
+                <div>
+
+                    <span class="tool-number">
+                        ${number}
+                    </span>
+
+                    <h3>
+                        Access Rule
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="remove-rule"
+                    onclick="removeRule(this)"
+                >
+                    Remove
+                </button>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Rule Description
+                </label>
+
+                <input
+                    type="text"
+                    name="description_${index}"
+                    placeholder="Allow HTTPS access"
+                    maxlength="120"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Source Networks
+                </label>
+
+                <textarea
+                    name="sources_${index}"
+                    rows="4"
+                    placeholder="10.10.10.0/24&#10;10.10.11.0/24"
+                ></textarea>
+
+                <small>
+                    One IPv4 network per line.
+                    Use <strong>any</strong> if required.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Destination Networks
+                </label>
+
+                <textarea
+                    name="destinations_${index}"
+                    rows="4"
+                    placeholder="10.20.20.0/24&#10;10.20.30.0/24"
+                ></textarea>
+
+                <small>
+                    One IPv4 network per line.
+                </small>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Protocol
+                    </label>
+
+                    <select name="protocol_${index}">
+
+                        <option value="ip">
+                            IP
+                        </option>
+
+                        <option value="tcp">
+                            TCP
+                        </option>
+
+                        <option value="udp">
+                            UDP
+                        </option>
+
+                        <option value="icmp">
+                            ICMP
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Action
+                    </label>
+
+                    <select name="action_${index}">
+
+                        <option value="permit">
+                            Permit / Allow
+                        </option>
+
+                        <option value="deny">
+                            Deny
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Destination Ports
+                </label>
+
+                <textarea
+                    name="ports_${index}"
+                    rows="4"
+                    placeholder="443&#10;8443&#10;8000-8100"
+                ></textarea>
+
+                <small>
+                    One port or range per line.
+                    TCP/UDP only.
+                </small>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+addRuleButton.addEventListener(
+    "click",
+    function () {
+
+        if (ruleIndex >= 20) {
+
+            alert(
+                "Maximum 20 rules are allowed."
+            );
+
+            return;
+        }
+
+        rulesContainer.insertAdjacentHTML(
+            "beforeend",
+            createRule(ruleIndex)
+        );
+
+        ruleIndex++;
+
+        updateRuleCount();
+
+        updateSummary();
+    }
+);
+
+
+function removeRule(button) {
+
+    const rule =
+        button.closest(".acl-rule");
+
+    if (!rule) {
+        return;
+    }
+
+    rule.remove();
+
+    renumberRules();
+
+    updateRuleCount();
+
+    updateSummary();
+}
+
+
+function renumberRules() {
+
+    const rules =
+        document.querySelectorAll(".acl-rule");
+
+    rules.forEach(
+        function (rule, index) {
+
+            rule.dataset.ruleIndex = index;
+
+            const number =
+                rule.querySelector(".tool-number");
+
+            if (number) {
+
+                number.textContent =
+                    String(index + 1).padStart(2, "0");
+
+            }
+
+            const fields = [
+                "description",
+                "sources",
+                "destinations",
+                "protocol",
+                "action",
+                "ports"
+            ];
+
+            fields.forEach(
+                function (field) {
+
+                    const input =
+                        rule.querySelector(
+                            `[name^="${field}_"]`
+                        );
+
+                    if (input) {
+
+                        input.name =
+                            `${field}_${index}`;
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+    ruleIndex = rules.length;
+}
+
+
+function updateRuleCount() {
+
+    const count =
+        document.querySelectorAll(".acl-rule").length;
+
+    ruleCountInput.value = count;
+
+    document.getElementById(
+        "summary-rules"
+    ).textContent = count;
+}
+
+
+function countLines(value) {
+
+    return value
+        .split(/\r?\n/)
+        .map(
+            item => item.trim()
+        )
+        .filter(
+            item => item.length > 0
+        ).length;
+}
+
+
+function updateSummary() {
+
+    const rules =
+        document.querySelectorAll(".acl-rule");
+
+    let sources = 0;
+    let destinations = 0;
+    let ports = 0;
+    let combinations = 0;
+
+    rules.forEach(
+        function (rule) {
+
+            const sourceField =
+                rule.querySelector(
+                    '[name^="sources_"]'
+                );
+
+            const destinationField =
+                rule.querySelector(
+                    '[name^="destinations_"]'
+                );
+
+            const portField =
+                rule.querySelector(
+                    '[name^="ports_"]'
+                );
+
+            const protocolField =
+                rule.querySelector(
+                    '[name^="protocol_"]'
+                );
+
+            const sourceCount =
+                Math.max(
+                    countLines(
+                        sourceField.value
+                    ),
+                    1
+                );
+
+            const destinationCount =
+                Math.max(
+                    countLines(
+                        destinationField.value
+                    ),
+                    1
+                );
+
+            let portCount =
+                Math.max(
+                    countLines(
+                        portField.value
+                    ),
+                    1
+                );
+
+            if (
+                protocolField.value !== "tcp" &&
+                protocolField.value !== "udp"
+            ) {
+                portCount = 1;
+            }
+
+            sources += sourceCount;
+            destinations += destinationCount;
+            ports += portCount;
+
+            combinations +=
+                sourceCount *
+                destinationCount *
+                portCount;
+
+        }
+    );
+
+    document.getElementById(
+        "summary-sources"
+    ).textContent = sources;
+
+    document.getElementById(
+        "summary-destinations"
+    ).textContent = destinations;
+
+    document.getElementById(
+        "summary-ports"
+    ).textContent = ports;
+
+    document.getElementById(
+        "summary-combinations"
+    ).textContent = combinations;
+
+}
+
+
+document.addEventListener(
+    "input",
+    function (event) {
+
+        if (
+            event.target.closest(".acl-rule")
+        ) {
+
+            updateSummary();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "change",
+    function (event) {
+
+        if (
+            event.target.closest(".acl-rule")
+        ) {
+
+            updateSummary();
+
+        }
+
+    }
+);
+
+
+function copyConfig() {
+
+    const element =
+        document.getElementById(
+            "generated-config"
+        );
+
+    if (!element) {
+        return;
+    }
+
+    navigator.clipboard.writeText(
+        element.innerText
+    ).then(
+        function () {
+
+            alert(
+                "Configuration copied to clipboard."
+            );
+
+        }
+    );
+
+}
+
+
+updateRuleCount();
+updateSummary();
+
+</script>
+
+{% endblock %}
