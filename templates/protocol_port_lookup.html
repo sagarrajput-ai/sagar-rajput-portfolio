@@ -1,0 +1,875 @@
+{% extends "base.html" %}
+
+{% block title %}
+Enterprise Protocol & Port Lookup | Network Toolkit | Sagar Rajput
+{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Enterprise protocol and port lookup for network engineers. Quickly search BGP, OSPF, DNS, DHCP, RADIUS, TACACS+, SNMP, IPsec, Fortinet, Cisco, Palo Alto, Zscaler and other common network services.">
+{% endblock %}
+
+{% block og_title %}
+Enterprise Protocol & Port Lookup | Sagar Rajput
+{% endblock %}
+
+{% block og_description %}
+Search common enterprise networking protocols, ports, transport protocols, IP protocol numbers, vendors and troubleshooting notes.
+{% endblock %}
+
+{% block twitter_title %}
+Enterprise Protocol & Port Lookup | Sagar Rajput
+{% endblock %}
+
+{% block twitter_description %}
+A practical searchable reference for enterprise networking protocols, ports and services.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Enterprise Protocol & Port Quick Lookup",
+  "url": "https://sagarrajput.com/protocol-port-lookup",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "Searchable enterprise networking protocol and port reference for network engineers.",
+  "author": {
+    "@type": "Person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  }
+}
+</script>
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PROTOCOL PORT LOOKUP
+   ========================================================= */
+
+.protocol-page {
+    padding: 72px 0 100px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.protocol-hero {
+    margin-bottom: 42px;
+}
+
+.protocol-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 7px 12px;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 999px;
+
+    background: #ffffff;
+
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.protocol-eyebrow-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+
+    box-shadow: 0 0 0 4px #dcfce7;
+}
+
+.protocol-hero h1 {
+    margin: 20px 0 12px;
+
+    color: #0f172a;
+
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+}
+
+.protocol-hero h1 span {
+    color: #2563eb;
+}
+
+.protocol-lead {
+    max-width: 760px;
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   SEARCH PANEL
+   ========================================================= */
+
+.protocol-search-panel {
+    margin-bottom: 32px;
+
+    padding: 24px;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.protocol-search-grid {
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr) 220px auto;
+
+    gap: 14px;
+
+    align-items: end;
+}
+
+.protocol-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.protocol-field label {
+    color: #475569;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.protocol-field input,
+.protocol-field select {
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 0 15px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.protocol-field input:focus,
+.protocol-field select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.protocol-search-button {
+    min-height: 48px;
+
+    padding: 0 22px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.protocol-search-button:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+
+.protocol-summary {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    margin-bottom: 18px;
+}
+
+.protocol-result-count {
+    color: #475569;
+
+    font-size: 14px;
+}
+
+.protocol-result-count strong {
+    color: #0f172a;
+}
+
+.protocol-clear {
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.protocol-clear:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   RESULTS GRID
+   ========================================================= */
+
+.protocol-results {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+
+/* =========================================================
+   RESULT CARD
+   ========================================================= */
+
+.protocol-card {
+    position: relative;
+
+    padding: 24px;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.protocol-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #bfdbfe;
+
+    box-shadow:
+        0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.protocol-card-top {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 18px;
+
+    margin-bottom: 18px;
+}
+
+.protocol-service {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 21px;
+    line-height: 1.25;
+}
+
+.protocol-category {
+    flex-shrink: 0;
+
+    padding: 5px 9px;
+
+    border: 1px solid #dbeafe;
+    border-radius: 999px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.protocol-port-row {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.protocol-metric {
+    padding: 13px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    background: #f8fafc;
+}
+
+.protocol-metric-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.protocol-metric-value {
+    display: block;
+
+    color: #0f172a;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    word-break: break-word;
+}
+
+.protocol-detail {
+    padding-top: 16px;
+
+    border-top: 1px solid #eef2f7;
+}
+
+.protocol-detail + .protocol-detail {
+    margin-top: 14px;
+}
+
+.protocol-detail-label {
+    margin-bottom: 5px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.protocol-detail-text {
+    margin: 0;
+
+    color: #475569;
+
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.protocol-notes {
+    margin-top: 16px;
+
+    padding: 12px 14px;
+
+    border-left: 3px solid #2563eb;
+
+    background: #f8fafc;
+
+    color: #475569;
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.protocol-empty {
+    grid-column: 1 / -1;
+
+    padding: 55px 25px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    text-align: center;
+}
+
+.protocol-empty-icon {
+    margin-bottom: 12px;
+
+    color: #94a3b8;
+
+    font-size: 30px;
+}
+
+.protocol-empty h3 {
+    margin: 0 0 8px;
+
+    color: #0f172a;
+
+    font-size: 20px;
+}
+
+.protocol-empty p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   REFERENCE NOTE
+   ========================================================= */
+
+.protocol-reference {
+    margin-top: 36px;
+
+    padding: 20px 22px;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 14px;
+
+    background: #ffffff;
+}
+
+.protocol-reference strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #0f172a;
+
+    font-size: 14px;
+}
+
+.protocol-reference p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .protocol-search-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .protocol-results {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .protocol-page {
+        padding: 50px 0 70px;
+    }
+
+    .protocol-search-panel {
+        padding: 18px;
+    }
+
+    .protocol-card {
+        padding: 19px;
+    }
+
+    .protocol-card-top {
+        flex-direction: column;
+    }
+
+    .protocol-port-row {
+        grid-template-columns: 1fr;
+    }
+
+    .protocol-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+}
+
+</style>
+
+
+<section class="protocol-page">
+
+    <div class="container">
+
+
+        <!-- =================================================
+             HERO
+             ================================================= -->
+
+        <div class="protocol-hero">
+
+            <div class="protocol-eyebrow">
+                <span class="protocol-eyebrow-dot"></span>
+                ENTERPRISE NETWORK REFERENCE
+            </div>
+
+            <h1>
+                Protocol & Port
+                <span>Lookup.</span>
+            </h1>
+
+            <p class="protocol-lead">
+                Quickly search enterprise networking protocols,
+                ports, transport protocols, IP protocol numbers,
+                common vendors and practical troubleshooting notes.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             SEARCH
+             ================================================= -->
+
+        <form
+            method="GET"
+            action="{{ url_for('protocol_port_lookup') }}"
+            class="protocol-search-panel"
+        >
+
+            <div class="protocol-search-grid">
+
+                <div class="protocol-field">
+
+                    <label for="protocol-search">
+                        Search
+                    </label>
+
+                    <input
+                        id="protocol-search"
+                        type="text"
+                        name="q"
+                        value="{{ query }}"
+                        placeholder="Search BGP, RADIUS, 443, FortiGate..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="protocol-field">
+
+                    <label for="protocol-category">
+                        Category
+                    </label>
+
+                    <select
+                        id="protocol-category"
+                        name="category"
+                    >
+
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        {% for item_category in categories %}
+
+                            <option
+                                value="{{ item_category }}"
+                                {% if selected_category == item_category %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ item_category }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="protocol-search-button"
+                >
+                    Search Reference
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <!-- =================================================
+             RESULT SUMMARY
+             ================================================= -->
+
+        <div class="protocol-summary">
+
+            <div class="protocol-result-count">
+
+                Showing
+                <strong>{{ results|length }}</strong>
+                result{% if results|length != 1 %}s{% endif %}
+
+                {% if query %}
+                    for
+                    <strong>"{{ query }}"</strong>
+                {% endif %}
+
+            </div>
+
+
+            {% if query or selected_category %}
+
+                <a
+                    href="{{ url_for('protocol_port_lookup') }}"
+                    class="protocol-clear"
+                >
+                    Clear Filters
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             RESULTS
+             ================================================= -->
+
+        <div class="protocol-results">
+
+            {% if results %}
+
+                {% for item in results %}
+
+                    <article class="protocol-card">
+
+                        <div class="protocol-card-top">
+
+                            <h2 class="protocol-service">
+                                {{ item.service }}
+                            </h2>
+
+                            <span class="protocol-category">
+                                {{ item.category }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="protocol-port-row">
+
+                            <div class="protocol-metric">
+
+                                <span class="protocol-metric-label">
+                                    Port
+                                </span>
+
+                                <span class="protocol-metric-value">
+                                    {{ item.port }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="protocol-metric">
+
+                                <span class="protocol-metric-label">
+                                    Transport
+                                </span>
+
+                                <span class="protocol-metric-value">
+                                    {{ item.transport }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="protocol-metric">
+
+                                <span class="protocol-metric-label">
+                                    IP Protocol
+                                </span>
+
+                                <span class="protocol-metric-value">
+                                    {{ item.protocol_number }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="protocol-detail">
+
+                            <div class="protocol-detail-label">
+                                Purpose
+                            </div>
+
+                            <p class="protocol-detail-text">
+                                {{ item.purpose }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="protocol-detail">
+
+                            <div class="protocol-detail-label">
+                                Common Platforms
+                            </div>
+
+                            <p class="protocol-detail-text">
+                                {{ item.platforms }}
+                            </p>
+
+                        </div>
+
+
+                        {% if item.notes %}
+
+                            <div class="protocol-notes">
+
+                                <strong>
+                                    Note:
+                                </strong>
+
+                                {{ item.notes }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </article>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="protocol-empty">
+
+                    <div class="protocol-empty-icon">
+                        ⌕
+                    </div>
+
+                    <h3>
+                        No matching protocol found
+                    </h3>
+
+                    <p>
+                        Try searching for a service, port,
+                        protocol, category or vendor such as
+                        BGP, 443, RADIUS, FortiGate or Cisco.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             REFERENCE NOTE
+             ================================================= -->
+
+        <div class="protocol-reference">
+
+            <strong>
+                Engineering Reference
+            </strong>
+
+            <p>
+                Port and protocol information is provided as a
+                practical network-engineering reference. Actual
+                service ports can vary by vendor, software version,
+                configuration and deployment architecture. Always
+                verify vendor-specific requirements before applying
+                firewall or ACL rules in production.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

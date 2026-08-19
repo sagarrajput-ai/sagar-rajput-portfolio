@@ -32,6 +32,445 @@ MAX_SUBNETS = 1024
 SOCKET_TIMEOUT = 3
 
 
+# ---------------------------------------------------------------------------
+# Enterprise Protocol & Port Quick Lookup
+# ---------------------------------------------------------------------------
+
+PROTOCOL_PORT_DATABASE = [
+
+    # =========================
+    # Routing
+    # =========================
+
+    {
+        "service": "BGP",
+        "port": "179",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Routing",
+        "purpose": "Inter-domain routing between autonomous systems.",
+        "platforms": "Cisco, Fortinet, Aruba, Juniper, Pica8",
+        "notes": "BGP uses TCP for reliable session establishment."
+    },
+
+    {
+        "service": "OSPF",
+        "port": "—",
+        "transport": "IP",
+        "protocol_number": "89",
+        "category": "Routing",
+        "purpose": "Interior gateway routing protocol.",
+        "platforms": "Cisco, Fortinet, Aruba, Juniper, Pica8",
+        "notes": "OSPF does not use TCP or UDP ports."
+    },
+
+    {
+        "service": "EIGRP",
+        "port": "—",
+        "transport": "IP",
+        "protocol_number": "88",
+        "category": "Routing",
+        "purpose": "Cisco-originated interior gateway routing protocol.",
+        "platforms": "Cisco",
+        "notes": "EIGRP operates directly over IP."
+    },
+
+    {
+        "service": "RIP",
+        "port": "520",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Routing",
+        "purpose": "Distance-vector interior routing protocol.",
+        "platforms": "Cisco, Aruba, Linux",
+        "notes": "RIPv2 commonly uses UDP 520."
+    },
+
+    # =========================
+    # Infrastructure
+    # =========================
+
+    {
+        "service": "DNS",
+        "port": "53",
+        "transport": "TCP / UDP",
+        "protocol_number": "6 / 17",
+        "category": "Infrastructure",
+        "purpose": "Domain name resolution.",
+        "platforms": "Windows, Linux, Cisco, Fortinet, Aruba",
+        "notes": "UDP is commonly used for queries; TCP is used for larger responses and zone transfers."
+    },
+
+    {
+        "service": "DHCP Server",
+        "port": "67",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Infrastructure",
+        "purpose": "Provides IP addressing configuration to clients.",
+        "platforms": "Windows, Linux, Cisco, Fortinet",
+        "notes": "Client uses UDP 68."
+    },
+
+    {
+        "service": "DHCP Client",
+        "port": "68",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Infrastructure",
+        "purpose": "Receives DHCP configuration from a DHCP server.",
+        "platforms": "Windows, Linux, Cisco, Aruba",
+        "notes": "Communicates with DHCP server on UDP 67."
+    },
+
+    {
+        "service": "NTP",
+        "port": "123",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Infrastructure",
+        "purpose": "Network time synchronization.",
+        "platforms": "Windows, Linux, Cisco, Fortinet, Aruba",
+        "notes": "Accurate time is important for logs, authentication and troubleshooting."
+    },
+
+    {
+        "service": "TFTP",
+        "port": "69",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Infrastructure",
+        "purpose": "Simple file transfer commonly used for network device configuration and image operations.",
+        "platforms": "Cisco, Aruba, Pica8",
+        "notes": "TFTP has no built-in authentication."
+    },
+
+    # =========================
+    # Monitoring
+    # =========================
+
+    {
+        "service": "SNMP",
+        "port": "161",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Monitoring",
+        "purpose": "Network device monitoring and management queries.",
+        "platforms": "Cisco, Fortinet, Aruba, Pica8, Linux",
+        "notes": "SNMP traps commonly use UDP 162."
+    },
+
+    {
+        "service": "SNMP Trap",
+        "port": "162",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "Monitoring",
+        "purpose": "Asynchronous monitoring notifications from network devices.",
+        "platforms": "Cisco, Fortinet, Aruba, Pica8",
+        "notes": "Trap receiver normally listens on UDP 162."
+    },
+
+    {
+        "service": "Syslog",
+        "port": "514",
+        "transport": "UDP / TCP",
+        "protocol_number": "17 / 6",
+        "category": "Monitoring",
+        "purpose": "Centralized event and system log collection.",
+        "platforms": "Cisco, Fortinet, Aruba, Linux, Palo Alto",
+        "notes": "TLS-secured syslog commonly uses TCP 6514."
+    },
+
+    {
+        "service": "Syslog over TLS",
+        "port": "6514",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Monitoring",
+        "purpose": "Encrypted centralized syslog transport.",
+        "platforms": "Cisco, Fortinet, Palo Alto, Linux",
+        "notes": "Provides encrypted syslog transport."
+    },
+
+    # =========================
+    # Authentication / AAA
+    # =========================
+
+    {
+        "service": "RADIUS Authentication",
+        "port": "1812",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "AAA",
+        "purpose": "Centralized authentication and authorization.",
+        "platforms": "Cisco, Fortinet, Aruba, Windows",
+        "notes": "Commonly used for network access authentication."
+    },
+
+    {
+        "service": "RADIUS Accounting",
+        "port": "1813",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "AAA",
+        "purpose": "RADIUS accounting and session tracking.",
+        "platforms": "Cisco, Fortinet, Aruba",
+        "notes": "Used for accounting records."
+    },
+
+    {
+        "service": "TACACS+",
+        "port": "49",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "AAA",
+        "purpose": "Centralized device administration authentication and authorization.",
+        "platforms": "Cisco, Aruba, Fortinet",
+        "notes": "Frequently used for administrator access to network devices."
+    },
+
+    # =========================
+    # Directory Services
+    # =========================
+
+    {
+        "service": "LDAP",
+        "port": "389",
+        "transport": "TCP / UDP",
+        "protocol_number": "6 / 17",
+        "category": "Directory",
+        "purpose": "Directory service access and authentication.",
+        "platforms": "Microsoft, Linux, Cisco, Fortinet, Palo Alto",
+        "notes": "LDAP over TLS/SSL commonly uses port 636."
+    },
+
+    {
+        "service": "LDAPS",
+        "port": "636",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Directory",
+        "purpose": "Encrypted LDAP communication.",
+        "platforms": "Microsoft, Linux, Cisco, Fortinet, Palo Alto",
+        "notes": "Provides TLS/SSL-protected LDAP."
+    },
+
+    # =========================
+    # Management
+    # =========================
+
+    {
+        "service": "SSH",
+        "port": "22",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Management",
+        "purpose": "Secure remote CLI administration.",
+        "platforms": "Cisco, Fortinet, Aruba, Pica8, Palo Alto, Linux",
+        "notes": "Preferred over Telnet for secure administration."
+    },
+
+    {
+        "service": "Telnet",
+        "port": "23",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Management",
+        "purpose": "Remote terminal access.",
+        "platforms": "Legacy network equipment",
+        "notes": "Unencrypted; SSH should normally be preferred."
+    },
+
+    {
+        "service": "HTTP",
+        "port": "80",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Web",
+        "purpose": "Unencrypted web traffic.",
+        "platforms": "Network devices, servers, applications",
+        "notes": "Usually redirected or replaced by HTTPS."
+    },
+
+    {
+        "service": "HTTPS",
+        "port": "443",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Web",
+        "purpose": "Encrypted web traffic and web-based administration.",
+        "platforms": "Cisco, Fortinet, Aruba, Palo Alto, servers",
+        "notes": "Common port for secure management interfaces."
+    },
+
+    # =========================
+    # File / Windows
+    # =========================
+
+    {
+        "service": "FTP",
+        "port": "20 / 21",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "File Transfer",
+        "purpose": "File transfer.",
+        "platforms": "Windows, Linux, network devices",
+        "notes": "TCP 21 is control; TCP 20 is traditionally associated with active-mode data."
+    },
+
+    {
+        "service": "SMB",
+        "port": "445",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Windows",
+        "purpose": "Windows file and printer sharing.",
+        "platforms": "Microsoft Windows",
+        "notes": "Modern SMB commonly uses TCP 445."
+    },
+
+    {
+        "service": "RDP",
+        "port": "3389",
+        "transport": "TCP / UDP",
+        "protocol_number": "6 / 17",
+        "category": "Windows",
+        "purpose": "Remote Desktop access.",
+        "platforms": "Microsoft Windows",
+        "notes": "Used for Windows remote administration."
+    },
+
+    # =========================
+    # VPN / Security
+    # =========================
+
+    {
+        "service": "IKE",
+        "port": "500",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "VPN",
+        "purpose": "IPsec Internet Key Exchange.",
+        "platforms": "Cisco, Fortinet, Palo Alto, Aruba",
+        "notes": "Used for IPsec tunnel negotiation."
+    },
+
+    {
+        "service": "IPsec NAT-T",
+        "port": "4500",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "VPN",
+        "purpose": "IPsec NAT traversal.",
+        "platforms": "Cisco, Fortinet, Palo Alto, Aruba",
+        "notes": "Commonly used when IPsec peers traverse NAT."
+    },
+
+    {
+        "service": "L2TP",
+        "port": "1701",
+        "transport": "UDP",
+        "protocol_number": "17",
+        "category": "VPN",
+        "purpose": "Layer 2 tunneling.",
+        "platforms": "Cisco, Windows, Linux",
+        "notes": "Often combined with IPsec for encryption."
+    },
+
+    {
+        "service": "GRE",
+        "port": "—",
+        "transport": "IP",
+        "protocol_number": "47",
+        "category": "VPN / Tunneling",
+        "purpose": "Generic Routing Encapsulation tunneling.",
+        "platforms": "Cisco, Fortinet, Palo Alto, Linux",
+        "notes": "GRE does not use TCP or UDP ports."
+    },
+
+    {
+        "service": "ESP",
+        "port": "—",
+        "transport": "IP",
+        "protocol_number": "50",
+        "category": "VPN / Security",
+        "purpose": "IPsec Encapsulating Security Payload.",
+        "platforms": "Cisco, Fortinet, Palo Alto, Aruba",
+        "notes": "ESP operates directly over IP."
+    },
+
+    # =========================
+    # Fortinet
+    # =========================
+
+    {
+        "service": "FortiGate HTTPS Administration",
+        "port": "443",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Fortinet",
+        "purpose": "Web-based FortiGate administration.",
+        "platforms": "FortiGate",
+        "notes": "Actual administrative port can be customized."
+    },
+
+    {
+        "service": "FortiGate SSH Administration",
+        "port": "22",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Fortinet",
+        "purpose": "CLI administration of FortiGate.",
+        "platforms": "FortiGate",
+        "notes": "Actual SSH administrative port can be customized."
+    },
+
+    {
+        "service": "FortiManager",
+        "port": "541",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Fortinet",
+        "purpose": "FortiManager management communication.",
+        "platforms": "FortiManager / FortiGate",
+        "notes": "Verify the exact service requirement against the Fortinet version and deployment."
+    },
+
+    # =========================
+    # Palo Alto
+    # =========================
+
+    {
+        "service": "Palo Alto Web Management",
+        "port": "443",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Palo Alto",
+        "purpose": "HTTPS-based firewall administration.",
+        "platforms": "Palo Alto PAN-OS",
+        "notes": "Management port configuration can vary."
+    },
+
+    # =========================
+    # Zscaler
+    # =========================
+
+    {
+        "service": "Zscaler HTTPS",
+        "port": "443",
+        "transport": "TCP",
+        "protocol_number": "6",
+        "category": "Zscaler",
+        "purpose": "Secure web and cloud security connectivity.",
+        "platforms": "Zscaler",
+        "notes": "Actual Zscaler connectivity requirements depend on the deployed Zscaler product and architecture."
+    },
+
+]
+
+
+
 def get_safe_host_addresses(host):
     """
     Resolve a hostname/IP and return only globally routable addresses.
@@ -1511,6 +1950,60 @@ def acl_generator():
         "acl_generator.html",
         result=result,
         error=error,
+    )
+
+
+@app.route("/protocol-port-lookup", methods=["GET"])
+def protocol_port_lookup():
+
+    query = request.args.get(
+        "q",
+        ""
+    ).strip().lower()
+
+    category = request.args.get(
+        "category",
+        ""
+    ).strip()
+
+    results = PROTOCOL_PORT_DATABASE
+
+    if category:
+        results = [
+            item
+            for item in results
+            if item["category"].lower() == category.lower()
+        ]
+
+    if query:
+
+        results = [
+            item
+            for item in results
+            if (
+                query in item["service"].lower()
+                or query in item["port"].lower()
+                or query in item["transport"].lower()
+                or query in item["category"].lower()
+                or query in item["purpose"].lower()
+                or query in item["platforms"].lower()
+                or query in item["notes"].lower()
+            )
+        ]
+
+    categories = sorted(
+        {
+            item["category"]
+            for item in PROTOCOL_PORT_DATABASE
+        }
+    )
+
+    return render_template(
+        "protocol_port_lookup.html",
+        results=results,
+        categories=categories,
+        query=query,
+        selected_category=category,
     )
 
 
