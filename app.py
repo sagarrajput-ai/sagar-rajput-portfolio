@@ -7,6 +7,7 @@ import socket
 import os
 
 from port_scanner import port_scanner_bp
+from tavily import TavilyClient
 
 
 
@@ -2006,6 +2007,219 @@ def protocol_port_lookup():
         selected_category=category,
     )
 
+# ---------------------------------------------------------------------------
+# Network Command Finder - Tool 10
+# ---------------------------------------------------------------------------
+
+COMMAND_FINDER_VENDORS = {
+    "Cisco IOS / IOS-XE": [
+        "cisco.com",
+    ],
+    "Cisco NX-OS": [
+        "cisco.com",
+    ],
+    "Aruba": [
+        "arubanetworking.hpe.com",
+        "hpe.com",
+    ],
+    "Dell": [
+        "dell.com",
+    ],
+    "Pica8": [
+        "pica8.com",
+    ],
+    "FortiGate": [
+        "fortinet.com",
+    ],
+    "Palo Alto": [
+        "paloaltonetworks.com",
+    ],
+    "Check Point": [
+        "checkpoint.com",
+    ],
+    "Juniper": [
+        "juniper.net",
+    ],
+    "Arista": [
+        "arista.com",
+    ],
+    "Huawei": [
+        "huawei.com",
+    ],
+    "MikroTik": [
+        "mikrotik.com",
+    ],
+    "Linux": [
+        "kernel.org",
+        "man7.org",
+    ],
+    "Windows": [
+        "learn.microsoft.com",
+    ],
+}
+
+
+def search_network_commands(query, vendor="all"):
+    """
+    Search official vendor documentation through Tavily.
+
+    The API key is read only from the server-side environment and is
+    never exposed to the browser.
+    """
+
+    query = query.strip()
+
+    if not query:
+        raise ValueError("Please enter a command or networking topic.")
+
+    if len(query) > 200:
+        raise ValueError(
+            "Search query is too long. Maximum 200 characters."
+        )
+
+    api_key = os.environ.get("TAVILY_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "Tavily API key is not configured on the server."
+        )
+
+    client = TavilyClient(api_key=api_key)
+
+    # Build a documentation-focused search query.
+    if vendor and vendor != "all":
+
+        domains = COMMAND_FINDER_VENDORS.get(vendor)
+
+        if not domains:
+            raise ValueError("Unsupported vendor selected.")
+
+        domain_query = " OR ".join(
+            f"site:{domain}"
+            for domain in domains
+        )
+
+        search_query = (
+            f"{query} network command configuration documentation "
+            f"({domain_query})"
+        )
+
+    else:
+
+        all_domains = []
+
+        for domains in COMMAND_FINDER_VENDORS.values():
+            all_domains.extend(domains)
+
+        # Remove duplicates while preserving order.
+        all_domains = list(dict.fromkeys(all_domains))
+
+        domain_query = " OR ".join(
+            f"site:{domain}"
+            for domain in all_domains
+        )
+
+        search_query = (
+            f"{query} network command configuration documentation "
+            f"({domain_query})"
+        )
+
+    response = client.search(
+        search_query,
+        search_depth="basic",
+        max_results=8,
+        include_answer=False,
+    )
+
+    results = []
+
+    for item in response.get("results", []):
+
+        title = str(
+            item.get("title", "")
+        ).strip()
+
+        url = str(
+            item.get("url", "")
+        ).strip()
+
+        content = str(
+            item.get("content", "")
+        ).strip()
+
+        if not title or not url:
+            continue
+
+        results.append(
+            {
+                "title": title,
+                "url": url,
+                "content": content,
+            }
+        )
+
+    return results
+
+
+@app.route("/command-finder", methods=["GET", "POST"])
+def command_finder():
+
+    results = []
+    error = None
+
+    query = ""
+    vendor = "all"
+
+    if request.method == "POST":
+
+        query = request.form.get(
+            "query",
+            ""
+        ).strip()
+
+        vendor = request.form.get(
+            "vendor",
+            "all"
+        ).strip()
+
+        try:
+
+            results = search_network_commands(
+                query=query,
+                vendor=vendor,
+            )
+
+            if not results:
+                error = (
+                    "No relevant official documentation was found. "
+                    "Try a different command or networking keyword."
+                )
+
+        except (ValueError, RuntimeError) as exc:
+
+            error = str(exc)
+
+        except Exception:
+
+            app.logger.exception(
+                "Network Command Finder search failed."
+            )
+
+            error = (
+                "Unable to complete the documentation search. "
+                "Please try again."
+            )
+
+    return render_template(
+        "command_finder.html",
+        results=results,
+        error=error,
+        query=query,
+        selected_vendor=vendor,
+        vendors=sorted(
+            COMMAND_FINDER_VENDORS.keys()
+        ),
+    )
 
 if __name__ == "__main__":
     # Development-only server. Render uses Gunicorn via the Procfile.

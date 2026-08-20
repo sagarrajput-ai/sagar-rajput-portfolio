@@ -1,0 +1,513 @@
+{% extends "base.html" %}
+
+{% block title %}Network Command Finder | Cisco, FortiGate, Aruba, Pica8 & More | Sagar Rajput{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Search network device commands and official documentation across Cisco, FortiGate, Aruba, Pica8, Palo Alto, Juniper, Dell and other networking platforms.">
+{% endblock %}
+
+{% block og_title %}Network Command Finder | Sagar Rajput{% endblock %}
+
+{% block og_description %}
+Search networking commands and official vendor documentation across Cisco, FortiGate, Aruba, Pica8, Palo Alto, Juniper and more.
+{% endblock %}
+
+{% block twitter_title %}Network Command Finder | Sagar Rajput{% endblock %}
+
+{% block twitter_description %}
+Search network device commands and official vendor documentation from multiple networking platforms.
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero command-finder-hero">
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    INTERNET SEARCH · VENDOR DOCUMENTATION
+                </div>
+
+                <h1>
+                    Network
+                    <span>Command Finder.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    Search networking commands, configuration references
+                    and official vendor documentation across multiple
+                    network platforms.
+                </p>
+
+                <div class="toolkit-actions">
+
+                    <a
+                        href="#command-search"
+                        class="btn btn-primary"
+                    >
+                        Search Commands ↓
+                    </a>
+
+                    <a
+                        href="{{ url_for('network_toolkit') }}"
+                        class="btn btn-secondary"
+                    >
+                        ← Network Toolkit
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+
+                    <div>
+                        <span class="status-label">
+                            SEARCH ENGINE
+                        </span>
+
+                        <h3>
+                            Operational
+                        </h3>
+                    </div>
+
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+
+                </div>
+
+                <div class="network-line"></div>
+
+                <div class="status-metrics">
+
+                    <div>
+                        <strong>14</strong>
+                        <span>Platforms</span>
+                    </div>
+
+                    <div>
+                        <strong>WEB</strong>
+                        <span>Search</span>
+                    </div>
+
+                    <div>
+                        <strong>DOCS</strong>
+                        <span>Sources</span>
+                    </div>
+
+                </div>
+
+                <div class="network-pattern">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="section"
+    id="command-search"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="section-kicker">
+                    COMMAND SEARCH
+                </p>
+
+                <h2>
+                    Find commands & documentation
+                </h2>
+
+            </div>
+
+            <p>
+                Search by command, keyword or networking topic.
+            </p>
+
+        </div>
+
+
+        <div class="command-search-panel">
+
+            <form
+                method="POST"
+                action="{{ url_for('command_finder') }}"
+                class="command-search-form"
+            >
+
+                <div class="command-search-field">
+
+                    <label for="query">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        id="query"
+                        name="query"
+                        value="{{ query }}"
+                        placeholder="e.g. ip route, BGP neighbor, VLAN trunk..."
+                        maxlength="200"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="command-vendor-field">
+
+                    <label for="vendor">
+                        Vendor / Platform
+                    </label>
+
+                    <select
+                        id="vendor"
+                        name="vendor"
+                    >
+
+                        <option
+                            value="all"
+                            {% if selected_vendor == "all" %}selected{% endif %}
+                        >
+                            All Vendors
+                        </option>
+
+                        {% for item in vendors %}
+
+                            <option
+                                value="{{ item }}"
+                                {% if selected_vendor == item %}selected{% endif %}
+                            >
+                                {{ item }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="command-search-submit">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        🔎 Search
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <div class="command-search-help">
+
+                <span>Try:</span>
+
+                <button
+                    type="button"
+                    onclick="setCommandSearch('ip route')"
+                >
+                    ip route
+                </button>
+
+                <button
+                    type="button"
+                    onclick="setCommandSearch('BGP neighbor')"
+                >
+                    BGP neighbor
+                </button>
+
+                <button
+                    type="button"
+                    onclick="setCommandSearch('OSPF')"
+                >
+                    OSPF
+                </button>
+
+                <button
+                    type="button"
+                    onclick="setCommandSearch('VLAN trunk')"
+                >
+                    VLAN trunk
+                </button>
+
+                <button
+                    type="button"
+                    onclick="setCommandSearch('DHCP relay')"
+                >
+                    DHCP relay
+                </button>
+
+            </div>
+
+        </div>
+
+
+        {% if error %}
+
+        <div class="notice-box command-error">
+
+            <strong>
+                Search Notice
+            </strong>
+
+            <p>
+                {{ error }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if results %}
+
+        <div class="command-results-header">
+
+            <div>
+
+                <p class="section-kicker">
+                    SEARCH RESULTS
+                </p>
+
+                <h2>
+                    Documentation found
+                </h2>
+
+            </div>
+
+            <span class="command-result-count">
+                {{ results|length }} result{% if results|length != 1 %}s{% endif %}
+            </span>
+
+        </div>
+
+
+        <div class="command-results">
+
+            {% for result in results %}
+
+            <article class="command-result-card">
+
+                <div class="command-result-top">
+
+                    <span class="command-result-number">
+                        {{ "%02d"|format(loop.index) }}
+                    </span>
+
+                    <span class="command-source-badge">
+                        OFFICIAL DOCUMENTATION
+                    </span>
+
+                </div>
+
+
+                <div class="command-result-content">
+
+                    <h3>
+                        {{ result.title }}
+                    </h3>
+
+                    {% if result.content %}
+
+                    <p>
+                        {{ result.content }}
+                    </p>
+
+                    {% endif %}
+
+                    <div class="command-result-actions">
+
+                        <a
+                            href="{{ result.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-primary"
+                        >
+                            Open Documentation →
+                        </a>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary copy-result-url"
+                            data-url="{{ result.url }}"
+                        >
+                            Copy Link
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<section class="toolkit-tech">
+
+    <div class="container">
+
+        <div class="tech-panel">
+
+            <div>
+
+                <p class="section-kicker">
+                    HOW IT WORKS
+                </p>
+
+                <h2>
+                    Search first. Verify from the source.
+                </h2>
+
+                <p>
+                    The Command Finder searches current online vendor
+                    documentation instead of relying on a manually
+                    maintained command database. Always verify commands
+                    against the official documentation and the software
+                    version running on your device.
+                </p>
+
+            </div>
+
+
+            <div class="tech-stack">
+
+                <span>Cisco</span>
+                <span>Aruba</span>
+                <span>Dell</span>
+                <span>Pica8</span>
+                <span>FortiGate</span>
+                <span>Palo Alto</span>
+                <span>Juniper</span>
+                <span>Check Point</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="toolkit-notice">
+
+    <div class="container">
+
+        <div class="notice-box">
+
+            <strong>
+                ⚠ Verify Before Production Use
+            </strong>
+
+            <p>
+                Search results are retrieved from online documentation.
+                Commands can vary by vendor, platform, operating system
+                and software version. Always verify syntax and behavior
+                against the official vendor documentation before applying
+                changes to production infrastructure.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+
+function setCommandSearch(value) {
+
+    const input = document.getElementById("query");
+
+    if (!input) {
+        return;
+    }
+
+    input.value = value;
+    input.focus();
+
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".copy-result-url").forEach(function (button) {
+
+        button.addEventListener("click", async function () {
+
+            const url = button.dataset.url;
+
+            try {
+
+                await navigator.clipboard.writeText(url);
+
+                const originalText = button.textContent;
+
+                button.textContent = "Copied ✓";
+
+                setTimeout(function () {
+                    button.textContent = originalText;
+                }, 1800);
+
+            } catch (error) {
+
+                button.textContent = "Copy failed";
+
+                setTimeout(function () {
+                    button.textContent = "Copy Link";
+                }, 1800);
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}
