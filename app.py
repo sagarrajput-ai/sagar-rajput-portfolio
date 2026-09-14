@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, Response, url_for
 import ipaddress
 import socket
 import os
+import re
 
 from port_scanner import port_scanner_bp
 from tavily import TavilyClient
@@ -1207,6 +1208,10 @@ def sitemap_xml():
         "ip_range",
         "dns_lookup",
         "port_checker",
+        "subnet_wildcard",
+        "acl_generator",
+        "protocol_port_lookup",
+        "command_finder",
     ]
 
     urls = []
@@ -2059,18 +2064,467 @@ COMMAND_FINDER_VENDORS = {
 }
 
 
+# def search_network_commands(query, vendor="all"):
+#     """
+#     Search official vendor documentation through Tavily.
+
+#     The API key is read only from the server-side environment and is
+#     never exposed to the browser.
+#     """
+
+#     query = query.strip()
+
+#     if not query:
+#         raise ValueError("Please enter a command or networking topic.")
+
+#     if len(query) > 200:
+#         raise ValueError(
+#             "Search query is too long. Maximum 200 characters."
+#         )
+
+#     api_key = os.environ.get("TAVILY_API_KEY")
+
+#     if not api_key:
+#         raise RuntimeError(
+#             "Tavily API key is not configured on the server."
+#         )
+
+#     client = TavilyClient(api_key=api_key)
+
+#     # Build a documentation-focused search query.
+#     if vendor and vendor != "all":
+
+#         domains = COMMAND_FINDER_VENDORS.get(vendor)
+
+#         if not domains:
+#             raise ValueError("Unsupported vendor selected.")
+
+#         domain_query = " OR ".join(
+#             f"site:{domain}"
+#             for domain in domains
+#         )
+
+#         search_query = (
+#             f"{query} network command configuration documentation "
+#             f"({domain_query})"
+#         )
+
+#     else:
+
+#         all_domains = []
+
+#         for domains in COMMAND_FINDER_VENDORS.values():
+#             all_domains.extend(domains)
+
+#         # Remove duplicates while preserving order.
+#         all_domains = list(dict.fromkeys(all_domains))
+
+#         domain_query = " OR ".join(
+#             f"site:{domain}"
+#             for domain in all_domains
+#         )
+
+#         search_query = (
+#             f"{query} network command configuration documentation "
+#             f"({domain_query})"
+#         )
+
+#     response = client.search(
+#         search_query,
+#         search_depth="basic",
+#         max_results=8,
+#         include_answer=False,
+#     )
+
+#     results = []
+
+#     for item in response.get("results", []):
+
+#         title = str(
+#             item.get("title", "")
+#         ).strip()
+
+#         url = str(
+#             item.get("url", "")
+#         ).strip()
+
+#         content = str(
+#             item.get("content", "")
+#         ).strip()
+
+#         if not title or not url:
+#             continue
+
+#         results.append(
+#             {
+#                 "title": title,
+#                 "url": url,
+#                 "content": content,
+#             }
+#         )
+
+#     return results
+
+def extract_command_candidates(text, search_query=""):
+    """
+    Extract likely CLI commands from retrieved documentation.
+
+    This function does NOT generate commands.
+    It only extracts command-like syntax that appears in the
+    retrieved documentation.
+    """
+
+    if not text:
+        return []
+
+    candidates = []
+
+    # Normalize the search query so we can prefer commands
+    # related to what the user actually searched for.
+    search_query = search_query.strip().lower()
+
+    # ---------------------------------------------------------
+    # Helper: validate a possible CLI command
+    # ---------------------------------------------------------
+
+    def is_valid_command(value):
+
+        value = value.strip()
+
+        if not value:
+            return False
+
+        # Length protection.
+        if len(value) < 3 or len(value) > 180:
+            return False
+
+        lower = value.lower()
+
+        # -----------------------------------------------------
+        # Reject obvious non-command values
+        # -----------------------------------------------------
+
+        rejected_exact = {
+            "ip",
+            "interface",
+            "interface name",
+            "route-interface",
+            "ip-route(8)",
+            "route",
+            "network",
+            "address",
+            "mask",
+            "destination-address",
+            "next-hop-address",
+        }
+
+        if lower in rejected_exact:
+            return False
+
+        # -----------------------------------------------------
+        # Reject filesystem paths / URLs
+        # -----------------------------------------------------
+
+        if lower.startswith(
+            (
+                "/etc/",
+                "/usr/",
+                "/var/",
+                "http://",
+                "https://",
+            )
+        ):
+            return False
+
+        # -----------------------------------------------------
+        # Reject man pages
+        # -----------------------------------------------------
+
+        if re.match(
+            r"^[a-z0-9_-]+\(\d+\)$",
+            lower
+        ):
+            return False
+
+        # -----------------------------------------------------
+        # Reject obvious parameter placeholders by themselves
+        # -----------------------------------------------------
+
+        if re.fullmatch(
+            r"[<\[][a-z0-9_. -]+[>\]]",
+            lower
+        ):
+            return False
+
+        # -----------------------------------------------------
+        # Reject ordinary documentation sentences
+        # -----------------------------------------------------
+
+        if value.endswith(
+            (".", "?", "!")
+        ):
+            return False
+
+        prose_prefixes = (
+            "the ",
+            "this ",
+            "these ",
+            "those ",
+            "a ",
+            "an ",
+            "when ",
+            "where ",
+            "which ",
+            "used ",
+            "use the ",
+            "displays ",
+            "display the ",
+            "specifies ",
+            "specify ",
+            "provides ",
+            "allows ",
+            "indicates ",
+            "indicate ",
+            "parameter ",
+            "parameters ",
+            "description ",
+            "command objective ",
+            "interface name ",
+            "ip address ",
+        )
+
+        if lower.startswith(prose_prefixes):
+            return False
+
+        # -----------------------------------------------------
+        # Reject obviously long prose
+        # -----------------------------------------------------
+
+        if len(value.split()) > 18:
+            return False
+
+        # -----------------------------------------------------
+        # Strong CLI command prefixes
+        # -----------------------------------------------------
+
+        command_prefixes = (
+            "show ",
+            "display ",
+            "get ",
+            "set ",
+            "configure ",
+            "config ",
+            "interface ",
+            "router ",
+            "ip route ",
+            "ip address ",
+            "ip access-list ",
+            "ipv6 route ",
+            "network ",
+            "vlan ",
+            "switchport ",
+            "neighbor ",
+            "route ",
+            "no ",
+            "diagnose ",
+            "diagnostic ",
+            "edit ",
+            "delete ",
+            "commit",
+            "request ",
+            "run ",
+            "system ",
+            "firewall ",
+        )
+
+        has_command_prefix = lower.startswith(
+            command_prefixes
+        )
+
+        # -----------------------------------------------------
+        # If it doesn't look like a command, reject it.
+        # -----------------------------------------------------
+
+        if not has_command_prefix:
+            return False
+
+        # -----------------------------------------------------
+        # Reject obvious explanatory fragments.
+        # -----------------------------------------------------
+
+        if lower in {
+            "show",
+            "display",
+            "get",
+            "set",
+            "configure",
+            "config",
+            "interface",
+            "router",
+            "network",
+            "vlan",
+            "switchport",
+            "neighbor",
+            "system",
+            "firewall",
+        }:
+            return False
+
+        return True
+
+    # ---------------------------------------------------------
+    # 1. Extract Markdown / inline code
+    # ---------------------------------------------------------
+
+    code_matches = re.findall(
+        r"`([^`]+)`",
+        text
+    )
+
+    for match in code_matches:
+
+        candidate = match.strip()
+
+        if is_valid_command(candidate):
+            candidates.append(candidate)
+
+    # ---------------------------------------------------------
+    # 2. Extract command-looking lines
+    # ---------------------------------------------------------
+
+    for raw_line in text.splitlines():
+
+        line = raw_line.strip()
+
+        if not line:
+            continue
+
+        # Remove Markdown bullets / numbering.
+        line = re.sub(
+            r"^[>*+\-\d.)\s]+",
+            "",
+            line
+        ).strip()
+
+        # Remove surrounding code markers.
+        line = line.strip("`").strip()
+
+        if not line:
+            continue
+
+        if is_valid_command(line):
+            candidates.append(line)
+
+    # ---------------------------------------------------------
+    # 3. Prefer commands containing the searched keyword.
+    # ---------------------------------------------------------
+
+    if search_query:
+
+        search_words = [
+            word
+            for word in re.findall(
+                r"[a-z0-9_-]+",
+                search_query
+            )
+            if len(word) >= 2
+        ]
+
+        matching = []
+        non_matching = []
+
+        for candidate in candidates:
+
+            candidate_lower = candidate.lower()
+
+            if all(
+                word in candidate_lower
+                for word in search_words
+            ):
+                matching.append(candidate)
+            else:
+                non_matching.append(candidate)
+
+        candidates = matching + non_matching
+
+    # ---------------------------------------------------------
+    # 4. Remove duplicates while preserving order.
+    # ---------------------------------------------------------
+
+    unique_candidates = []
+
+    seen = set()
+
+    for candidate in candidates:
+
+        # Normalize whitespace.
+        candidate = re.sub(
+            r"\s+",
+            " ",
+            candidate
+        ).strip()
+
+        key = candidate.lower()
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+        unique_candidates.append(candidate)
+
+    return unique_candidates[:10]
+
+
+
+def detect_documentation_source(url):
+    """
+    Identify the likely vendor/source from a documentation URL.
+    """
+
+    url_lower = url.lower()
+
+    source_map = (
+        ("cisco.com", "Cisco"),
+        ("arubanetworks.com", "Aruba"),
+        ("hpe.com", "HPE"),
+        ("dell.com", "Dell"),
+        ("pica8.com", "Pica8"),
+        ("fortinet.com", "Fortinet"),
+        ("fortiguard.com", "Fortinet"),
+        ("paloaltonetworks.com", "Palo Alto"),
+        ("juniper.net", "Juniper"),
+        ("checkpoint.com", "Check Point"),
+        ("arista.com", "Arista"),
+        ("huawei.com", "Huawei"),
+        ("mikrotik.com", "MikroTik"),
+        ("microsoft.com", "Microsoft"),
+        ("redhat.com", "Red Hat"),
+        ("linux.org", "Linux"),
+        ("kernel.org", "Linux"),
+    )
+
+    for domain, vendor_name in source_map:
+
+        if domain in url_lower:
+            return vendor_name
+
+    return "Other Source"
+
+
 def search_network_commands(query, vendor="all"):
     """
-    Search official vendor documentation through Tavily.
+    Search official vendor documentation through Tavily and extract
+    command candidates directly from the returned documentation.
 
-    The API key is read only from the server-side environment and is
-    never exposed to the browser.
+    Commands are extracted from source text. They are not generated.
     """
 
     query = query.strip()
 
     if not query:
-        raise ValueError("Please enter a command or networking topic.")
+        raise ValueError(
+            "Please enter a command or networking topic."
+        )
 
     if len(query) > 200:
         raise ValueError(
@@ -2086,13 +2540,14 @@ def search_network_commands(query, vendor="all"):
 
     client = TavilyClient(api_key=api_key)
 
-    # Build a documentation-focused search query.
     if vendor and vendor != "all":
 
         domains = COMMAND_FINDER_VENDORS.get(vendor)
 
         if not domains:
-            raise ValueError("Unsupported vendor selected.")
+            raise ValueError(
+                "Unsupported vendor selected."
+            )
 
         domain_query = " OR ".join(
             f"site:{domain}"
@@ -2100,8 +2555,8 @@ def search_network_commands(query, vendor="all"):
         )
 
         search_query = (
-            f"{query} network command configuration documentation "
-            f"({domain_query})"
+            f"{query} CLI command configuration "
+            f"documentation ({domain_query})"
         )
 
     else:
@@ -2111,8 +2566,9 @@ def search_network_commands(query, vendor="all"):
         for domains in COMMAND_FINDER_VENDORS.values():
             all_domains.extend(domains)
 
-        # Remove duplicates while preserving order.
-        all_domains = list(dict.fromkeys(all_domains))
+        all_domains = list(
+            dict.fromkeys(all_domains)
+        )
 
         domain_query = " OR ".join(
             f"site:{domain}"
@@ -2120,8 +2576,8 @@ def search_network_commands(query, vendor="all"):
         )
 
         search_query = (
-            f"{query} network command configuration documentation "
-            f"({domain_query})"
+            f"{query} CLI command configuration "
+            f"documentation ({domain_query})"
         )
 
     response = client.search(
@@ -2150,11 +2606,21 @@ def search_network_commands(query, vendor="all"):
         if not title or not url:
             continue
 
+        commands = extract_command_candidates(
+            content,
+            search_query=query
+        )
+
+        source = detect_documentation_source(url)
+
         results.append(
-            {
-                "title": title,
-                "url": url,
-                "content": content,
+        {
+        "title": title,
+        "url": url,
+        "content": content,
+        "commands": commands,
+        "has_command": bool(commands),
+        "source": source,
             }
         )
 
