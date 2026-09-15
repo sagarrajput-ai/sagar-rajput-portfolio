@@ -1198,7 +1198,6 @@ def sitemap_xml():
     public_endpoints = [
         "home",
         "about",
-        "resume",
         "projects",
         "network_toolkit_project",
         "noida_sez_project",
@@ -1230,11 +1229,6 @@ def sitemap_xml():
 @app.route("/about")
 def about():
     return render_template("about.html")
-
-
-@app.route("/resume")
-def resume():
-    return render_template("resume.html")
 
 
 @app.route("/projects")
