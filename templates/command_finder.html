@@ -328,7 +328,7 @@ Search network device commands and official vendor documentation from multiple n
                     </span>
 
                     <span class="command-source-badge">
-                        OFFICIAL DOCUMENTATION
+                        {{ result.source }}
                     </span>
 
                 </div>
@@ -340,13 +340,53 @@ Search network device commands and official vendor documentation from multiple n
                         {{ result.title }}
                     </h3>
 
-                    {% if result.content %}
+               {% if result.commands %}
 
-                    <p>
-                        {{ result.content }}
-                    </p>
+                <div class="command-suggestions">
 
-                    {% endif %}
+                    <div class="command-suggestions-label">
+                        COMMAND FOUND IN SOURCE
+                    </div>
+
+                    {% for command in result.commands %}
+
+                    <div class="command-suggestion">
+
+                        <code>{{ command }}</code>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary copy-command"
+                            data-command="{{ command }}"
+                        >
+                            Copy Command
+                        </button>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+                {% else %}
+
+                <div class="command-no-match">
+
+                    <span>
+                        No CLI command was confidently identified in this result.
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+                {% if result.content %}
+
+                <p>
+                    {{ result.content }}
+                </p>
+
+                {% endif %}
 
                     <div class="command-result-actions">
 
@@ -503,6 +543,39 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         });
+
+    });
+
+});
+
+
+document.querySelectorAll(".copy-command").forEach(function (button) {
+
+    button.addEventListener("click", async function () {
+
+        const command = button.dataset.command;
+
+        try {
+
+            await navigator.clipboard.writeText(command);
+
+            const originalText = button.textContent;
+
+            button.textContent = "Copied ✓";
+
+            setTimeout(function () {
+                button.textContent = originalText;
+            }, 1800);
+
+        } catch (error) {
+
+            button.textContent = "Copy failed";
+
+            setTimeout(function () {
+                button.textContent = "Copy Command";
+            }, 1800);
+
+        }
 
     });
 
