@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Projects & Applications | Sagar Rajput{% endblock %}
+{% block title %}
+Projects & Work | Sagar Rajput
+{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="Explore projects by Sagar Rajput, including the Network Engineering Toolkit and Infosys Noida SEZ Network Infrastructure project, covering networking, infrastructure, automation and IT operations.">
+<meta name="description" content="Explore projects and real-world technology work by Sagar Rajput, including the Network Engineering Toolkit, Infosys Noida infrastructure projects, Aruba networking and practical IT solutions.">
 {% endblock %}
 
-{% block og_title %}Projects & Applications | Sagar Rajput{% endblock %}
+{% block og_title %}
+Projects & Work | Sagar Rajput
+{% endblock %}
 
 {% block og_description %}
-Explore Sagar Rajput's technology and networking projects, including the Network Engineering Toolkit and Infosys Noida SEZ Network Infrastructure project.
+Explore Sagar Rajput's personal technology projects and real-world networking and infrastructure work, including the Network Engineering Toolkit and Infosys Noida projects.
 {% endblock %}
 
-{% block twitter_title %}Projects & Applications | Sagar Rajput{% endblock %}
+{% block twitter_title %}
+Projects & Work | Sagar Rajput
+{% endblock %}
 
 {% block twitter_description %}
-Explore networking, infrastructure and IT projects built and delivered by Sagar Rajput.
+Explore Sagar Rajput's technology projects, networking tools and real-world infrastructure work.
 {% endblock %}
 
 {% block structured_data %}
@@ -23,9 +29,9 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "Projects & Applications | Sagar Rajput",
+  "name": "Projects & Work | Sagar Rajput",
   "url": "https://sagarrajput.com/projects",
-  "description": "Technology, networking and infrastructure projects by Sagar Rajput.",
+  "description": "Technology projects and real-world networking and infrastructure work by Sagar Rajput.",
   "author": {
     "@type": "Person",
     "name": "Sagar Rajput",
@@ -43,6 +49,10 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
       "@type": "CreativeWork",
       "name": "Infosys Noida SEZ Network Infrastructure",
       "url": "https://sagarrajput.com/projects/noida-sez-network"
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Infosys Noida STP-2 Sector 90 Aruba Network Setup"
     }
   ]
 }
@@ -50,6 +60,7 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 {% endblock %}
 
 {% block content %}
+
 
 <!-- =========================================
      PROJECTS HERO
@@ -60,18 +71,19 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
     <div class="container">
 
         <p class="section-kicker">
-            SELECTED WORK
+            PROJECTS & WORK
         </p>
 
         <h1>
-            Projects &
-            <span>Applications.</span>
+            Things I've built,
+            <span>implemented & explored.</span>
         </h1>
 
         <p class="projects-intro">
-            A selection of technology, networking and infrastructure
-            projects focused on solving practical problems and
-            delivering reliable real-world solutions.
+            A collection of personal technology projects and
+            real-world networking and infrastructure work —
+            from practical tools and applications to enterprise
+            technology deployments.
         </p>
 
     </div>
@@ -80,12 +92,21 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 
 
 <!-- =========================================
-     PROJECTS
+     PERSONAL / BUILT PROJECTS
      ========================================= -->
 
 <section class="section projects-section">
 
     <div class="container">
+
+        <p class="section-kicker">
+            01 · BUILT PROJECTS
+        </p>
+
+        <h2>
+            Things I've
+            <span>built.</span>
+        </h2>
 
         <div class="projects-grid">
 
@@ -155,6 +176,33 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
             </article>
 
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     PROFESSIONAL INFRASTRUCTURE WORK
+     ========================================= -->
+
+<section class="section section-dark">
+
+    <div class="container">
+
+        <p class="section-kicker">
+            02 · PROFESSIONAL INFRASTRUCTURE
+        </p>
+
+        <h2>
+            Real-world
+            <span>technology deployments.</span>
+        </h2>
+
+        <div class="projects-grid">
+
+
             <!-- =====================================
                  PROJECT 02 — INFOSYS NOIDA SEZ
                  ===================================== -->
@@ -185,7 +233,7 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 
 
                 <p>
-                    Configured and delivered the LAN/WAN network
+                    Configured and delivered LAN/WAN network
                     infrastructure for the Infosys Noida SEZ site,
                     covering data center network setup, routing and
                     switching, infrastructure planning, structured
@@ -221,6 +269,66 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
             </article>
 
 
+            <!-- =====================================
+                 PROJECT 03 — INFOSYS NOIDA STP-2
+                 ===================================== -->
+
+            <article class="project-card project-featured">
+
+                <div class="project-card-top">
+
+                    <div class="project-number">
+                        03
+                    </div>
+
+                    <span class="project-status">
+                        LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="project-icon">
+                    ARB
+                </div>
+
+
+                <h2>
+                    Infosys Noida STP-2 · Sector 90
+                </h2>
+
+
+                <p>
+                    Fully Aruba-based network setup for the Infosys
+                    Noida STP-2, Sector 90 site. The infrastructure
+                    was completed and brought into live operation
+                    in December 2024.
+                </p>
+
+
+                <div class="tag-row">
+
+                    <span>Aruba</span>
+                    <span>Enterprise Networking</span>
+                    <span>LAN</span>
+                    <span>Wireless</span>
+                    <span>Infrastructure</span>
+                    <span>Deployment</span>
+
+                </div>
+
+
+                <div class="project-card-actions">
+
+                    <span class="project-status">
+                        LIVE SINCE DEC 2024
+                    </span>
+
+                </div>
+
+            </article>
+
+
         </div>
 
     </div>
@@ -229,17 +337,17 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 
 
 <!-- =========================================
-     PROJECT PHILOSOPHY
+     PROJECT APPROACH
      ========================================= -->
 
-<section class="section section-dark">
+<section class="section">
 
     <div class="container two-col">
 
         <div>
 
             <p class="section-kicker">
-                HOW I APPROACH PROJECTS
+                03 · HOW I APPROACH PROJECTS
             </p>
 
             <h2>
@@ -253,18 +361,18 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
         <div class="section-copy">
 
             <p>
-                My projects are built around practical technical
-                requirements rather than technology for its own sake.
-                Whether developing a networking utility or delivering
-                enterprise infrastructure, the focus is on reliability,
-                usability and operational readiness.
+                I enjoy working on projects where technology has
+                a practical purpose — whether that means building
+                a useful tool, solving a networking problem or
+                helping deliver reliable infrastructure.
             </p>
 
             <p>
-                I combine hands-on networking experience with
-                infrastructure planning, troubleshooting, automation
-                and IT operations to turn technical requirements into
-                working solutions.
+                My professional background in networking,
+                infrastructure and IT operations influences how
+                I approach projects: understand the requirement,
+                solve the problem, test the solution and make
+                it useful in the real world.
             </p>
 
         </div>
@@ -275,27 +383,28 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 
 
 <!-- =========================================
-     FUTURE PROJECTS
+     WHAT'S NEXT
      ========================================= -->
 
-<section class="section">
+<section class="section section-dark">
 
     <div class="container project-preview">
 
         <div>
 
             <p class="section-kicker">
-                MORE TO COME
+                04 · WHAT'S NEXT
             </p>
 
             <h2>
-                More projects are in progress.
+                More things are
+                <span>in progress.</span>
             </h2>
 
             <p class="section-copy">
-                This portfolio will continue to grow as I build and
-                document more networking, infrastructure, automation
-                and IT projects.
+                I'm continuing to build and document projects around
+                networking, infrastructure, automation, software and
+                practical technology.
             </p>
 
         </div>
@@ -305,16 +414,16 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
 
             <a
                 class="btn btn-primary"
-                href="{{ url_for('about') }}"
+                href="{{ url_for('network_toolkit') }}"
             >
-                About Me →
+                Explore Network Toolkit →
             </a>
 
             <a
                 class="btn btn-secondary"
-                href="{{ url_for('network_toolkit') }}"
+                href="{{ url_for('about') }}"
             >
-                Explore Network Toolkit →
+                About Me →
             </a>
 
         </div>
@@ -322,5 +431,6 @@ Explore networking, infrastructure and IT projects built and delivered by Sagar 
     </div>
 
 </section>
+
 
 {% endblock %}
