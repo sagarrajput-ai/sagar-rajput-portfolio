@@ -1,11 +1,21 @@
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-from flask import Flask, render_template, request, Response, url_for
+from flask import Flask, render_template, request, Response, url_for, jsonify
 import ipaddress
 import socket
 import os
 import re
+import json
+import ssl
+import subprocess
+import platform
+import time
+import urllib.parse
+import urllib.request
+import urllib.error
+import http.client
+import concurrent.futures
 
 from port_scanner import port_scanner_bp
 from tavily import TavilyClient
@@ -33,6 +43,21 @@ MAX_HOSTNAME_LENGTH = 253
 MAX_SUBNETS = 1024
 SOCKET_TIMEOUT = 3
 
+# ---------------------------------------------------------------------------
+# Network Diagnostic Lab limits
+# ---------------------------------------------------------------------------
+
+DIAGNOSTIC_TIMEOUT = 5
+MAX_BULK_PING_TARGETS = 50
+MAX_PING_PACKETS = 10
+MAX_PACKET_SIZE = 1400
+MAX_DIAGNOSTIC_INPUT = 4096
+MAX_TRACE_HOPS = 30
+MAX_DNS_NAMES = 20
+
+DIAGNOSTIC_USER_AGENT = (
+    "SagarRajput-NetworkDiagnosticLab/1.0"
+)
 
 # ---------------------------------------------------------------------------
 # Enterprise Protocol & Port Quick Lookup
@@ -629,6 +654,355 @@ def normalize_hostname(value):
     return hostname
 
 
+# ---------------------------------------------------------------------------
+# Network Diagnostic Lab helpers
+# ---------------------------------------------------------------------------
+
+def validate_diagnostic_target(value):
+    """
+    Validate an IP address or hostname.
+
+    Public deployment defaults to globally routable destinations only.
+    Set ALLOW_PRIVATE_DIAGNOSTICS=true locally if private/lab addressing
+    is intentionally required.
+    """
+    value = value.strip()
+
+    if not value:
+        raise ValueError("Please enter an IP address or hostname.")
+
+    if len(value) > MAX_HOSTNAME_LENGTH:
+        raise ValueError("Target is too long.")
+
+    try:
+        address = ipaddress.ip_address(value)
+
+        if address.is_unspecified or address.is_multicast:
+            raise ValueError("Unspecified or multicast addresses are not allowed.")
+
+        if address.is_private and os.environ.get(
+            "ALLOW_PRIVATE_DIAGNOSTICS", ""
+        ).lower() != "true":
+            raise ValueError(
+                "Private IP diagnostics are disabled on the public service."
+            )
+
+        return str(address)
+
+    except ValueError as exc:
+        if str(exc).endswith("not allowed.") or str(exc).startswith(
+            "Private IP diagnostics"
+        ):
+            raise
+
+    hostname = normalize_hostname(value)
+
+    try:
+        addresses = socket.getaddrinfo(
+            hostname,
+            None,
+            type=socket.SOCK_STREAM
+        )
+    except socket.gaierror:
+        raise ValueError("Unable to resolve the target.")
+
+    public = []
+
+    for info in addresses:
+        resolved = info[4][0]
+
+        try:
+            address = ipaddress.ip_address(resolved)
+        except ValueError:
+            continue
+
+        if address.is_unspecified or address.is_multicast:
+            continue
+
+        if address.is_global:
+            public.append(str(address))
+        elif (
+            address.is_private
+            and os.environ.get(
+                "ALLOW_PRIVATE_DIAGNOSTICS", ""
+            ).lower() == "true"
+        ):
+            public.append(str(address))
+
+    if not public:
+        raise ValueError(
+            "Target does not resolve to an allowed IP address."
+        )
+
+    return hostname
+
+
+def run_command(command, timeout):
+    """
+    Execute only internally constructed diagnostic commands.
+    User input must never be inserted as a shell command string.
+    """
+    try:
+        completed = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            shell=False
+        )
+
+        return {
+            "returncode": completed.returncode,
+            "stdout": completed.stdout[-12000:],
+            "stderr": completed.stderr[-6000:],
+        }
+
+    except subprocess.TimeoutExpired:
+        raise TimeoutError("Diagnostic command timed out.")
+
+
+def normalize_mac(value):
+    mac = re.sub(r"[^0-9A-Fa-f]", "", value.strip())
+
+    if len(mac) != 12 or not re.fullmatch(r"[0-9A-Fa-f]{12}", mac):
+        raise ValueError(
+            "Invalid MAC address. Example: 00:11:22:33:44:55"
+        )
+
+    return ":".join(
+        mac[index:index + 2]
+        for index in range(0, 12, 2)
+    ).upper()
+
+
+def fetch_json(url, timeout=DIAGNOSTIC_TIMEOUT):
+    request_obj = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": DIAGNOSTIC_USER_AGENT,
+            "Accept": "application/json",
+        },
+    )
+
+    with urllib.request.urlopen(
+        request_obj,
+        timeout=timeout
+    ) as response:
+
+        data = response.read(1024 * 1024)
+
+        if len(data) > 1024 * 1024:
+            raise ValueError("Remote response is too large.")
+
+        return json.loads(data.decode("utf-8"))
+
+
+def resolve_reverse_dns(ip):
+    address = ipaddress.ip_address(ip)
+
+    try:
+        hostname, aliases, addresses = socket.gethostbyaddr(
+            str(address)
+        )
+
+        return {
+            "ip": str(address),
+            "hostname": hostname,
+            "aliases": aliases,
+            "addresses": addresses,
+        }
+
+    except socket.herror:
+        return {
+            "ip": str(address),
+            "hostname": None,
+            "aliases": [],
+            "addresses": [],
+        }
+
+
+def get_ip_information(ip):
+    address = ipaddress.ip_address(ip)
+
+    result = {
+        "ip": str(address),
+        "version": f"IPv{address.version}",
+        "compressed": address.compressed,
+        "is_global": address.is_global,
+        "is_private": address.is_private,
+        "is_reserved": address.is_reserved,
+        "is_loopback": address.is_loopback,
+        "is_multicast": address.is_multicast,
+    }
+
+    try:
+        rdns = socket.gethostbyaddr(str(address))
+        result["reverse_dns"] = rdns[0]
+    except socket.herror:
+        result["reverse_dns"] = None
+
+    return result
+
+
+def ping_single_target(target, count=4, timeout=2, packet_size=32):
+    start = time.perf_counter()
+
+    system = platform.system().lower()
+
+    if system == "windows":
+        command = [
+            "ping",
+            "-n",
+            str(count),
+            "-w",
+            str(int(timeout * 1000)),
+            "-l",
+            str(packet_size),
+            target,
+        ]
+    else:
+        command = [
+            "ping",
+            "-c",
+            str(count),
+            "-W",
+            str(timeout),
+            "-s",
+            str(packet_size),
+            target,
+        ]
+
+    result = run_command(
+        command,
+        timeout=(count * timeout) + 3
+    )
+
+    elapsed = round(
+        (time.perf_counter() - start) * 1000,
+        2
+    )
+
+    output = result["stdout"] + result["stderr"]
+
+    return {
+        "target": target,
+        "success": result["returncode"] == 0,
+        "elapsed_ms": elapsed,
+        "output": output,
+    }
+
+
+@app.route(
+    "/api/diagnostic/ping",
+    methods=["POST"]
+)
+def diagnostic_ping():
+
+    data = request.get_json(silent=True) or {}
+
+    targets_raw = data.get("targets", "")
+    count = data.get("count", 4)
+    timeout = data.get("timeout", 2)
+    packet_size = data.get("packet_size", 32)
+
+    try:
+        if not isinstance(targets_raw, str):
+            raise ValueError("Invalid target list.")
+
+        if len(targets_raw) > MAX_DIAGNOSTIC_INPUT:
+            raise ValueError("Ping input is too large.")
+
+        targets = [
+            line.strip()
+            for line in targets_raw.splitlines()
+            if line.strip()
+        ]
+
+        # Remove duplicates while preserving order.
+        targets = list(dict.fromkeys(targets))
+
+        if not targets:
+            raise ValueError("Enter at least one target.")
+
+        if len(targets) > MAX_BULK_PING_TARGETS:
+            raise ValueError(
+                f"Maximum {MAX_BULK_PING_TARGETS} targets are allowed."
+            )
+
+        count = int(count)
+        timeout = float(timeout)
+        packet_size = int(packet_size)
+
+        if not 1 <= count <= MAX_PING_PACKETS:
+            raise ValueError(
+                f"Packet count must be between 1 and {MAX_PING_PACKETS}."
+            )
+
+        if not 0.5 <= timeout <= 5:
+            raise ValueError(
+                "Timeout must be between 0.5 and 5 seconds."
+            )
+
+        if not 8 <= packet_size <= MAX_PACKET_SIZE:
+            raise ValueError(
+                f"Packet size must be between 8 and {MAX_PACKET_SIZE} bytes."
+            )
+
+        validated = []
+
+        for target in targets:
+            validated.append(
+                validate_diagnostic_target(target)
+            )
+
+        results = []
+
+        # Controlled concurrency rather than spawning unlimited processes.
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(10, len(validated))
+        ) as executor:
+
+            futures = [
+                executor.submit(
+                    ping_single_target,
+                    target,
+                    count,
+                    timeout,
+                    packet_size
+                )
+                for target in validated
+            ]
+
+            for future in futures:
+                try:
+                    results.append(future.result())
+                except Exception as exc:
+                    results.append({
+                        "target": "unknown",
+                        "success": False,
+                        "error": str(exc),
+                    })
+
+        reachable = sum(
+            1 for item in results
+            if item.get("success")
+        )
+
+        return jsonify({
+            "success": True,
+            "total": len(results),
+            "reachable": reachable,
+            "unreachable": len(results) - reachable,
+            "results": results,
+        })
+
+    except (ValueError, TypeError) as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
 def generate_acl_config(
     vendor,
     rules,
@@ -1199,6 +1573,7 @@ def sitemap_xml():
         "home",
         "about",
         "projects",
+        "network_diagnostic_lab",
         "network_toolkit_project",
         "noida_sez_project",
         "network_toolkit",
@@ -1236,6 +1611,11 @@ def projects():
     return render_template("projects.html")
 
 
+@app.route("/network-diagnostic-lab")
+def network_diagnostic_lab():
+    return render_template("network_diagnostic_lab.html")
+
+
 @app.route("/projects/network-toolkit")
 def network_toolkit_project():
     return render_template("network_toolkit_project.html")
@@ -1245,6 +1625,9 @@ def network_toolkit_project():
 def noida_sez_project():
     return render_template("noida_sez_project.html")
 
+@app.route("/projects/noida-stp2-aruba")
+def noida_stp2_project():
+    return render_template("noida_stp2_aruba.html")
 
 @app.route("/network-toolkit", methods=["GET", "POST"])
 def network_toolkit():
@@ -1254,6 +1637,555 @@ def network_toolkit():
 def healthz():
     """Uptime monitoring endpoint to prevent Render free-tier spin-downs."""
     return {"status": "healthy"}, 200
+
+
+# ---------------------------------------------------------------------------
+# Network Engineering Tools
+# ---------------------------------------------------------------------------
+
+
+@app.route(
+    "/api/diagnostic/reverse-dns",
+    methods=["POST"]
+)
+def diagnostic_reverse_dns():
+
+    data = request.get_json(silent=True) or {}
+    value = data.get("ip", "").strip()
+
+    try:
+        ip = ipaddress.ip_address(value)
+
+        result = resolve_reverse_dns(ip)
+
+        return jsonify({
+            "success": True,
+            "result": result,
+        })
+
+    except ValueError as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
+@app.route(
+    "/api/diagnostic/ip-info",
+    methods=["POST"]
+)
+def diagnostic_ip_info():
+
+    data = request.get_json(silent=True) or {}
+    value = data.get("ip", "").strip()
+
+    try:
+        network = ipaddress.ip_network(
+            value,
+            strict=False
+        )
+
+        first_host, last_host, usable_hosts = (
+            first_and_last_host(network)
+        )
+
+        result = {
+            "network": str(network),
+            "version": f"IPv{network.version}",
+            "network_address": str(network.network_address),
+            "broadcast": str(network.broadcast_address),
+            "netmask": str(network.netmask),
+            "hostmask": str(network.hostmask),
+            "prefix": network.prefixlen,
+            "total_addresses": network.num_addresses,
+            "first_host": first_host,
+            "last_host": last_host,
+            "usable_hosts": usable_hosts,
+        }
+
+        return jsonify({
+            "success": True,
+            "result": result,
+        })
+
+    except ValueError as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
+
+@app.route(
+    "/api/diagnostic/tcp",
+    methods=["POST"]
+)
+def diagnostic_tcp():
+
+    data = request.get_json(silent=True) or {}
+
+    host = data.get("host", "").strip()
+
+    try:
+        port = int(data.get("port", 443))
+    except (TypeError, ValueError):
+        return jsonify({
+            "success": False,
+            "error": "Invalid port."
+        }), 400
+
+    try:
+        if not 1 <= port <= 65535:
+            raise ValueError(
+                "Port must be between 1 and 65535."
+            )
+
+        target = validate_diagnostic_target(host)
+
+        start = time.perf_counter()
+
+        sock = socket.create_connection(
+            (target, port),
+            timeout=SOCKET_TIMEOUT
+        )
+
+        sock.close()
+
+        elapsed = round(
+            (time.perf_counter() - start) * 1000,
+            2
+        )
+
+        return jsonify({
+            "success": True,
+            "result": {
+                "host": host,
+                "port": port,
+                "status": "OPEN",
+                "latency_ms": elapsed,
+            }
+        })
+
+    except Exception as exc:
+        return jsonify({
+            "success": True,
+            "result": {
+                "host": host,
+                "port": port,
+                "status": "CLOSED / UNREACHABLE",
+                "error": str(exc),
+            }
+        })
+
+
+@app.route(
+    "/api/diagnostic/http-headers",
+    methods=["POST"]
+)
+def diagnostic_http_headers():
+
+    data = request.get_json(silent=True) or {}
+
+    raw_url = data.get("url", "").strip()
+
+    try:
+        if len(raw_url) > 2048:
+            raise ValueError("URL is too long.")
+
+        parsed = urllib.parse.urlparse(raw_url)
+
+        if parsed.scheme not in ("http", "https"):
+            raise ValueError(
+                "Only HTTP and HTTPS URLs are allowed."
+            )
+
+        if not parsed.hostname:
+            raise ValueError("Invalid URL.")
+
+        validate_diagnostic_target(parsed.hostname)
+
+        port = parsed.port
+
+        if parsed.scheme == "https":
+            connection = http.client.HTTPSConnection(
+                parsed.hostname,
+                port or 443,
+                timeout=DIAGNOSTIC_TIMEOUT,
+                context=ssl.create_default_context()
+            )
+        else:
+            connection = http.client.HTTPConnection(
+                parsed.hostname,
+                port or 80,
+                timeout=DIAGNOSTIC_TIMEOUT
+            )
+
+        path = parsed.path or "/"
+
+        if parsed.query:
+            path += "?" + parsed.query
+
+        start = time.perf_counter()
+
+        connection.request(
+            "HEAD",
+            path,
+            headers={
+                "User-Agent": DIAGNOSTIC_USER_AGENT,
+                "Accept": "*/*",
+                "Connection": "close",
+            }
+        )
+
+        response = connection.getresponse()
+
+        elapsed = round(
+            (time.perf_counter() - start) * 1000,
+            2
+        )
+
+        headers = dict(response.getheaders())
+
+        connection.close()
+
+        return jsonify({
+            "success": True,
+            "result": {
+                "url": raw_url,
+                "status": response.status,
+                "reason": response.reason,
+                "latency_ms": elapsed,
+                "headers": headers,
+            }
+        })
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
+
+@app.route(
+    "/api/diagnostic/mac-vendor",
+    methods=["POST"]
+)
+def diagnostic_mac_vendor():
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        mac = normalize_mac(
+            data.get("mac", "")
+        )
+
+        encoded = urllib.parse.quote(mac)
+
+        request_obj = urllib.request.Request(
+            f"https://api.macvendors.com/{encoded}",
+            headers={
+                "User-Agent": DIAGNOSTIC_USER_AGENT
+            }
+        )
+
+        with urllib.request.urlopen(
+            request_obj,
+            timeout=DIAGNOSTIC_TIMEOUT
+        ) as response:
+
+            vendor = response.read(
+                4096
+            ).decode(
+                "utf-8",
+                errors="replace"
+            ).strip()
+
+        if not vendor:
+            raise ValueError(
+                "Vendor not found."
+            )
+
+        return jsonify({
+            "success": True,
+            "result": {
+                "mac": mac,
+                "vendor": vendor,
+            }
+        })
+
+    except urllib.error.HTTPError as exc:
+
+        if exc.code == 404:
+            message = "MAC vendor not found."
+        elif exc.code == 429:
+            message = "MAC vendor service rate limit reached."
+        else:
+            message = "MAC vendor lookup failed."
+
+        return jsonify({
+            "success": False,
+            "error": message,
+        }), 502
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
+DNS_RESOLVERS = {
+    "Cloudflare": "https://cloudflare-dns.com/dns-query",
+    "Google": "https://dns.google/resolve",
+    "Quad9": "https://dns.quad9.net:5053/dns-query",
+}
+
+
+@app.route(
+    "/api/diagnostic/dns-propagation",
+    methods=["POST"]
+)
+def diagnostic_dns_propagation():
+
+    data = request.get_json(silent=True) or {}
+
+    hostname = normalize_hostname(
+        data.get("hostname", "")
+    )
+
+    record_type = data.get(
+        "record_type",
+        "A"
+    ).upper()
+
+    allowed_types = {
+        "A",
+        "AAAA",
+        "CNAME",
+        "MX",
+        "NS",
+        "TXT",
+    }
+
+    if record_type not in allowed_types:
+        return jsonify({
+            "success": False,
+            "error": "Unsupported DNS record type."
+        }), 400
+
+    results = {}
+
+    for resolver_name, resolver_url in DNS_RESOLVERS.items():
+
+        try:
+            params = urllib.parse.urlencode({
+                "name": hostname,
+                "type": record_type,
+            })
+
+            request_obj = urllib.request.Request(
+                resolver_url + "?" + params,
+                headers={
+                    "User-Agent": DIAGNOSTIC_USER_AGENT,
+                    "Accept": "application/dns-json",
+                }
+            )
+
+            with urllib.request.urlopen(
+                request_obj,
+                timeout=DIAGNOSTIC_TIMEOUT
+            ) as response:
+
+                payload = json.loads(
+                    response.read(
+                        128 * 1024
+                    ).decode(
+                        "utf-8",
+                        errors="replace"
+                    )
+                )
+
+            answers = []
+
+            for answer in payload.get(
+                "Answer",
+                []
+            ):
+                answers.append({
+                    "name": answer.get("name"),
+                    "type": answer.get("type"),
+                    "ttl": answer.get("TTL"),
+                    "data": answer.get("data"),
+                })
+
+            results[resolver_name] = {
+                "status": "SUCCESS",
+                "answers": answers,
+            }
+
+        except Exception as exc:
+            results[resolver_name] = {
+                "status": "ERROR",
+                "error": str(exc),
+            }
+
+    return jsonify({
+        "success": True,
+        "hostname": hostname,
+        "record_type": record_type,
+        "resolvers": results,
+    })
+
+
+@app.route(
+    "/api/diagnostic/rdap",
+    methods=["POST"]
+)
+def diagnostic_rdap():
+
+    data = request.get_json(silent=True) or {}
+    value = data.get("query", "").strip()
+
+    try:
+        try:
+            address = ipaddress.ip_address(value)
+            lookup_url = (
+                f"https://rdap.org/ip/{address}"
+            )
+        except ValueError:
+
+            hostname = normalize_hostname(value)
+
+            lookup_url = (
+                f"https://rdap.org/domain/"
+                f"{urllib.parse.quote(hostname)}"
+            )
+
+        payload = fetch_json(
+            lookup_url,
+            timeout=DIAGNOSTIC_TIMEOUT
+        )
+
+        return jsonify({
+            "success": True,
+            "result": payload,
+        })
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
+@app.route(
+    "/api/diagnostic/bgp",
+    methods=["POST"]
+)
+def diagnostic_bgp():
+
+    data = request.get_json(silent=True) or {}
+    value = data.get("query", "").strip()
+
+    try:
+        ip = ipaddress.ip_address(value)
+
+        encoded = urllib.parse.quote(
+            str(ip)
+        )
+
+        url = (
+            "https://stat.ripe.net/data/"
+            "network-info/data.json?resource="
+            + encoded
+        )
+
+        payload = fetch_json(url)
+
+        return jsonify({
+            "success": True,
+            "result": payload.get(
+                "data",
+                payload
+            ),
+        })
+
+    except ValueError as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": "BGP/ASN lookup failed.",
+        }), 502
+
+@app.route(
+    "/api/diagnostic/traceroute",
+    methods=["POST"]
+)
+def diagnostic_traceroute():
+
+    data = request.get_json(silent=True) or {}
+
+    target = data.get(
+        "target",
+        ""
+    ).strip()
+
+    try:
+        target = validate_diagnostic_target(
+            target
+        )
+
+        system = platform.system().lower()
+
+        if system == "windows":
+
+            command = [
+                "tracert",
+                "-d",
+                "-h",
+                str(MAX_TRACE_HOPS),
+                target,
+            ]
+
+        else:
+
+            command = [
+                "traceroute",
+                "-n",
+                "-m",
+                str(MAX_TRACE_HOPS),
+                target,
+            ]
+
+        result = run_command(
+            command,
+            timeout=45
+        )
+
+        return jsonify({
+            "success": True,
+            "target": target,
+            "output": (
+                result["stdout"]
+                + result["stderr"]
+            )[-20000:],
+        })
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc),
+        }), 400
+
+
+
+
 
 
 # ---------------------------------------------------------------------------

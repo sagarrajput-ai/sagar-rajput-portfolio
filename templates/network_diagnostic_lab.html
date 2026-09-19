@@ -1,0 +1,600 @@
+{% extends "base.html" %}
+
+{% block title %}
+Network Diagnostic Lab | Sagar Rajput
+{% endblock %}
+
+{% block meta_description %}
+Advanced network diagnostic tools by Sagar Rajput including bulk ping, traceroute, DNS, reverse DNS, RDAP, BGP, TCP connectivity, HTTP headers, subnet information and MAC vendor lookup.
+{% endblock %}
+
+{% block og_title %}
+Network Diagnostic Lab | Sagar Rajput
+{% endblock %}
+
+{% block og_description %}
+Advanced network intelligence, diagnostics and troubleshooting tools including bulk ping, traceroute, DNS, RDAP, BGP, TCP and HTTP diagnostics.
+{% endblock %}
+
+{% block twitter_title %}
+Network Diagnostic Lab | Sagar Rajput
+{% endblock %}
+
+{% block twitter_description %}
+Network intelligence, diagnostics and troubleshooting tools in one unified browser-based lab.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Network Diagnostic Lab",
+    "url": "https://sagarrajput.com/network-diagnostic-lab",
+    "description": "Network intelligence, diagnostics and troubleshooting tools built by Sagar Rajput.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "author": {
+        "@type": "Person",
+        "name": "Sagar Rajput",
+        "url": "https://sagarrajput.com"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<main class="diagnostic-page">
+
+    <section class="diagnostic-hero">
+        <div class="container">
+            <div class="diagnostic-eyebrow">
+                <span class="diagnostic-eyebrow-dot"></span>
+                NETWORK INTELLIGENCE · DIAGNOSTICS · TROUBLESHOOTING
+            </div>
+
+            <h1>
+                Network Diagnostic
+                <span>Lab.</span>
+            </h1>
+
+            <p class="diagnostic-lead">
+                A unified workspace for network intelligence, connectivity testing, DNS analysis, routing information, web diagnostics, and troubleshooting.
+            </p>
+
+            <div class="diagnostic-stats">
+                <div class="diagnostic-stat">
+                    <strong>10</strong>
+                    <span>Diagnostic Tools</span>
+                </div>
+                <div class="diagnostic-stat">
+                    <strong>1</strong>
+                    <span>Unified Workspace</span>
+                </div>
+                <div class="diagnostic-stat">
+                    <strong>IPv4/6</strong>
+                    <span>Dual-Stack Ready</span>
+                </div>
+                <div class="diagnostic-stat">
+                    <strong>Bulk</strong>
+                    <span>Ping Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="diagnostic-tools-section">
+        <div class="container">
+
+            <!-- Category 1 -->
+            <div class="diagnostic-category">
+                <div class="diagnostic-category-title">
+                    <span>01 · NETWORK INTELLIGENCE</span>
+                    <h2>Identify networks, vendors and routing information.</h2>
+                </div>
+                <div class="diagnostic-tool-grid">
+                    <button type="button" class="diagnostic-tool active" data-tool="mac-vendor">
+                        <span class="diagnostic-tool-icon">MAC</span>
+                        <h3>MAC Vendor Lookup</h3>
+                        <p>Identify hardware vendor by MAC prefix.</p>
+                    </button>
+
+                    <button type="button" class="diagnostic-tool" data-tool="ip-info">
+                        <span class="diagnostic-tool-icon">IP</span>
+                        <h3>IP / Subnet Information</h3>
+                        <p>Inspect network boundaries, masks, and scopes.</p>
+                    </button>
+
+                    <button type="button" class="diagnostic-tool" data-tool="bgp">
+                        <span class="diagnostic-tool-icon">BGP</span>
+                        <h3>BGP / ASN Lookup</h3>
+                        <p>Inspect Autonomous System route origins.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category 2 -->
+            <div class="diagnostic-category">
+                <div class="diagnostic-category-title">
+                    <span>02 · DNS & IDENTITY</span>
+                    <h2>Resolve names, ownership and DNS responses.</h2>
+                </div>
+                <div class="diagnostic-tool-grid">
+                    <button type="button" class="diagnostic-tool" data-tool="reverse-dns">
+                        <span class="diagnostic-tool-icon">RDNS</span>
+                        <h3>Reverse DNS</h3>
+                        <p>Resolve IP addresses to PTR host records.</p>
+                    </button>
+
+                    <button type="button" class="diagnostic-tool" data-tool="rdap">
+                        <span class="diagnostic-tool-icon">RDAP</span>
+                        <h3>WHOIS / RDAP</h3>
+                        <p>Retrieve authoritative registry allocations.</p>
+                    </button>
+
+                    <button type="button" class="diagnostic-tool" data-tool="dns-propagation">
+                        <span class="diagnostic-tool-icon">DNS</span>
+                        <h3>DNS Resolver Check</h3>
+                        <p>Compare queries across public DNS servers.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category 3 -->
+            <div class="diagnostic-category">
+                <div class="diagnostic-category-title">
+                    <span>03 · CONNECTIVITY</span>
+                    <h2>Test reachability and network paths.</h2>
+                </div>
+                <div class="diagnostic-tool-grid">
+                    <button type="button" class="diagnostic-tool" data-tool="ping">
+                        <span class="diagnostic-tool-icon">PING</span>
+                        <h3>Advanced Ping</h3>
+                        <p>Bulk target ICMP echo latency check.</p>
+                    </button>
+
+                    <button type="button" class="diagnostic-tool" data-tool="traceroute">
+                        <span class="diagnostic-tool-icon">TRACE</span>
+                        <h3>Traceroute</h3>
+                        <p>Inspect intermediate transit hops.</p>
+                    </button>
+
+                    <button type="button" class="diagnostic-tool" data-tool="tcp">
+                        <span class="diagnostic-tool-icon">TCP</span>
+                        <h3>TCP Connectivity</h3>
+                        <p>Verify socket reachability on specific ports.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category 4 -->
+            <div class="diagnostic-category">
+                <div class="diagnostic-category-title">
+                    <span>04 · WEB & HOST DIAGNOSTICS</span>
+                    <h2>Inspect websites, DNS and network services.</h2>
+                </div>
+                <div class="diagnostic-tool-grid">
+                    <button type="button" class="diagnostic-tool" data-tool="http-headers">
+                        <span class="diagnostic-tool-icon">HTTP</span>
+                        <h3>HTTP / HTTPS Headers</h3>
+                        <p>Inspect response status, TLS, and security headers.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- WORKSPACE -->
+            <section class="diagnostic-workspace">
+                <div class="diagnostic-workspace-header">
+                    <div>
+                        <p class="diagnostic-workspace-kicker" id="workspace-kicker">ACTIVE TOOL</p>
+                        <h2 id="workspace-title">MAC Vendor Lookup</h2>
+                        <p class="diagnostic-workspace-description" id="workspace-description">
+                            Enter a MAC address to identify its registered manufacturer.
+                        </p>
+                    </div>
+                    <div class="diagnostic-status" id="diagnostic-status-badge">
+                        <span class="diagnostic-status-dot"></span>
+                        <span id="diagnostic-status-text">READY</span>
+                    </div>
+                </div>
+
+                <!-- FORM: MAC VENDOR -->
+                <form class="diagnostic-form active" id="form-mac-vendor" data-endpoint="/api/diagnostic/mac-vendor">
+                    <div class="diagnostic-field">
+                        <label for="mac-input">MAC Address</label>
+                        <input class="diagnostic-input" id="mac-input" name="mac" type="text" placeholder="00:11:22:33:44:55" autocomplete="off" required>
+                        <small>Supported formats: 00:11:22:33:44:55, 00-11-22-33-44-55, 0011.2233.4455, or 001122334455.</small>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Lookup Vendor →</button>
+                </form>
+
+                <!-- FORM: IP INFO -->
+                <form class="diagnostic-form" id="form-ip-info" data-endpoint="/api/diagnostic/ip-info">
+                    <div class="diagnostic-field">
+                        <label for="ip-info-input">IP Address or Network</label>
+                        <input class="diagnostic-input" id="ip-info-input" name="ip" type="text" placeholder="192.168.1.10 or 10.0.0.0/24" required>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Analyze IP →</button>
+                </form>
+
+                <!-- FORM: BGP -->
+                <form class="diagnostic-form" id="form-bgp" data-endpoint="/api/diagnostic/bgp">
+                    <div class="diagnostic-field">
+                        <label for="bgp-input">IP Address</label>
+                        <input class="diagnostic-input" id="bgp-input" name="query" type="text" placeholder="8.8.8.8" required>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Lookup BGP / ASN →</button>
+                </form>
+
+                <!-- FORM: REVERSE DNS -->
+                <form class="diagnostic-form" id="form-reverse-dns" data-endpoint="/api/diagnostic/reverse-dns">
+                    <div class="diagnostic-field">
+                        <label for="reverse-dns-input">IP Address</label>
+                        <input class="diagnostic-input" id="reverse-dns-input" name="ip" type="text" placeholder="8.8.8.8" required>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Reverse Lookup →</button>
+                </form>
+
+                <!-- FORM: RDAP -->
+                <form class="diagnostic-form" id="form-rdap" data-endpoint="/api/diagnostic/rdap">
+                    <div class="diagnostic-field">
+                        <label for="rdap-input">IP Address or Domain</label>
+                        <input class="diagnostic-input" id="rdap-input" name="query" type="text" placeholder="8.8.8.8 or example.com" required>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Lookup RDAP →</button>
+                </form>
+
+                <!-- FORM: DNS PROPAGATION -->
+                <form class="diagnostic-form" id="form-dns-propagation" data-endpoint="/api/diagnostic/dns-propagation">
+                    <div class="diagnostic-grid-2">
+                        <div class="diagnostic-field">
+                            <label for="dns-hostname">Hostname</label>
+                            <input class="diagnostic-input" id="dns-hostname" name="hostname" type="text" placeholder="example.com" required>
+                        </div>
+                        <div class="diagnostic-field">
+                            <label for="dns-record-type">Record Type</label>
+                            <select class="diagnostic-select" id="dns-record-type" name="record_type">
+                                <option>A</option>
+                                <option>AAAA</option>
+                                <option>CNAME</option>
+                                <option>MX</option>
+                                <option>NS</option>
+                                <option>TXT</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Check Resolvers →</button>
+                </form>
+
+                <!-- FORM: PING -->
+                <form class="diagnostic-form" id="form-ping" data-endpoint="/api/diagnostic/ping">
+                    <div class="diagnostic-field">
+                        <label for="ping-targets">Target(s)</label>
+                        <textarea class="diagnostic-textarea" id="ping-targets" name="targets" placeholder="8.8.8.8&#10;1.1.1.1&#10;google.com" required></textarea>
+                        <small>One IP address or hostname per line. Up to 50 targets.</small>
+                    </div>
+                    <div class="diagnostic-grid-3">
+                        <div class="diagnostic-field">
+                            <label for="ping-count">Packets</label>
+                            <input class="diagnostic-input" id="ping-count" name="count" type="number" min="1" max="10" value="4">
+                        </div>
+                        <div class="diagnostic-field">
+                            <label for="ping-timeout">Timeout (s)</label>
+                            <input class="diagnostic-input" id="ping-timeout" name="timeout" type="number" min="0.5" max="5" step="0.5" value="2">
+                        </div>
+                        <div class="diagnostic-field">
+                            <label for="ping-size">Bytes</label>
+                            <input class="diagnostic-input" id="ping-size" name="packet_size" type="number" min="8" max="1400" value="32">
+                        </div>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Run Advanced Ping →</button>
+                </form>
+
+                <!-- FORM: TRACEROUTE -->
+                <form class="diagnostic-form" id="form-traceroute" data-endpoint="/api/diagnostic/traceroute">
+                    <div class="diagnostic-field">
+                        <label for="trace-target">Target</label>
+                        <input class="diagnostic-input" id="trace-target" name="target" type="text" placeholder="8.8.8.8 or google.com" required>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Run Traceroute →</button>
+                </form>
+
+                <!-- FORM: TCP -->
+                <form class="diagnostic-form" id="form-tcp" data-endpoint="/api/diagnostic/tcp">
+                    <div class="diagnostic-grid-2">
+                        <div class="diagnostic-field">
+                            <label for="tcp-host">Host / IP</label>
+                            <input class="diagnostic-input" id="tcp-host" name="host" type="text" placeholder="example.com" required>
+                        </div>
+                        <div class="diagnostic-field">
+                            <label for="tcp-port">Port</label>
+                            <input class="diagnostic-input" id="tcp-port" name="port" type="number" min="1" max="65535" value="443" required>
+                        </div>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Test TCP Connectivity →</button>
+                </form>
+
+                <!-- FORM: HTTP HEADERS -->
+                <form class="diagnostic-form" id="form-http-headers" data-endpoint="/api/diagnostic/http-headers">
+                    <div class="diagnostic-field">
+                        <label for="http-url">HTTP / HTTPS URL</label>
+                        <input class="diagnostic-input" id="http-url" name="url" type="url" placeholder="https://example.com" required>
+                    </div>
+                    <button class="diagnostic-run" type="submit">Check Headers →</button>
+                </form>
+
+                <!-- RESULTS DISPLAY -->
+                <div class="diagnostic-results" id="diagnostic-results" style="display: none; margin-top: 30px;">
+                    <div class="diagnostic-results-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">Diagnostic Results</h3>
+                        <button type="button" class="diagnostic-copy" id="copy-results">Copy Output</button>
+                    </div>
+
+                    <!-- Visual Formatted Cards / Tables -->
+                    <div id="diagnostic-visual-output" style="margin-bottom: 20px;"></div>
+
+            </section>
+
+            <!-- RESPONSIBLE USE -->
+            <div class="diagnostic-notice">
+                <strong>Responsible use</strong>
+                <p>
+                    These diagnostics are intended for troubleshooting, learning and authorized testing. Do not probe networks without permission.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toolButtons = document.querySelectorAll(".diagnostic-tool");
+    const forms = document.querySelectorAll(".diagnostic-form");
+    const title = document.getElementById("workspace-title");
+    const description = document.getElementById("workspace-description");
+    const statusText = document.getElementById("diagnostic-status-text");
+    const resultsContainer = document.getElementById("diagnostic-results");
+    const visualOutput = document.getElementById("diagnostic-visual-output");
+    const rawOutput = document.getElementById("diagnostic-output-text");
+    const copyButton = document.getElementById("copy-results");
+
+    const tools = {
+        "mac-vendor": {
+            title: "MAC Vendor Lookup",
+            description: "Enter a MAC address to identify its registered manufacturer."
+        },
+        "ip-info": {
+            title: "IP / Subnet Information",
+            description: "Inspect addressing, subnet, mask and host-range information."
+        },
+        "bgp": {
+            title: "BGP / ASN Lookup",
+            description: "Inspect routing and autonomous-system information associated with an IP address."
+        },
+        "reverse-dns": {
+            title: "Reverse DNS",
+            description: "Resolve an IP address to its reverse DNS hostname."
+        },
+        "rdap": {
+            title: "WHOIS / RDAP",
+            description: "Retrieve structured registration information for an IP address or domain."
+        },
+        "dns-propagation": {
+            title: "DNS Resolver Check",
+            description: "Compare DNS answers across multiple public DNS resolvers."
+        },
+        "ping": {
+            title: "Advanced Ping",
+            description: "Test one or many targets with configurable packet count, timeout and packet size."
+        },
+        "traceroute": {
+            title: "Traceroute",
+            description: "Trace the network path from the diagnostic server to the selected destination."
+        },
+        "tcp": {
+            title: "TCP Connectivity",
+            description: "Check whether a TCP service is reachable on a selected port."
+        },
+        "http-headers": {
+            title: "HTTP / HTTPS Headers",
+            description: "Inspect HTTP status and response headers from a public web destination."
+        }
+    };
+
+    function escapeHtml(val) {
+        if (val === null || val === undefined) return "";
+        return String(val)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function formatLabel(key) {
+        return String(key)
+            .replace(/_/g, " ")
+            .replace(/([a-z])([A-Z])/g, "$1 $2")
+            .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function showTool(toolName) {
+        if (!tools[toolName]) return;
+
+        toolButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.tool === toolName));
+        forms.forEach(form => form.classList.toggle("active", form.id === "form-" + toolName));
+
+        title.textContent = tools[toolName].title;
+        description.textContent = tools[toolName].description;
+        statusText.textContent = "READY";
+        resultsContainer.style.display = "none";
+        visualOutput.innerHTML = "";
+        rawOutput.textContent = "";
+
+        const activeForm = document.getElementById("form-" + toolName);
+        if (activeForm) {
+            const firstInput = activeForm.querySelector("input, textarea, select");
+            if (firstInput) setTimeout(() => firstInput.focus(), 60);
+        }
+    }
+
+    toolButtons.forEach(btn => {
+        btn.addEventListener("click", () => showTool(btn.dataset.tool));
+    });
+
+    function renderResults(data) {
+        resultsContainer.style.display = "block";
+        visualOutput.innerHTML = "";
+/*        rawOutput.textContent = JSON.stringify(data, null, 2);*/
+
+        // Check failure
+        if (data.success === false || data.error) {
+            statusText.textContent = "ERROR";
+            visualOutput.innerHTML = `
+                <div class="diagnostic-error" style="padding: 16px; border-radius: 10px; background: #fff1f2; border: 1px solid #fecdd3; color: #be123c; font-weight: 600;">
+                    ${escapeHtml(data.error || "Diagnostic operation failed.")}
+                </div>
+            `;
+            return;
+        }
+
+        statusText.textContent = "COMPLETED";
+
+        // 1. Bulk Ping Response
+        if (data.results && Array.isArray(data.results)) {
+            let table = `
+                <table class="diagnostic-table" style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--line, #e2e8f0);">
+                            <th style="padding: 10px;">Target</th>
+                            <th style="padding: 10px;">Status</th>
+                            <th style="padding: 10px;">Latency</th>
+                            <th style="padding: 10px;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            data.results.forEach(item => {
+                const isOnline = item.success === true;
+                table += `
+                    <tr style="border-bottom: 1px solid var(--line, #f1f5f9);">
+                        <td style="padding: 10px; font-family: monospace;">${escapeHtml(item.target || "-")}</td>
+                        <td style="padding: 10px; font-weight: bold; color: ${isOnline ? '#10b981' : '#ef4444'};">
+                            ${isOnline ? 'ONLINE' : 'OFFLINE'}
+                        </td>
+                        <td style="padding: 10px;">${item.elapsed_ms !== undefined ? escapeHtml(item.elapsed_ms) + ' ms' : '-'}</td>
+                        <td style="padding: 10px;">${escapeHtml(item.error || (isOnline ? 'Echo Reply OK' : 'No Response'))}</td>
+                    </tr>
+                `;
+            });
+            table += "</tbody></table>";
+            visualOutput.innerHTML = table;
+            return;
+        }
+
+        // 2. DNS Resolvers Response
+        if (data.resolvers && typeof data.resolvers === "object") {
+            let table = `
+                <table class="diagnostic-table" style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--line, #e2e8f0);">
+                            <th style="padding: 10px;">Resolver</th>
+                            <th style="padding: 10px;">Status</th>
+                            <th style="padding: 10px;">Answers / Records</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            Object.entries(data.resolvers).forEach(([res, resData]) => {
+                const answers = (resData.answers || []).map(a => a.data || a).join(", ");
+                table += `
+                    <tr style="border-bottom: 1px solid var(--line, #f1f5f9);">
+                        <td style="padding: 10px; font-weight: 600;">${escapeHtml(res)}</td>
+                        <td style="padding: 10px; color: #10b981;">${escapeHtml(resData.status || 'OK')}</td>
+                        <td style="padding: 10px; font-family: monospace;">${escapeHtml(answers || resData.error || '-')}</td>
+                    </tr>
+                `;
+            });
+            table += "</tbody></table>";
+            visualOutput.innerHTML = table;
+            return;
+        }
+
+        // 3. Key-Value Card Display for MAC, IP, BGP, TCP, Headers
+        const sourceObject = (data.result && typeof data.result === "object") ? data.result : data;
+        let cardsHtml = `<div class="diagnostic-result-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">`;
+        
+        Object.entries(sourceObject).forEach(([k, v]) => {
+            if (k === "success" || k === "raw") return;
+            let displayVal = (typeof v === "object" && v !== null) ? JSON.stringify(v) : String(v);
+            cardsHtml += `
+                <div class="result-card" style="padding: 16px; border: 1px solid var(--line, #e2e8f0); border-radius: 12px; background: rgba(255,255,255,0.03);">
+                    <span style="display: block; font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;">
+                        ${escapeHtml(formatLabel(k))}
+                    </span>
+                    <strong style="font-family: monospace; font-size: 14px; word-break: break-all; color: var(--accent, #28d7c5);">
+                        ${escapeHtml(displayVal)}
+                    </strong>
+                </div>
+            `;
+        });
+        cardsHtml += `</div>`;
+        visualOutput.innerHTML = cardsHtml;
+    }
+
+    forms.forEach(form => {
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const btn = form.querySelector(".diagnostic-run");
+            const endpoint = form.dataset.endpoint;
+            const payload = Object.fromEntries(new FormData(form).entries());
+
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = "Running diagnostic…";
+            statusText.textContent = "RUNNING";
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+
+                const data = await response.json();
+                renderResults(data);
+            } catch (err) {
+                renderResults({
+                    success: false,
+                    error: err.message || "Failed to communicate with diagnostic API."
+                });
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    });
+
+        copyButton.addEventListener("click", async function () {
+            try {
+                const textToCopy = visualOutput.innerText || "";
+                await navigator.clipboard.writeText(textToCopy.trim());
+                copyButton.textContent = "Copied ✓";
+                setTimeout(() => copyButton.textContent = "Copy Output", 1500);
+            } catch (e) {
+                copyButton.textContent = "Copy Failed";
+            }
+        });
+
+    showTool("mac-vendor");
+});
+</script>
+
+{% endblock %}

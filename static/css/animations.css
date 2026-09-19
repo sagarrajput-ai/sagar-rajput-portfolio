@@ -1,0 +1,123 @@
+/* ============================================
+   Sagar Rajput Portfolio — Animation Layer v2
+   Additive only. No existing rules removed.
+   ============================================ */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .8s cubic-bezier(.16,.8,.24,1),
+              transform .8s cubic-bezier(.16,.8,.24,1);
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#network-canvas,
+.network-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero h1 span,
+.toolkit-hero h1 span {
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.btn-primary, .btn-secondary {
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease, color .3s ease;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(40,215,197,.35); }
+.btn-secondary:hover { transform: translateY(-3px); border-color: var(--accent); color: var(--accent); }
+
+.hero-card { transition: transform .5s cubic-bezier(.16,.8,.24,1); transform-style: preserve-3d; }
+
+.avatar { animation: avatarGlow 3.2s ease-in-out infinite; }
+@keyframes avatarGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(40,215,197,.35); }
+  50%      { box-shadow: 0 0 0 14px rgba(40,215,197,0); }
+}
+
+.card, .hero-card, [class*="project-card"] {
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.card:hover, [class*="project-card"]:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 45px rgba(8,17,31,.18);
+}
+
+/* --- About section: real depth instead of flat white --- */
+.home-about {
+  position: relative;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(40,215,197,.07), transparent 40%),
+    radial-gradient(circle at 88% 85%, rgba(124,140,255,.07), transparent 40%),
+    var(--bg);
+}
+.home-about h2 span {
+  background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent2));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 7s ease infinite;
+}
+
+/* --- Toolkit hero: same stacking fix as home hero, added here
+       so style.css doesn't need to be touched --- */
+.toolkit-hero { position: relative; overflow: hidden; }
+.toolkit-hero-grid { position: relative; z-index: 2; }
+
+/* --- Toolkit cards: staggered entrance + icon hover animation
+       (replaces literal "rotation" — keeps tools instantly clickable) --- */
+.toolkit-card {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s cubic-bezier(.16,.8,.24,1),
+              transform .6s cubic-bezier(.16,.8,.24,1),
+              box-shadow .3s ease;
+}
+.toolkit-card.is-visible { opacity: 1; transform: translateY(0); }
+.tool-icon { transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+.toolkit-card:hover .tool-icon { transform: rotate(-10deg) scale(1.1); }
+
+/* --- Toolkit terminal-style typewriter line --- */
+.toolkit-terminal {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 30px;
+  padding: 12px 18px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  font: 500 14px "DM Mono", monospace;
+  color: #7ee9db;
+}
+.toolkit-terminal .type-prompt { color: var(--accent2); }
+.toolkit-terminal .type-cursor { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], .toolkit-card { opacity: 1; transform: none; transition: none; }
+  .hero h1 span, .toolkit-hero h1 span, .home-about h2 span { animation: none; }
+  .avatar { animation: none; }
+  #network-canvas, .network-canvas { display: none; }
+  .toolkit-terminal .type-cursor { animation: none; }
+}
