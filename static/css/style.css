@@ -17,7 +17,8 @@ a{color:inherit}
 .brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07101e;font-size:13px}
 .nav-links{display:flex;align-items:center;gap:25px;color:#cbd5e1;font-size:14px;font-weight:600}
 .nav-links a{text-decoration:none}.nav-links a:hover{color:#fff}
-.nav-cta{padding:9px 15px;border:1px solid rgba(255,255,255,.2);border-radius:10px;color:#fff!important}
+.nav-cta{padding:9px 15px;border:1px solid rgba(255,255,255,.2);font-weight: 800;color: var(--accent) !important;border-radius:10px;color:#fff!important}
+.nav-cta:hover {color: var(--accent2) !important;}
 .menu-toggle{display:none;background:none;border:0;color:#fff;font-size:25px}
 .hero{background:radial-gradient(circle at 85% 20%,rgba(40,215,197,.14),transparent 30%),radial-gradient(circle at 20% 0%,rgba(124,140,255,.15),transparent 28%),var(--dark);color:#fff;padding:105px 0 80px;position:relative;overflow:hidden}
 .hero-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:80px;align-items:center;position:relative;z-index:2}
@@ -3273,15 +3274,6 @@ a{color:inherit}
    NETWORK DIAGNOSTIC LAB
    Scoped UI — prevents conflicts with existing tools
    ========================================================= */
-
-.nav-diagnostic {
-    color: var(--accent) !important;
-    font-weight: 800;
-}
-
-.nav-diagnostic:hover {
-    color: var(--accent2) !important;
-}
 
 
 .diagnostic-page {
