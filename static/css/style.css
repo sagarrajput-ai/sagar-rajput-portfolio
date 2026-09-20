@@ -3286,6 +3286,8 @@ a{color:inherit}
 
 .diagnostic-page {
     padding-bottom: 90px;
+    background: var(--dark);
+    color: #fff;
 }
 
 .diagnostic-hero {

@@ -12,7 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
   toolkitCards.forEach((card, i) => {
     card.setAttribute("data-reveal-delay", Math.min(i * 70, 420));
   });
-  const allReveal = [...revealEls, ...toolkitCards];
+  const diagnosticTools = [...document.querySelectorAll(".diagnostic-tool")];
+  diagnosticTools.forEach((tool, i) => {
+    tool.setAttribute("data-reveal-delay", Math.min(i * 60, 400));
+  });
+  const allReveal = [...revealEls, ...toolkitCards, ...diagnosticTools];
 
   if (allReveal.length && !reduceMotion) {
     const io = new IntersectionObserver((entries) => {
@@ -175,3 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tick();
   }
 });
+
+
+

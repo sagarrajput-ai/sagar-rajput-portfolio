@@ -48,6 +48,9 @@ Network intelligence, diagnostics and troubleshooting tools in one unified brows
 <main class="diagnostic-page">
 
     <section class="diagnostic-hero">
+
+        <canvas class="network-canvas" aria-hidden="true"></canvas>
+
         <div class="container">
             <div class="diagnostic-eyebrow">
                 <span class="diagnostic-eyebrow-dot"></span>
@@ -334,6 +337,8 @@ Network intelligence, diagnostics and troubleshooting tools in one unified brows
                     <!-- Visual Formatted Cards / Tables -->
                     <div id="diagnostic-visual-output" style="margin-bottom: 20px;"></div>
 
+                    <pre id="diagnostic-output-text" style="display: none;"></pre>
+
             </section>
 
             <!-- RESPONSIBLE USE -->
@@ -437,12 +442,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const activeForm = document.getElementById("form-" + toolName);
         if (activeForm) {
             const firstInput = activeForm.querySelector("input, textarea, select");
-            if (firstInput) setTimeout(() => firstInput.focus(), 60);
+            if (firstInput) setTimeout(() => firstInput.focus({ preventScroll: false }), 60);
         }
     }
 
     toolButtons.forEach(btn => {
-        btn.addEventListener("click", () => showTool(btn.dataset.tool));
+        btn.addEventListener("click", () => {
+            showTool(btn.dataset.tool);
+            const workspace = document.querySelector(".diagnostic-workspace");
+            if (workspace) {
+                workspace.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
     });
 
     function renderResults(data) {

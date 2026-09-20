@@ -359,62 +359,54 @@ def logout():
 # ============================================================
 
 def resolve_target(target):
-
     target = target.strip()
 
     if not target:
-        raise ValueError(
-            "Please enter a hostname or IP address."
-        )
+        raise ValueError("Please enter a hostname or IP address.")
 
     if len(target) > 253:
-        raise ValueError(
-            "Target name is too long."
-        )
+        raise ValueError("Target name is too long.")
 
-    # Remove URL prefixes.
-    target = target.replace(
-        "https://",
-        ""
-    )
-
-    target = target.replace(
-        "http://",
-        ""
-    )
-
-    target = target.split("/")[0]
-
-    # Remove accidental whitespace.
-    target = target.strip()
+    target = target.replace("https://", "")
+    target = target.replace("http://", "")
+    target = target.split("/")[0].strip()
 
     try:
         ip_obj = ipaddress.ip_address(target)
 
         if ip_obj.version != 4:
+            raise ValueError("Only IPv4 targets are supported.")
+
+        if not ip_obj.is_global:
             raise ValueError(
-                "Only IPv4 targets are supported."
+                "Only publicly routable IPv4 targets are allowed."
             )
 
-        return target
+        return str(ip_obj)
 
-    except ValueError:
-        pass
+    except ValueError as exc:
+        if str(exc) == "Only IPv4 targets are supported.":
+            raise
+        if str(exc) == "Only publicly routable IPv4 targets are allowed.":
+            raise
 
     try:
-        resolved_ip = socket.gethostbyname(
-            target
-        )
+        resolved_ip = socket.gethostbyname(target)
+        ip_obj = ipaddress.ip_address(resolved_ip)
+
+        if ip_obj.version != 4:
+            raise ValueError("Only IPv4 targets are supported.")
+
+        if not ip_obj.is_global:
+            raise ValueError(
+                "The hostname resolves to a non-public IPv4 address."
+            )
 
         return resolved_ip
 
     except socket.gaierror:
-
-        raise ValueError(
-            "Unable to resolve the hostname."
-        )
-
-
+        raise ValueError("Unable to resolve the hostname.")
+        
 # ============================================================
 # PORT PARSER
 # ============================================================
