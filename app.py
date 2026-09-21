@@ -1576,6 +1576,7 @@ def sitemap_xml():
         "network_diagnostic_lab",
         "network_toolkit_project",
         "noida_sez_project",
+        "noida_stp2_project",
         "network_toolkit",
         "ip_calculator",
         "subnet_planner",
