@@ -258,3 +258,32 @@ select:focus {
 .diagnostic-workspace {
   scroll-margin-top: 100px;
 }
+
+
+
+/* --- Projects page hero + card animations --- */
+.projects-hero { position: relative; overflow: hidden; }
+.projects-hero .container { position: relative; z-index: 2; }
+.projects-hero h1 span {
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+.project-card {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s cubic-bezier(.16,.8,.24,1),
+              transform .4s cubic-bezier(.16,.8,.24,1),
+              box-shadow .25s ease,
+              border-color .25s ease;
+}
+.project-card.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card { opacity: 1; transform: none; transition: none; }
+  .projects-hero h1 span { animation: none; }
+}

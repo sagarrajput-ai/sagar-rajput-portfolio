@@ -16,7 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
   diagnosticTools.forEach((tool, i) => {
     tool.setAttribute("data-reveal-delay", Math.min(i * 60, 400));
   });
-  const allReveal = [...revealEls, ...toolkitCards, ...diagnosticTools];
+  const projectCards = [...document.querySelectorAll(".project-card")];
+  projectCards.forEach((card, i) => {
+    card.setAttribute("data-reveal-delay", Math.min(i * 90, 360));
+  });
+  const allReveal = [...revealEls, ...toolkitCards, ...diagnosticTools, ...projectCards];
 
   if (allReveal.length && !reduceMotion) {
     const io = new IntersectionObserver((entries) => {
