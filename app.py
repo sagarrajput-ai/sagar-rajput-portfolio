@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-from flask import Flask, render_template, request, Response, url_for, jsonify
+from flask import Flask, render_template, request, Response, redirect, url_for, jsonify
 import ipaddress
 import socket
 import os
@@ -891,6 +891,10 @@ def ping_single_target(target, count=4, timeout=2, packet_size=32):
         "output": output,
     }
 
+
+@app.route("/index.html")
+def redirect_index_html():
+    return redirect(url_for("home"), code=301)
 
 @app.route(
     "/api/diagnostic/ping",
