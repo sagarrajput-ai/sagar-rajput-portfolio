@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% block title %}
 Sagar Rajput | IT Professional & Network Engineer
 {% endblock %}
@@ -33,7 +34,7 @@ Sagar Rajput — exploring technology, building practical projects, and sharing 
       "name": "Sagar Rajput",
       "alternateName": "Sagar Rajput AI",
       "url": "https://sagarrajput.com/",
-      "image": "https://sagarrajput.com/static/images/sagar-profile.png",
+      "image": "https://sagarrajput.com/static/images/sagar-profile-share.jpg",
       "jobTitle": "IT Professional & Network Engineer",
       "description": "Sagar Rajput is an IT Professional and Network Engineer based in India, currently at Infosys Limited, with prior experience at Jubilant FoodWorks, FusionNet India and JAVI Systems. He builds practical networking tools and writes about enterprise networking, network security and IT infrastructure.",
       "worksFor": {
@@ -131,8 +132,10 @@ Sagar Rajput — exploring technology, building practical projects, and sharing 
             <div class="avatar photo-avatar">
 
                 <img
-                    src="{{ url_for('static', filename='images/sagar-profile.png') }}"
+                    src="{{ url_for('static', filename='images/sagar-profile-avatar.webp') }}"
                     alt="Sagar Rajput"
+                    width="320"
+                    height="320"
                 >
 
             </div>
