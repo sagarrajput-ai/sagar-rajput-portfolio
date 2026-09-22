@@ -1,0 +1,20 @@
+{% macro faq_schema(questions) %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for q in questions %}
+    {
+      "@type": "Question",
+      "name": {{ q.question | tojson }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ q.answer | tojson }}
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endmacro %}

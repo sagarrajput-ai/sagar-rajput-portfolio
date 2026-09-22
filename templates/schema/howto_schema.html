@@ -1,0 +1,19 @@
+{% macro howto_schema(name, description, steps) %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": {{ name | tojson }},
+  "description": {{ description | tojson }},
+  "step": [
+    {% for s in steps %}
+    {
+      "@type": "HowToStep",
+      "name": {{ s.title | tojson }},
+      "text": {{ s.text | tojson }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endmacro %}
