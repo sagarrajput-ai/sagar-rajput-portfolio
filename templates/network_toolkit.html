@@ -34,6 +34,15 @@ Practical networking tools built with Python and Flask for IP addressing, subnet
   }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+
+{{ faq_schema([
+  {"question": "What is the Network Engineering Toolkit?", "answer": "A collection of ten free network engineering tools built with Python and Flask, covering IP addressing, subnet planning, DNS, connectivity testing, ACL generation and network documentation search."},
+  {"question": "What tools are included?", "answer": "IP / Subnet Calculator, Subnet Planner, IP Range Calculator, DNS Lookup, TCP Port Checker, Secure Port Scanner, Subnet & Wildcard Mask Calculator, Multi-Vendor ACL Generator, Protocol & Port Lookup, and Network Command Finder."},
+  {"question": "Is the toolkit free to use?", "answer": "Yes. All tools are free to use, though the Secure Port Scanner requires a limited-use access PIN for authorized testing."},
+  {"question": "Who built this toolkit?", "answer": "The toolkit was built by Sagar Rajput, an IT Professional and Network Engineer, using Python and Flask."}
+]) }}
 {% endblock %}
 {% block content %}
 
@@ -747,6 +756,42 @@ Practical networking tools built with Python and Flask for IP addressing, subnet
                 networks you are permitted to access.
             </p>
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">ABOUT THIS TOOLKIT</p>
+            <h2>Network Engineering Toolkit FAQ</h2>
+        </div>
+
+        <div class="faq-list">
+            <details>
+                <summary>What is the Network Engineering Toolkit?</summary>
+                <p>A collection of ten free network engineering tools built with Python and Flask, covering IP addressing, subnet planning, DNS, connectivity testing, ACL generation and network documentation search.</p>
+            </details>
+
+            <details>
+                <summary>What tools are included?</summary>
+                <p>IP / Subnet Calculator, Subnet Planner, IP Range Calculator, DNS Lookup, TCP Port Checker, Secure Port Scanner, Subnet & Wildcard Mask Calculator, Multi-Vendor ACL Generator, Protocol & Port Lookup, and Network Command Finder.</p>
+            </details>
+
+            <details>
+                <summary>Is the toolkit free to use?</summary>
+                <p>Yes. All tools are free to use, though the Secure Port Scanner requires a limited-use access PIN for authorized testing.</p>
+            </details>
+
+            <details>
+                <summary>Who built this toolkit?</summary>
+                <p>The toolkit was built by Sagar Rajput, an IT Professional and Network Engineer, using Python and Flask.</p>
+            </details>
         </div>
 
     </div>
