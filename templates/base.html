@@ -41,6 +41,24 @@
     </noscript>
 
     {% block structured_data %}{% endblock %}
+    {% if breadcrumbs and breadcrumbs|length > 1 %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {% for crumb in breadcrumbs %}
+        {
+          "@type": "ListItem",
+          "position": {{ loop.index }},
+          "name": {{ crumb.name | tojson }},
+          "item": {{ crumb.url | tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }
+    </script>
+    {% endif %}
 </head>
 <body>
 <header class="site-header">

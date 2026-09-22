@@ -27,6 +27,42 @@ app = Flask(__name__)
 app.register_blueprint(port_scanner_bp)
 app.config["SITE_URL"] = "https://sagarrajput.com"
 
+# Known acronyms/proper names that shouldn't be auto title-cased
+# (e.g. "ip-calculator" -> "IP Calculator", not "Ip Calculator")
+BREADCRUMB_LABELS = {
+    "ip": "IP",
+    "dns": "DNS",
+    "acl": "ACL",
+    "tcp": "TCP",
+    "bgp": "BGP",
+    "rdap": "RDAP",
+    "stp2": "STP2",
+    "sez": "SEZ",
+    "aruba": "Aruba",
+}
+
+def _breadcrumb_label(segment):
+    words = segment.replace("-", " ").split(" ")
+    return " ".join(BREADCRUMB_LABELS.get(w.lower(), w.capitalize()) for w in words)
+
+@app.context_processor
+def inject_breadcrumbs():
+    path = request.path.strip("/")
+    site_url = app.config["SITE_URL"]
+
+    if not path:
+        return {"breadcrumbs": [{"name": "Home", "url": site_url + "/"}]}
+
+    crumbs = [{"name": "Home", "url": site_url + "/"}]
+    accumulated = ""
+    for segment in path.split("/"):
+        accumulated += "/" + segment
+        crumbs.append({
+            "name": _breadcrumb_label(segment),
+            "url": site_url + accumulated
+        })
+    return {"breadcrumbs": crumbs}
+
 app.secret_key = os.environ.get(
     "FLASK_SECRET_KEY",
     "change-this-secret-key"
