@@ -42,13 +42,31 @@ Calculate IPv4 subnet masks, wildcard masks, host ranges and RFC classifications
 }
 </script>
 
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to calculate a subnet and wildcard mask",
+  "Steps to calculate an IPv4 network's subnet mask, Cisco wildcard mask and RFC classification.",
+  [
+    {"title": "Enter an IPv4 network and CIDR", "text": "Type a network such as 10.20.30.0/24."},
+    {"title": "Click Calculate Network", "text": "Submit the form to run the calculation."},
+    {"title": "Review the results", "text": "The tool returns the network address, broadcast address, subnet mask, Cisco wildcard mask, usable host range, usable hosts, total addresses, prefix length and RFC address classification."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What is a wildcard mask?", "answer": "A wildcard mask is the inverse of the subnet mask. It is commonly used in Cisco IOS access-control lists and OSPF network statements."},
+  {"question": "What is the difference between a subnet mask and a wildcard mask?", "answer": "A subnet mask identifies the network and host portions of an address by marking network bits as 1. A wildcard mask inverts this, marking the bits Cisco should ignore when matching addresses."},
+  {"question": "What is CIDR notation?", "answer": "A way of writing an IP network as an address followed by a slash and the number of bits used for the network portion, such as /24."},
+  {"question": "What information does this calculator provide?", "answer": "Network address, broadcast address, subnet mask, wildcard mask, usable host range, usable hosts, total addresses, prefix length and RFC address classification."}
+]) }}
 {% endblock %}
 
 {% block content %}
 
 <section class="tool-page">
 
-```
 <div class="container">
 
     <!-- =========================================
@@ -433,8 +451,60 @@ Calculate IPv4 subnet masks, wildcard masks, host ranges and RFC classifications
 
     </div>
 
+
+    <div class="tool-info-section">
+
+        <div class="tool-info-container">
+
+            <div class="tool-info-heading" data-reveal>
+                <p class="section-kicker">HOW TO USE</p>
+                <h2>How to calculate a subnet and wildcard mask</h2>
+            </div>
+
+            <ol class="howto-steps">
+                <li>
+                    <strong>Enter an IPv4 network and CIDR.</strong>
+                    <p>Type a network such as 10.20.30.0/24.</p>
+                </li>
+                <li>
+                    <strong>Click Calculate Network.</strong>
+                    <p>Submit the form to run the calculation.</p>
+                </li>
+                <li>
+                    <strong>Review the results.</strong>
+                    <p>The tool returns the network address, broadcast address, subnet mask, Cisco wildcard mask, usable host range, usable hosts, total addresses, prefix length and RFC address classification.</p>
+                </li>
+            </ol>
+
+            <div class="faq-list">
+                <h2>Subnet & Wildcard Mask FAQ</h2>
+
+                <details>
+                    <summary>What is a wildcard mask?</summary>
+                    <p>A wildcard mask is the inverse of the subnet mask. It is commonly used in Cisco IOS access-control lists and OSPF network statements.</p>
+                </details>
+
+                <details>
+                    <summary>What is the difference between a subnet mask and a wildcard mask?</summary>
+                    <p>A subnet mask identifies the network and host portions of an address by marking network bits as 1. A wildcard mask inverts this, marking the bits Cisco should ignore when matching addresses.</p>
+                </details>
+
+                <details>
+                    <summary>What is CIDR notation?</summary>
+                    <p>A way of writing an IP network as an address followed by a slash and the number of bits used for the network portion, such as /24.</p>
+                </details>
+
+                <details>
+                    <summary>What information does this calculator provide?</summary>
+                    <p>Network address, broadcast address, subnet mask, wildcard mask, usable host range, usable hosts, total addresses, prefix length and RFC address classification.</p>
+                </details>
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
-```
 
 </section>
 

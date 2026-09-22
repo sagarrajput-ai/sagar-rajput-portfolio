@@ -41,6 +41,28 @@ Network intelligence, diagnostics and troubleshooting tools in one unified brows
     }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to use the Network Diagnostic Lab",
+  "Steps to run a network diagnostic using any of the ten available tools.",
+  [
+    {"title": "Select a diagnostic tool", "text": "Choose from tools such as MAC Vendor Lookup, IP/Subnet Information, BGP/ASN Lookup, Reverse DNS, WHOIS/RDAP, DNS Resolver Check, Advanced Ping, Traceroute, TCP Connectivity or HTTP/HTTPS Headers."},
+    {"title": "Enter the required target", "text": "Depending on the tool selected, enter a MAC address, IP address, hostname, ASN or domain."},
+    {"title": "Run the diagnostic", "text": "Submit the form to run the selected tool."},
+    {"title": "Review the formatted result", "text": "Results are displayed as tables or cards specific to the diagnostic you ran."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What is the Network Diagnostic Lab?", "answer": "A single page combining ten network diagnostic tools covering hardware identification, DNS, connectivity and web/host inspection."},
+  {"question": "Which diagnostics are available?", "answer": "MAC Vendor Lookup, IP/Subnet Information, BGP/ASN Lookup, Reverse DNS, WHOIS/RDAP, DNS Resolver Check, Advanced Ping, Traceroute, TCP Connectivity and HTTP/HTTPS Headers."},
+  {"question": "Do I need to reload the page to switch tools?", "answer": "No. Selecting a different tool updates the workspace without reloading the page."},
+  {"question": "What does the BGP/ASN Lookup show?", "answer": "Autonomous System route origin information for a given IP address or ASN."}
+]) }}
+
 {% endblock %}
 
 {% block content %}
@@ -350,6 +372,63 @@ Network intelligence, diagnostics and troubleshooting tools in one unified brows
             </div>
 
         </div>
+    </section>
+
+
+    <section class="tool-info-section">
+
+        <div class="container tool-info-container">
+
+            <div class="tool-info-heading" data-reveal>
+                <p class="section-kicker">HOW TO USE</p>
+                <h2>How to use the Network Diagnostic Lab</h2>
+            </div>
+
+            <ol class="howto-steps">
+                <li>
+                    <strong>Select a diagnostic tool.</strong>
+                    <p>Choose from tools such as MAC Vendor Lookup, IP/Subnet Information, BGP/ASN Lookup, Reverse DNS, WHOIS/RDAP, DNS Resolver Check, Advanced Ping, Traceroute, TCP Connectivity or HTTP/HTTPS Headers.</p>
+                </li>
+                <li>
+                    <strong>Enter the required target.</strong>
+                    <p>Depending on the tool selected, enter a MAC address, IP address, hostname, ASN or domain.</p>
+                </li>
+                <li>
+                    <strong>Run the diagnostic.</strong>
+                    <p>Submit the form to run the selected tool.</p>
+                </li>
+                <li>
+                    <strong>Review the formatted result.</strong>
+                    <p>Results are displayed as tables or cards specific to the diagnostic you ran.</p>
+                </li>
+            </ol>
+
+            <div class="faq-list">
+                <h2>Network Diagnostic Lab FAQ</h2>
+
+                <details>
+                    <summary>What is the Network Diagnostic Lab?</summary>
+                    <p>A single page combining ten network diagnostic tools covering hardware identification, DNS, connectivity and web/host inspection.</p>
+                </details>
+
+                <details>
+                    <summary>Which diagnostics are available?</summary>
+                    <p>MAC Vendor Lookup, IP/Subnet Information, BGP/ASN Lookup, Reverse DNS, WHOIS/RDAP, DNS Resolver Check, Advanced Ping, Traceroute, TCP Connectivity and HTTP/HTTPS Headers.</p>
+                </details>
+
+                <details>
+                    <summary>Do I need to reload the page to switch tools?</summary>
+                    <p>No. Selecting a different tool updates the workspace without reloading the page.</p>
+                </details>
+
+                <details>
+                    <summary>What does the BGP/ASN Lookup show?</summary>
+                    <p>Autonomous System route origin information for a given IP address or ASN.</p>
+                </details>
+            </div>
+
+        </div>
+
     </section>
 
 </main>

@@ -8,6 +8,54 @@ Multi-Vendor ACL & Firewall Rule Generator | Sagar Rajput
 <meta name="description" content="Generate multi-rule ACL and firewall configurations for Cisco IOS-XE, Cisco ASA, Aruba, Pica8, FortiGate and Palo Alto.">
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput Multi-Vendor ACL Generator",
+  "url": "https://sagarrajput.com/acl-generator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "Multi-vendor ACL and firewall rule generator supporting Cisco IOS-XE, Cisco ASA, Aruba CX, ArubaOS-Switch, Pica8, FortiGate and Palo Alto PAN-OS.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to generate a multi-vendor ACL configuration",
+  "Steps to build access rules and generate vendor-specific ACL or firewall configuration syntax.",
+  [
+    {"title": "Select the target platform", "text": "Choose from Cisco IOS/IOS-XE, Cisco ASA, Aruba CX, ArubaOS-Switch, Pica8/PicOS, FortiGate or Palo Alto PAN-OS."},
+    {"title": "Define each access rule", "text": "For each rule, enter a description, source networks, destination networks, protocol, action (permit or deny) and destination ports."},
+    {"title": "Add more rules if needed", "text": "Build up to 20 rules in a single configuration."},
+    {"title": "Click Generate Configuration", "text": "Submit the form to generate vendor-specific syntax."},
+    {"title": "Review and copy the configuration", "text": "Use the Copy Configuration button to copy the generated output."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What is a network ACL?", "answer": "An access control list (ACL) is a set of rules that permit or deny network traffic based on source, destination, protocol and port."},
+  {"question": "Which platforms does this generator support?", "answer": "Cisco IOS/IOS-XE, Cisco ASA, Aruba CX, ArubaOS-Switch, Pica8/PicOS, FortiGate and Palo Alto PAN-OS."},
+  {"question": "How many rules can I build at once?", "answer": "Up to 20 rules in a single configuration."},
+  {"question": "Can I use 'any' for source or destination?", "answer": "Yes. Entering 'any' matches all sources or all destinations for that rule."},
+  {"question": "Should I use the generated configuration directly in production?", "answer": "The output is a starting reference. Always review the generated syntax against your platform version and test in a controlled environment before applying it to production."}
+]) }}
+{% endblock %}
+
 {% block content %}
 
 <section class="toolkit-hero">
@@ -568,6 +616,72 @@ Multi-Vendor ACL & Firewall Rule Generator | Sagar Rajput
                 against your platform version and test before deployment.
             </p>
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to generate a multi-vendor ACL configuration</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Select the target platform.</strong>
+                <p>Choose from Cisco IOS/IOS-XE, Cisco ASA, Aruba CX, ArubaOS-Switch, Pica8/PicOS, FortiGate or Palo Alto PAN-OS.</p>
+            </li>
+            <li>
+                <strong>Define each access rule.</strong>
+                <p>For each rule, enter a description, source networks, destination networks, protocol, action (permit or deny) and destination ports.</p>
+            </li>
+            <li>
+                <strong>Add more rules if needed.</strong>
+                <p>Build up to 20 rules in a single configuration.</p>
+            </li>
+            <li>
+                <strong>Click Generate Configuration.</strong>
+                <p>Submit the form to generate vendor-specific syntax.</p>
+            </li>
+            <li>
+                <strong>Review and copy the configuration.</strong>
+                <p>Use the Copy Configuration button to copy the generated output.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>ACL Generator FAQ</h2>
+
+            <details>
+                <summary>What is a network ACL?</summary>
+                <p>An access control list (ACL) is a set of rules that permit or deny network traffic based on source, destination, protocol and port.</p>
+            </details>
+
+            <details>
+                <summary>Which platforms does this generator support?</summary>
+                <p>Cisco IOS/IOS-XE, Cisco ASA, Aruba CX, ArubaOS-Switch, Pica8/PicOS, FortiGate and Palo Alto PAN-OS.</p>
+            </details>
+
+            <details>
+                <summary>How many rules can I build at once?</summary>
+                <p>Up to 20 rules in a single configuration.</p>
+            </details>
+
+            <details>
+                <summary>Can I use "any" for source or destination?</summary>
+                <p>Yes. Entering "any" matches all sources or all destinations for that rule.</p>
+            </details>
+
+            <details>
+                <summary>Should I use the generated configuration directly in production?</summary>
+                <p>The output is a starting reference. Always review the generated syntax against your platform version and test in a controlled environment before applying it to production.</p>
+            </details>
         </div>
 
     </div>

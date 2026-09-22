@@ -6,6 +6,52 @@
 <meta name="description" content="Secure authorized network port scanning tool by Sagar Rajput. Access is protected using a limited-use PIN.">
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput Secure Port Scanner",
+  "url": "https://sagarrajput.com/port-scanner",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "PIN-protected TCP port scanning tool for authorized network testing, built by Sagar Rajput.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to access the Secure Port Scanner",
+  "Steps to gain access to the PIN-protected TCP port scanner and run an authorized scan.",
+  [
+    {"title": "Request an access PIN", "text": "Contact Sagar Rajput to request a limited-use access PIN for the scanner."},
+    {"title": "Enter the PIN", "text": "Type the provided PIN into the Access PIN field and submit."},
+    {"title": "Run an authorized scan", "text": "Once inside, enter a hostname or IP address you own or are authorized to test, choose a TCP port range, confirm authorization, and start the scan."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What is the Secure Port Scanner?", "answer": "A TCP port scanning tool that checks which ports are open and reachable on an authorized host, protected behind a limited-use access PIN."},
+  {"question": "Why does this tool require a PIN?", "answer": "Access is restricted to prevent misuse. Each PIN allows a limited number of scans and is issued only for authorized testing."},
+  {"question": "How do I get an access PIN?", "answer": "Contact Sagar Rajput directly, such as through the email link in the site footer, to request access."},
+  {"question": "Can I scan any host on the internet?", "answer": "No. The scanner is intended only for hosts and networks you own or have explicit authorization to test. You must confirm authorization before each scan."},
+  {"question": "What does the scanner return?", "answer": "For each authorized scan, it reports which TCP ports in the selected range are open, along with the resolved IP address and detected service names."}
+]) }}
+{% endblock %}
+
 {% block content %}
 
 <section class="section">
@@ -184,6 +230,64 @@
 
             </div>
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to access the Secure Port Scanner</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Request an access PIN.</strong>
+                <p>Contact Sagar Rajput to request a limited-use access PIN for the scanner.</p>
+            </li>
+            <li>
+                <strong>Enter the PIN.</strong>
+                <p>Type the provided PIN into the Access PIN field and submit.</p>
+            </li>
+            <li>
+                <strong>Run an authorized scan.</strong>
+                <p>Once inside, enter a hostname or IP address you own or are authorized to test, choose a TCP port range, confirm authorization, and start the scan.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>Secure Port Scanner FAQ</h2>
+
+            <details>
+                <summary>What is the Secure Port Scanner?</summary>
+                <p>A TCP port scanning tool that checks which ports are open and reachable on an authorized host, protected behind a limited-use access PIN.</p>
+            </details>
+
+            <details>
+                <summary>Why does this tool require a PIN?</summary>
+                <p>Access is restricted to prevent misuse. Each PIN allows a limited number of scans and is issued only for authorized testing.</p>
+            </details>
+
+            <details>
+                <summary>How do I get an access PIN?</summary>
+                <p>Contact Sagar Rajput directly, such as through the email link in the site footer, to request access.</p>
+            </details>
+
+            <details>
+                <summary>Can I scan any host on the internet?</summary>
+                <p>No. The scanner is intended only for hosts and networks you own or have explicit authorization to test. You must confirm authorization before each scan.</p>
+            </details>
+
+            <details>
+                <summary>What does the scanner return?</summary>
+                <p>For each authorized scan, it reports which TCP ports in the selected range are open, along with the resolved IP address and detected service names.</p>
+            </details>
         </div>
 
     </div>

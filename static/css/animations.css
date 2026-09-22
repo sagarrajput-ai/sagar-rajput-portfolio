@@ -287,3 +287,18 @@ select:focus {
   .project-card { opacity: 1; transform: none; transition: none; }
   .projects-hero h1 span { animation: none; }
 }
+
+
+/* --- Dark-theme override: FAQ/How-to borders and text need to
+       work on the Diagnostic Lab's dark background, not the
+       light-page default. --- */
+.diagnostic-page .tool-info-section .faq-list details {
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+.diagnostic-page .tool-info-section .faq-list details:last-child {
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.diagnostic-page .tool-info-section .howto-steps p,
+.diagnostic-page .tool-info-section .faq-list details p {
+    color: rgba(255,255,255,.65);
+}

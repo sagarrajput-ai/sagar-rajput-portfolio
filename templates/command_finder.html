@@ -18,6 +18,52 @@ Search networking commands and official vendor documentation across Cisco, Forti
 Search network device commands and official vendor documentation from multiple networking platforms.
 {% endblock %}
 
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sagar Rajput Network Command Finder",
+  "url": "https://sagarrajput.com/command-finder",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "Live search tool for networking commands and official vendor documentation across Cisco, FortiGate, Aruba, Pica8, Palo Alto, Juniper, Dell, Check Point and other platforms.",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "SoftwareApplication",
+    "name": "Sagar Rajput Network Engineering Toolkit",
+    "url": "https://sagarrajput.com/network-toolkit"
+  }
+}
+</script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to find networking commands and vendor documentation",
+  "Steps to search official vendor documentation for a networking command or topic.",
+  [
+    {"title": "Enter a search term", "text": "Type a command, keyword or networking topic, such as 'ip route' or 'BGP neighbor'."},
+    {"title": "Optionally select a vendor", "text": "Filter results to a specific platform such as Cisco, Aruba or FortiGate, or search all vendors."},
+    {"title": "Click Search", "text": "Submit the search."},
+    {"title": "Review the results", "text": "Each result links to official vendor documentation relevant to your search."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What is the Network Command Finder?", "answer": "A tool that searches the web for official vendor documentation and command references relevant to your networking query."},
+  {"question": "Which vendors are supported?", "answer": "Cisco, Aruba, Dell, Pica8, FortiGate, Palo Alto, Juniper, Check Point and other networking platforms."},
+  {"question": "Does this tool store command data locally?", "answer": "No. It performs a live web search and returns links to official documentation sources rather than relying on a static local database."},
+  {"question": "Can it help find Cisco commands?", "answer": "Yes. Select Cisco as the vendor filter, or search all vendors at once."}
+]) }}
+{% endblock %}
+
 {% block content %}
 
 <section class="toolkit-hero command-finder-hero">
@@ -489,6 +535,63 @@ Search network device commands and official vendor documentation from multiple n
                 changes to production infrastructure.
             </p>
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to find networking commands and vendor documentation</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Enter a search term.</strong>
+                <p>Type a command, keyword or networking topic, such as "ip route" or "BGP neighbor".</p>
+            </li>
+            <li>
+                <strong>Optionally select a vendor.</strong>
+                <p>Filter results to a specific platform such as Cisco, Aruba or FortiGate, or search all vendors.</p>
+            </li>
+            <li>
+                <strong>Click Search.</strong>
+                <p>Submit the search.</p>
+            </li>
+            <li>
+                <strong>Review the results.</strong>
+                <p>Each result links to official vendor documentation relevant to your search.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>Command Finder FAQ</h2>
+
+            <details>
+                <summary>What is the Network Command Finder?</summary>
+                <p>A tool that searches the web for official vendor documentation and command references relevant to your networking query.</p>
+            </details>
+
+            <details>
+                <summary>Which vendors are supported?</summary>
+                <p>Cisco, Aruba, Dell, Pica8, FortiGate, Palo Alto, Juniper, Check Point and other networking platforms.</p>
+            </details>
+
+            <details>
+                <summary>Does this tool store command data locally?</summary>
+                <p>No. It performs a live web search and returns links to official documentation sources rather than relying on a static local database.</p>
+            </details>
+
+            <details>
+                <summary>Can it help find Cisco commands?</summary>
+                <p>Yes. Select Cisco as the vendor filter, or search all vendors at once.</p>
+            </details>
         </div>
 
     </div>

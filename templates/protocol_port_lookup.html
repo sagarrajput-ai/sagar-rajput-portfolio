@@ -41,6 +41,28 @@ A practical searchable reference for enterprise networking protocols, ports and 
   }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to look up a protocol or port",
+  "Steps to search enterprise networking protocols, ports and services.",
+  [
+    {"title": "Enter a search term", "text": "Type a service, port number, protocol or vendor name, such as BGP, 443, RADIUS or FortiGate."},
+    {"title": "Optionally filter by category", "text": "Select a category from the dropdown to narrow the results."},
+    {"title": "Click Search Reference", "text": "Submit the search."},
+    {"title": "Review the matching entries", "text": "Each result shows the service, port, transport protocol, IP protocol number, purpose, common platforms and any additional notes."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What is a protocol and port lookup?", "answer": "A searchable reference of common enterprise networking services, their ports, transport protocols and typical use."},
+  {"question": "What is a TCP port?", "answer": "TCP is a connection-oriented transport protocol. A TCP port identifies a specific service using that protocol, such as port 443 for HTTPS."},
+  {"question": "What is a UDP port?", "answer": "UDP is a connectionless transport protocol. A UDP port identifies a service using that protocol, such as port 53 for DNS."},
+  {"question": "Can I search by port number?", "answer": "Yes. Enter a port number, such as 443, to find matching services."},
+  {"question": "What information is shown for each result?", "answer": "Service name, category, port, transport protocol, IP protocol number, purpose, common platforms and any relevant notes."}
+]) }}
 {% endblock %}
 
 
@@ -865,6 +887,68 @@ A practical searchable reference for enterprise networking protocols, ports and 
                 verify vendor-specific requirements before applying
                 firewall or ACL rules in production.
             </p>
+
+        </div>
+
+
+        <div class="tool-info-section">
+
+            <div class="tool-info-container" style="padding: 0; max-width: none;">
+
+                <div class="tool-info-heading" data-reveal>
+                    <p class="section-kicker">HOW TO USE</p>
+                    <h2>How to look up a protocol or port</h2>
+                </div>
+
+                <ol class="howto-steps">
+                    <li>
+                        <strong>Enter a search term.</strong>
+                        <p>Type a service, port number, protocol or vendor name, such as BGP, 443, RADIUS or FortiGate.</p>
+                    </li>
+                    <li>
+                        <strong>Optionally filter by category.</strong>
+                        <p>Select a category from the dropdown to narrow the results.</p>
+                    </li>
+                    <li>
+                        <strong>Click Search Reference.</strong>
+                        <p>Submit the search.</p>
+                    </li>
+                    <li>
+                        <strong>Review the matching entries.</strong>
+                        <p>Each result shows the service, port, transport protocol, IP protocol number, purpose, common platforms and any additional notes.</p>
+                    </li>
+                </ol>
+
+                <div class="faq-list">
+                    <h2>Protocol & Port Lookup FAQ</h2>
+
+                    <details>
+                        <summary>What is a protocol and port lookup?</summary>
+                        <p>A searchable reference of common enterprise networking services, their ports, transport protocols and typical use.</p>
+                    </details>
+
+                    <details>
+                        <summary>What is a TCP port?</summary>
+                        <p>TCP is a connection-oriented transport protocol. A TCP port identifies a specific service using that protocol, such as port 443 for HTTPS.</p>
+                    </details>
+
+                    <details>
+                        <summary>What is a UDP port?</summary>
+                        <p>UDP is a connectionless transport protocol. A UDP port identifies a service using that protocol, such as port 53 for DNS.</p>
+                    </details>
+
+                    <details>
+                        <summary>Can I search by port number?</summary>
+                        <p>Yes. Enter a port number, such as 443, to find matching services.</p>
+                    </details>
+
+                    <details>
+                        <summary>What information is shown for each result?</summary>
+                        <p>Service name, category, port, transport protocol, IP protocol number, purpose, common platforms and any relevant notes.</p>
+                    </details>
+                </div>
+
+            </div>
 
         </div>
 
