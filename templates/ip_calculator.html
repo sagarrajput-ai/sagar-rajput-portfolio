@@ -19,6 +19,9 @@ Free IPv4 IP calculator for network address, broadcast address, subnet mask, hos
 {% endblock %}
 
 {% block structured_data %}
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -41,6 +44,23 @@ Free IPv4 IP calculator for network address, broadcast address, subnet mask, hos
   }
 }
 </script>
+
+{{ howto_schema(
+  "How to calculate an IPv4 subnet",
+  "Steps to calculate network address, broadcast address, subnet mask and host information from an IPv4 address using the IP Calculator.",
+  [
+    {"title": "Enter an IPv4 address and CIDR prefix", "text": "Type or paste an address such as 192.168.10.0/24 into the IP Address / CIDR field."},
+    {"title": "Click Calculate Network", "text": "Submit the form to run the calculation."},
+    {"title": "Review the results", "text": "The tool returns the network address, broadcast address, subnet mask, host mask, first and last usable host, total addresses, usable hosts and CIDR prefix."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What does this IP calculator do?", "answer": "It calculates the network address, broadcast address, subnet mask, host mask, first and last usable host, total addresses, usable hosts and CIDR prefix from an IPv4 address entered in CIDR notation."},
+  {"question": "What format should I enter?", "answer": "Enter an IPv4 address followed by a CIDR prefix, such as 192.168.10.0/24."},
+  {"question": "What is the difference between total addresses and usable hosts?", "answer": "Total addresses includes every address in the subnet. Usable hosts excludes the network address and broadcast address, which are reserved at each end of the range."},
+  {"question": "What is a host mask?", "answer": "A host mask, also called a wildcard mask, is the inverse of the subnet mask. It shows which bits of the address identify the host rather than the network."}
+]) }}
 {% endblock %}
 
 {% block content %}
@@ -193,4 +213,57 @@ Free IPv4 IP calculator for network address, broadcast address, subnet mask, hos
 
 </section>
 
-{% endblock %}  
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to calculate an IPv4 subnet</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Enter an IPv4 address and CIDR prefix.</strong>
+                <p>Type or paste an address such as 192.168.10.0/24 into the IP Address / CIDR field.</p>
+            </li>
+            <li>
+                <strong>Click Calculate Network.</strong>
+                <p>Submit the form to run the calculation.</p>
+            </li>
+            <li>
+                <strong>Review the results.</strong>
+                <p>The tool returns the network address, broadcast address, subnet mask, host mask, first and last usable host, total addresses, usable hosts and CIDR prefix.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>IP Calculator FAQ</h2>
+
+            <details>
+                <summary>What does this IP calculator do?</summary>
+                <p>It calculates the network address, broadcast address, subnet mask, host mask, first and last usable host, total addresses, usable hosts and CIDR prefix from an IPv4 address entered in CIDR notation.</p>
+            </details>
+
+            <details>
+                <summary>What format should I enter?</summary>
+                <p>Enter an IPv4 address followed by a CIDR prefix, such as 192.168.10.0/24.</p>
+            </details>
+
+            <details>
+                <summary>What is the difference between total addresses and usable hosts?</summary>
+                <p>Total addresses includes every address in the subnet. Usable hosts excludes the network address and broadcast address, which are reserved at each end of the range.</p>
+            </details>
+
+            <details>
+                <summary>What is a host mask?</summary>
+                <p>A host mask, also called a wildcard mask, is the inverse of the subnet mask. It shows which bits of the address identify the host rather than the network.</p>
+            </details>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

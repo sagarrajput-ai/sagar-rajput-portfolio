@@ -41,6 +41,27 @@ Test TCP connectivity to a hostname or IP address with Sagar Rajput's practical 
   }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to check TCP port connectivity",
+  "Steps to test whether a TCP port on a host is reachable.",
+  [
+    {"title": "Enter a hostname or IP address", "text": "Type the target host, such as example.com or 192.168.1.1."},
+    {"title": "Enter the TCP port", "text": "Type a port number between 1 and 65535, such as 443."},
+    {"title": "Click Check Port", "text": "Submit the form to run the connectivity check."},
+    {"title": "Review the result", "text": "The tool returns the resolved IP address, the port and the connection status."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What does the port checker do?", "answer": "It attempts a TCP connection to a specified host and port and reports whether the connection succeeds, along with the resolved IP address."},
+  {"question": "What is a TCP port?", "answer": "A numbered endpoint, from 1 to 65535, that identifies a specific service or application running on a host."},
+  {"question": "What does an open port mean?", "answer": "It means the tool was able to establish a TCP connection, indicating a service is actively listening on that port."},
+  {"question": "Can I check any host on the internet?", "answer": "This tool is intended for checking hosts and ports you are authorized to test. Be mindful of the target network's policies before testing."}
+]) }}
 {% endblock %}
 
 {% block content %}
@@ -168,6 +189,63 @@ Test TCP connectivity to a hostname or IP address with Sagar Rajput's practical 
 
             {% endif %}
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to check TCP port connectivity</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Enter a hostname or IP address.</strong>
+                <p>Type the target host, such as example.com or 192.168.1.1.</p>
+            </li>
+            <li>
+                <strong>Enter the TCP port.</strong>
+                <p>Type a port number between 1 and 65535, such as 443.</p>
+            </li>
+            <li>
+                <strong>Click Check Port.</strong>
+                <p>Submit the form to run the connectivity check.</p>
+            </li>
+            <li>
+                <strong>Review the result.</strong>
+                <p>The tool returns the resolved IP address, the port and the connection status.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>TCP Port Checker FAQ</h2>
+
+            <details>
+                <summary>What does the port checker do?</summary>
+                <p>It attempts a TCP connection to a specified host and port and reports whether the connection succeeds, along with the resolved IP address.</p>
+            </details>
+
+            <details>
+                <summary>What is a TCP port?</summary>
+                <p>A numbered endpoint, from 1 to 65535, that identifies a specific service or application running on a host.</p>
+            </details>
+
+            <details>
+                <summary>What does an open port mean?</summary>
+                <p>It means the tool was able to establish a TCP connection, indicating a service is actively listening on that port.</p>
+            </details>
+
+            <details>
+                <summary>Can I check any host on the internet?</summary>
+                <p>This tool is intended for checking hosts and ports you are authorized to test. Be mindful of the target network's policies before testing.</p>
+            </details>
         </div>
 
     </div>

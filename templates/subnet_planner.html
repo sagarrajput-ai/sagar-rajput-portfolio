@@ -41,6 +41,27 @@ Practical IPv4 subnet planner by Sagar Rajput for dividing networks into multipl
   }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to plan IPv4 subnets",
+  "Steps to split an IPv4 network into multiple equally sized subnets using the Subnet Planner.",
+  [
+    {"title": "Enter the network and CIDR", "text": "Type an IPv4 network such as 192.168.10.0/24 into the Network / CIDR field."},
+    {"title": "Enter the required number of subnets", "text": "Type a number between 1 and 1024 into the Required Number of Subnets field."},
+    {"title": "Click Generate Subnets", "text": "Submit the form to generate the subnet table."},
+    {"title": "Review the subnet table", "text": "Each row shows the subnet number, network address, broadcast address, host range, mask and usable hosts."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What does the Subnet Planner do?", "answer": "It splits an IPv4 network into the requested number of equally sized subnets and shows the network address, broadcast address, host range, subnet mask and usable hosts for each one."},
+  {"question": "What format should I enter for the network?", "answer": "An IPv4 network in CIDR notation, such as 192.168.10.0/24."},
+  {"question": "How many subnets can I request?", "answer": "Between 1 and 1024 subnets in a single calculation."},
+  {"question": "What happens if I request more subnets than the network can support?", "answer": "The tool returns an error explaining that the network cannot be divided into the requested number of subnets at a valid prefix length."}
+]) }}
 {% endblock %}
 
 {% block content %}
@@ -222,6 +243,63 @@ Practical IPv4 subnet planner by Sagar Rajput for dividing networks into multipl
 
             {% endif %}
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to plan IPv4 subnets</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Enter the network and CIDR.</strong>
+                <p>Type an IPv4 network such as 192.168.10.0/24 into the Network / CIDR field.</p>
+            </li>
+            <li>
+                <strong>Enter the required number of subnets.</strong>
+                <p>Type a number between 1 and 1024 into the Required Number of Subnets field.</p>
+            </li>
+            <li>
+                <strong>Click Generate Subnets.</strong>
+                <p>Submit the form to generate the subnet table.</p>
+            </li>
+            <li>
+                <strong>Review the subnet table.</strong>
+                <p>Each row shows the subnet number, network address, broadcast address, host range, mask and usable hosts.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>Subnet Planner FAQ</h2>
+
+            <details>
+                <summary>What does the Subnet Planner do?</summary>
+                <p>It splits an IPv4 network into the requested number of equally sized subnets and shows the network address, broadcast address, host range, subnet mask and usable hosts for each one.</p>
+            </details>
+
+            <details>
+                <summary>What format should I enter for the network?</summary>
+                <p>An IPv4 network in CIDR notation, such as 192.168.10.0/24.</p>
+            </details>
+
+            <details>
+                <summary>How many subnets can I request?</summary>
+                <p>Between 1 and 1024 subnets in a single calculation.</p>
+            </details>
+
+            <details>
+                <summary>What happens if I request more subnets than the network can support?</summary>
+                <p>The tool returns an error explaining that the network cannot be divided into the requested number of subnets at a valid prefix length.</p>
+            </details>
         </div>
 
     </div>

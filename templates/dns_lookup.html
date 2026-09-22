@@ -41,6 +41,26 @@ Resolve hostnames and check IPv4 addresses with Sagar Rajput's practical DNS Loo
   }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to look up DNS records for a hostname",
+  "Steps to resolve a hostname's canonical name, aliases and IP addresses.",
+  [
+    {"title": "Enter a hostname or domain", "text": "Type a domain such as google.com or your own domain."},
+    {"title": "Click Lookup DNS", "text": "Submit the form to run the lookup."},
+    {"title": "Review the results", "text": "The tool returns the canonical name, any aliases, and the resolved IP addresses."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What does a DNS lookup do?", "answer": "It resolves a hostname to its canonical name, any aliases, and its current IP addresses."},
+  {"question": "What is a canonical name?", "answer": "The canonical name is the authoritative hostname associated with the DNS record, which can differ from the name you searched if the domain uses aliases."},
+  {"question": "What are DNS aliases?", "answer": "Alternate hostnames, defined as CNAME records, that point to the same canonical destination."},
+  {"question": "What does the tool return?", "answer": "Hostname, canonical name, any aliases, and the resolved IP addresses."}
+]) }}
 {% endblock %}
 
 {% block content %}
@@ -184,6 +204,59 @@ Resolve hostnames and check IPv4 addresses with Sagar Rajput's practical DNS Loo
 
             {% endif %}
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to look up DNS records for a hostname</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Enter a hostname or domain.</strong>
+                <p>Type a domain such as google.com or your own domain.</p>
+            </li>
+            <li>
+                <strong>Click Lookup DNS.</strong>
+                <p>Submit the form to run the lookup.</p>
+            </li>
+            <li>
+                <strong>Review the results.</strong>
+                <p>The tool returns the canonical name, any aliases, and the resolved IP addresses.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>DNS Lookup FAQ</h2>
+
+            <details>
+                <summary>What does a DNS lookup do?</summary>
+                <p>It resolves a hostname to its canonical name, any aliases, and its current IP addresses.</p>
+            </details>
+
+            <details>
+                <summary>What is a canonical name?</summary>
+                <p>The canonical name is the authoritative hostname associated with the DNS record, which can differ from the name you searched if the domain uses aliases.</p>
+            </details>
+
+            <details>
+                <summary>What are DNS aliases?</summary>
+                <p>Alternate hostnames, defined as CNAME records, that point to the same canonical destination.</p>
+            </details>
+
+            <details>
+                <summary>What does the tool return?</summary>
+                <p>Hostname, canonical name, any aliases, and the resolved IP addresses.</p>
+            </details>
         </div>
 
     </div>

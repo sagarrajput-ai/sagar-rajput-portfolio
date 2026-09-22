@@ -41,6 +41,27 @@ Calculate the number of IPv4 addresses between two IP addresses with Sagar Rajpu
   }
 }
 </script>
+
+{% from "schema/faq_schema.html" import faq_schema %}
+{% from "schema/howto_schema.html" import howto_schema %}
+
+{{ howto_schema(
+  "How to calculate an IP address range",
+  "Steps to calculate the total number of IP addresses between a starting and ending address.",
+  [
+    {"title": "Enter the starting IP address", "text": "Type the first address in the range, such as 192.168.10.10."},
+    {"title": "Enter the ending IP address", "text": "Type the last address in the range, such as 192.168.10.50."},
+    {"title": "Click Calculate Range", "text": "Submit the form to run the calculation."},
+    {"title": "Review the results", "text": "The tool returns the start IP, end IP, total number of addresses and the IP version."}
+  ]
+) }}
+
+{{ faq_schema([
+  {"question": "What does this IP range calculator do?", "answer": "It calculates the total number of IP addresses between a starting and ending IP address, and identifies whether the range is IPv4 or IPv6."},
+  {"question": "Can I calculate IPv6 ranges?", "answer": "Yes. Enter two IPv6 addresses and the tool will identify the range as IPv6 and calculate the total addresses."},
+  {"question": "Can I mix IPv4 and IPv6 addresses?", "answer": "No. Both the start and end address must be the same IP version."},
+  {"question": "Why must the start IP be less than or equal to the end IP?", "answer": "The calculator measures the range between two addresses, so the start address must come before or be equal to the end address for the calculation to be valid."}
+]) }}
 {% endblock %}
 
 {% block content %}
@@ -167,6 +188,63 @@ Calculate the number of IPv4 addresses between two IP addresses with Sagar Rajpu
 
             {% endif %}
 
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO USE</p>
+            <h2>How to calculate an IP address range</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Enter the starting IP address.</strong>
+                <p>Type the first address in the range, such as 192.168.10.10.</p>
+            </li>
+            <li>
+                <strong>Enter the ending IP address.</strong>
+                <p>Type the last address in the range, such as 192.168.10.50.</p>
+            </li>
+            <li>
+                <strong>Click Calculate Range.</strong>
+                <p>Submit the form to run the calculation.</p>
+            </li>
+            <li>
+                <strong>Review the results.</strong>
+                <p>The tool returns the start IP, end IP, total number of addresses and the IP version.</p>
+            </li>
+        </ol>
+
+        <div class="faq-list">
+            <h2>IP Range Calculator FAQ</h2>
+
+            <details>
+                <summary>What does this IP range calculator do?</summary>
+                <p>It calculates the total number of IP addresses between a starting and ending IP address, and identifies whether the range is IPv4 or IPv6.</p>
+            </details>
+
+            <details>
+                <summary>Can I calculate IPv6 ranges?</summary>
+                <p>Yes. Enter two IPv6 addresses and the tool will identify the range as IPv6 and calculate the total addresses.</p>
+            </details>
+
+            <details>
+                <summary>Can I mix IPv4 and IPv6 addresses?</summary>
+                <p>No. Both the start and end address must be the same IP version.</p>
+            </details>
+
+            <details>
+                <summary>Why must the start IP be less than or equal to the end IP?</summary>
+                <p>The calculator measures the range between two addresses, so the start address must come before or be equal to the end address for the calculation to be valid.</p>
+            </details>
         </div>
 
     </div>

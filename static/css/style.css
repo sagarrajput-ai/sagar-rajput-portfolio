@@ -3782,3 +3782,56 @@ a{color:inherit}
     color: var(--muted);
     margin: -2px 0 6px;
 }
+
+
+
+/* --- Tool FAQ / How-to sections (visible content for AEO) --- */
+.tool-info-section {
+    padding: 80px 0;
+}
+.tool-info-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+.tool-info-heading {
+    margin-bottom: 35px;
+}
+.howto-steps {
+    margin: 0 0 60px;
+    padding-left: 22px;
+}
+.howto-steps li {
+    margin-bottom: 24px;
+    padding-left: 8px;
+}
+.howto-steps strong {
+    display: block;
+    margin-bottom: 6px;
+}
+.howto-steps p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+.faq-list {
+    margin-top: 50px;
+}
+.faq-list h2 {
+    margin-bottom: 20px;
+}
+.faq-list details {
+    border-top: 1px solid var(--line);
+    padding: 18px 0;
+}
+.faq-list details:last-child {
+    border-bottom: 1px solid var(--line);
+}
+.faq-list summary {
+    cursor: pointer;
+    font-weight: 700;
+}
+.faq-list details p {
+    margin: 12px 0 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
