@@ -402,6 +402,7 @@ A free physics-based fruit merging game by Sagar Rajput.
 
     canvas.addEventListener("mousemove", (e) => pointerMove(e.clientX));
     canvas.addEventListener("click", (e) => { pointerMove(e.clientX); dropFruit(); });
+    canvas.addEventListener("touchstart", (e) => { pointerMove(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
     canvas.addEventListener("touchmove", (e) => { pointerMove(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
     canvas.addEventListener("touchend", (e) => { dropFruit(); e.preventDefault(); }, { passive: false });
 
