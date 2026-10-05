@@ -881,52 +881,65 @@ def get_ip_information(ip):
 
 
 def ping_single_target(target, count=4, timeout=2, packet_size=32):
-    start = time.perf_counter()
+    """
+    TCP-based reachability and latency check.
 
-    system = platform.system().lower()
+    True ICMP ping is not available in this hosting environment
+    (no 'ping' binary is installed, and unprivileged processes
+    cannot open raw ICMP sockets), so this measures TCP connection
+    establishment time instead. packet_size is accepted for
+    API/UI compatibility but has no effect on a TCP handshake.
 
-    if system == "windows":
-        command = [
-            "ping",
-            "-n",
-            str(count),
-            "-w",
-            str(int(timeout * 1000)),
-            "-l",
-            str(packet_size),
-            target,
-        ]
-    else:
-        command = [
-            "ping",
-            "-c",
-            str(count),
-            "-W",
-            str(timeout),
-            "-s",
-            str(packet_size),
-            target,
-        ]
+    The working port is discovered once, then the remaining
+    attempts run in parallel against that port - avoiding the
+    slow path of retrying both ports sequentially on every attempt.
+    """
+    probe_ports = (443, 80)
 
-    result = run_command(
-        command,
-        timeout=(count * timeout) + 3
-    )
+    working_port = None
+    first_latency = None
 
-    elapsed = round(
-        (time.perf_counter() - start) * 1000,
-        2
-    )
+    for port in probe_ports:
+        start = time.perf_counter()
+        try:
+            with socket.create_connection((target, port), timeout=timeout):
+                first_latency = round((time.perf_counter() - start) * 1000, 2)
+                working_port = port
+                break
+        except (socket.timeout, OSError):
+            continue
 
-    output = result["stdout"] + result["stderr"]
+    if working_port is None:
+        return {
+            "target": target,
+            "success": False,
+            "elapsed_ms": None,
+            "error": f"No TCP response on ports {' or '.join(str(p) for p in probe_ports)}",
+        }
+
+    def _probe():
+        start = time.perf_counter()
+        try:
+            with socket.create_connection((target, working_port), timeout=timeout):
+                return round((time.perf_counter() - start) * 1000, 2)
+        except (socket.timeout, OSError):
+            return None
+
+    latencies = [first_latency]
+    remaining = count - 1
+
+    if remaining > 0:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(remaining, 6)) as executor:
+            for result in executor.map(lambda _: _probe(), range(remaining)):
+                if result is not None:
+                    latencies.append(result)
 
     return {
         "target": target,
-        "success": result["returncode"] == 0,
-        "elapsed_ms": elapsed,
-        "output": output,
+        "success": True,
+        "elapsed_ms": round(sum(latencies) / len(latencies), 2),
+        "error": None,
     }
-
 
 @app.route("/index.html")
 def redirect_index_html():
@@ -1618,6 +1631,8 @@ def sitemap_xml():
         "noida_sez_project",
         "noida_stp2_project",
         "network_toolkit",
+        "games_hub",
+        "game_fruit_merge",
         "ip_calculator",
         "subnet_planner",
         "ip_range",
@@ -1650,6 +1665,15 @@ def about():
 @app.route("/projects")
 def projects():
     return render_template("projects.html")
+
+@app.route("/games")
+def games_hub():
+    return render_template("games.html")
+
+
+@app.route("/games/fruit-merge")
+def game_fruit_merge():
+    return render_template("game_fruit_merge.html")
 
 
 @app.route("/network-diagnostic-lab")
@@ -1979,7 +2003,7 @@ def diagnostic_mac_vendor():
 DNS_RESOLVERS = {
     "Cloudflare": "https://cloudflare-dns.com/dns-query",
     "Google": "https://dns.google/resolve",
-    "Quad9": "https://dns.quad9.net:5053/dns-query",
+    "Quad9": "https://dns.quad9.net/dns-query",
 }
 
 
@@ -2182,40 +2206,40 @@ def diagnostic_traceroute():
             target
         )
 
-        system = platform.system().lower()
+        # True hop-by-hop traceroute needs raw ICMP sockets, which
+        # this hosting environment does not permit for unprivileged
+        # processes (the same constraint that affects Ping). This
+        # instead sweeps a set of common service ports and reports
+        # TCP reachability and latency for each - honest, useful
+        # connectivity data, just not literal network hops.
+        probe_ports = [443, 80, 22, 3389]
+        results = []
 
-        if system == "windows":
+        for port in probe_ports:
+            start = time.perf_counter()
+            try:
+                with socket.create_connection((target, port), timeout=DIAGNOSTIC_TIMEOUT):
+                    results.append({
+                        "target": f"{target}:{port}",
+                        "success": True,
+                        "elapsed_ms": round((time.perf_counter() - start) * 1000, 2),
+                    })
+            except (socket.timeout, OSError):
+                results.append({
+                    "target": f"{target}:{port}",
+                    "success": False,
+                    "elapsed_ms": None,
+                    "error": "Unreachable or filtered",
+                })
 
-            command = [
-                "tracert",
-                "-d",
-                "-h",
-                str(MAX_TRACE_HOPS),
-                target,
-            ]
-
-        else:
-
-            command = [
-                "traceroute",
-                "-n",
-                "-m",
-                str(MAX_TRACE_HOPS),
-                target,
-            ]
-
-        result = run_command(
-            command,
-            timeout=45
-        )
+        reachable = sum(1 for item in results if item["success"])
 
         return jsonify({
             "success": True,
             "target": target,
-            "output": (
-                result["stdout"]
-                + result["stderr"]
-            )[-20000:],
+            "results": results,
+            "reachable": reachable,
+            "unreachable": len(results) - reachable,
         })
 
     except Exception as exc:

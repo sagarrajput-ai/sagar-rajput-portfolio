@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Games | Sagar Rajput{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Free browser-based games built by Sagar Rajput, including Fruit Merge - a physics-based fruit merging game.">
+{% endblock %}
+
+{% block og_title %}Games | Sagar Rajput{% endblock %}
+{% block og_description %}
+Free browser-based games built by Sagar Rajput.
+{% endblock %}
+{% block twitter_title %}Games | Sagar Rajput{% endblock %}
+{% block twitter_description %}
+Free browser-based games built by Sagar Rajput.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Games by Sagar Rajput",
+  "url": "https://sagarrajput.com/games",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero">
+
+    <canvas class="network-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    BUILT FOR FUN · FREE TO PLAY
+                </div>
+
+                <h1>
+                    Games
+                    <span>worth a break.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    A small collection of browser games, built the same way
+                    as the rest of this site - no installs, no accounts,
+                    just open and play.
+                </p>
+
+            </div>
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+                    <div>
+                        <span class="status-label">GAME LIBRARY</span>
+                        <h3>Growing</h3>
+                    </div>
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="network-line"></div>
+
+                <div class="status-metrics">
+                    <div>
+                        <strong>1</strong>
+                        <span>Game</span>
+                    </div>
+                    <div>
+                        <strong>FREE</strong>
+                        <span>To Play</span>
+                    </div>
+                    <div>
+                        <strong>WEB</strong>
+                        <span>No Install</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="toolkit-grid">
+
+            <article class="toolkit-card">
+                <span class="tool-number">01</span>
+                <div class="tool-content">
+                    <div class="tool-icon">🍉</div>
+                    <h3>Fruit Merge</h3>
+                    <p>Drop and merge matching fruit into bigger ones without letting the stack overflow. Physics-based, built with Matter.js.</p>
+                    <div class="tool-tags">
+                        <span>Physics</span>
+                        <span>Arcade</span>
+                    </div>
+                    <a href="{{ url_for('game_fruit_merge') }}" class="tool-link">Play Now →</a>
+                </div>
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

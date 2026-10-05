@@ -74,6 +74,7 @@
             <a href="{{ url_for('home') }}#creator">Creator</a>
             <a href="{{ url_for('home') }}#contact">Contact</a>
             <a href="{{ url_for('projects') }}">Projects</a>
+            <a href="{{ url_for('games_hub') }}">Games</a>
             <a href="{{ url_for('network_diagnostic_lab') }}" class="nav-cta">Diagnostic Lab</a>
             <a href="{{ url_for('network_toolkit') }}" class="nav-cta">Network Toolkit</a>
         </div>
@@ -162,5 +163,6 @@
 </footer>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>
