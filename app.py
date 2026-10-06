@@ -1636,6 +1636,7 @@ def sitemap_xml():
         "games_hub",
         "game_fruit_merge",
         "game_memory_match",
+        "game_cyber_snake",
         "ip_calculator",
         "subnet_planner",
         "ip_range",
@@ -1681,6 +1682,10 @@ def game_fruit_merge():
 @app.route("/games/memory-match")
 def game_memory_match():
     return render_template("game_memory_match.html")
+
+@app.route("/games/cyber-snake")
+def game_cyber_snake():
+    return render_template("game_cyber_snake.html")
 
 @app.route("/network-diagnostic-lab")
 def network_diagnostic_lab():

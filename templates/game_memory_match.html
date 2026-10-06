@@ -112,6 +112,7 @@ A free IT hardware themed memory card game by Sagar Rajput.
                 <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em;">TIME</div>
                 <div id="mm-time" style="font-size: 24px; font-weight: 800;">0:00</div>
             </div>
+            <button id="mm-mute" class="btn btn-secondary" type="button" style="padding: 10px 14px;" title="Toggle sound">🔊</button>
             <button id="mm-restart" class="btn btn-secondary" type="button">Restart ↻</button>
         </div>
 
@@ -189,6 +190,7 @@ A free IT hardware themed memory card game by Sagar Rajput.
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/game-audio.js') }}"></script>
 <script>
 (function () {
     "use strict";
@@ -215,6 +217,11 @@ A free IT hardware themed memory card game by Sagar Rajput.
     const nameEntryEl = document.getElementById("mm-name-entry");
     const nameInputEl = document.getElementById("mm-name-input");
     const nameSaveBtn = document.getElementById("mm-name-save");
+    const muteBtn = document.getElementById("mm-mute");
+    muteBtn.textContent = GameAudio.isMuted() ? "🔇" : "🔊";
+    muteBtn.addEventListener("click", () => {
+        muteBtn.textContent = GameAudio.toggleMuted() ? "🔇" : "🔊";
+    });
 
     let cards = [];
     let flipped = [];
@@ -329,6 +336,7 @@ A free IT hardware themed memory card game by Sagar Rajput.
         if (flipped.some(f => f.el === cardEl)) return;
 
         startTimerIfNeeded();
+        GameAudio.click();
         cardEl.style.transform = "rotateY(180deg)";
         flipped.push({ el: cardEl, card });
 
@@ -339,6 +347,7 @@ A free IT hardware themed memory card game by Sagar Rajput.
 
             const [a, b] = flipped;
             if (a.card.key === b.card.key) {
+                GameAudio.success();
                 matchedCount++;
                 flipped = [];
                 lockBoard = false;
@@ -346,6 +355,7 @@ A free IT hardware themed memory card game by Sagar Rajput.
                     endGame();
                 }
             } else {
+                GameAudio.fail();
                 setTimeout(() => {
                     a.el.style.transform = "";
                     b.el.style.transform = "";
@@ -358,6 +368,7 @@ A free IT hardware themed memory card game by Sagar Rajput.
 
     function endGame() {
         clearInterval(timerInterval);
+        GameAudio.win();
         winStatsEl.textContent = `${moves} moves · ${formatTime(seconds)}`;
         winEl.style.display = "block";
 

@@ -133,7 +133,25 @@ A free physics-based fruit merging game by Sagar Rajput.
                 box-shadow: 0 24px 60px rgba(8,17,31,.35);
             ">
 
-                <button id="fm-fullscreen" type="button" title="Toggle fullscreen" style="
+            <button id="fm-mute" type="button" title="Toggle sound" style="
+                position: absolute;
+                top: 14px;
+                right: 58px;
+                z-index: 5;
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
+                border: 1px solid rgba(255,255,255,.15);
+                background: rgba(255,255,255,.06);
+                color: #fff;
+                font-size: 15px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">🔊</button>
+
+            <button id="fm-fullscreen" type="button" title="Toggle fullscreen" style="
                     position: absolute;
                     top: 14px;
                     right: 16px;
@@ -281,6 +299,7 @@ A free physics-based fruit merging game by Sagar Rajput.
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+<script src="{{ url_for('static', filename='js/game-audio.js') }}"></script>
 <script>
 (function () {
     "use strict";
@@ -315,6 +334,11 @@ A free physics-based fruit merging game by Sagar Rajput.
     const startOverlay = document.getElementById("fm-start");
     const startBtn = document.getElementById("fm-start-btn");
     const fullscreenBtn = document.getElementById("fm-fullscreen");
+    const muteBtn = document.getElementById("fm-mute");
+    muteBtn.textContent = GameAudio.isMuted() ? "🔇" : "🔊";
+    muteBtn.addEventListener("click", () => {
+        muteBtn.textContent = GameAudio.toggleMuted() ? "🔇" : "🔊";
+    });
     const persistentBoardEl = document.getElementById("fm-leaderboard-persistent");
     const nameEntryEl = document.getElementById("fm-name-entry");
     const nameInputEl = document.getElementById("fm-name-input");
@@ -450,8 +474,10 @@ A free physics-based fruit merging game by Sagar Rajput.
                         const body = makeFruit(m.at.x, m.at.y, m.newTier);
                         Composite.add(world, body);
                         score += FRUITS[m.newTier].score;
+                        GameAudio.merge(m.newTier);
                     } else {
                         score += 100;
+                        GameAudio.win();
                     }
                     scoreEl.textContent = score;
                 });
@@ -492,6 +518,7 @@ A free physics-based fruit merging game by Sagar Rajput.
 
     function endGame() {
         gameOver = true;
+        GameAudio.fail();
         finalScoreEl.textContent = score;
 
         const qualifies = score > 0 && (topScores.length < 3 || score > parseInt(topScores[topScores.length - 1].value, 10));
@@ -601,6 +628,7 @@ A free physics-based fruit merging game by Sagar Rajput.
     function dropFruit() {
         if (!canDrop || gameOver || !gameStarted) return;
         canDrop = false;
+        GameAudio.pop();
         const body = makeFruit(dropX, 30, nextTier);
         Composite.add(world, body);
         nextTier = Math.floor(Math.random() * SPAWN_POOL);
