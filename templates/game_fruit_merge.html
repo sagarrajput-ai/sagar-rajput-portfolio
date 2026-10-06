@@ -110,24 +110,6 @@ A free physics-based fruit merging game by Sagar Rajput.
             height: 100vh;
             background: var(--bg);
         }
-
-        /* Mobile: CSS-only "fullscreen" instead of the real Fullscreen API,
-           so the phone's status bar (clock/signal/battery) stays visible. */
-        #fm-wrap.fm-pseudo-fs {
-            position: fixed;
-            inset: 0;
-            z-index: 2000;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #fm-wrap.fm-pseudo-fs #fm-card {
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            border-radius: 0;
-        }
     </style>
 
     <div class="container" style="max-width: 520px;">
@@ -390,8 +372,7 @@ A free physics-based fruit merging game by Sagar Rajput.
         }
 
         const prevW = WIDTH, prevH = HEIGHT;
-        const isPseudoFullscreen = wrap.classList.contains("fm-pseudo-fs");
-        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement) || isPseudoFullscreen;
+        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement) || pseudoFullscreenActive;
         const mobileFullscreen = isFullscreen && isMobileDevice;
 
         if (mobileFullscreen) {
@@ -646,13 +627,58 @@ A free physics-based fruit merging game by Sagar Rajput.
         setTimeout(resize, 50);
     }
 
+    let pseudoFullscreenActive = false;
+
+    function enterPseudoFullscreen() {
+        pseudoFullscreenActive = true;
+        wrap.style.position = "fixed";
+        wrap.style.inset = "0";
+        wrap.style.zIndex = "2000";
+        wrap.style.background = "#f4f7fb";
+        wrap.style.display = "flex";
+        wrap.style.alignItems = "center";
+        wrap.style.justifyContent = "center";
+
+        card.style.width = "100vw";
+        card.style.height = "100vh";
+        card.style.maxWidth = "none";
+        card.style.borderRadius = "0";
+        card.style.margin = "0";
+
+        document.body.style.overflow = "hidden";
+        syncFullscreenSize();
+    }
+
+    function exitPseudoFullscreen() {
+        pseudoFullscreenActive = false;
+        wrap.style.position = "relative";
+        wrap.style.inset = "";
+        wrap.style.zIndex = "";
+        wrap.style.background = "";
+        wrap.style.display = "";
+        wrap.style.alignItems = "";
+        wrap.style.justifyContent = "";
+
+        card.style.width = "100%";
+        card.style.height = "";
+        card.style.maxWidth = "520px";
+        card.style.borderRadius = "20px";
+        card.style.margin = "0 auto";
+
+        document.body.style.overflow = "";
+        syncFullscreenSize();
+    }
+
     if (isMobileDevice) {
-        // Mobile: CSS-only pseudo-fullscreen, no Fullscreen API call -
-        // keeps the OS status bar visible, as requested.
+        // Mobile: direct inline-style toggle, no Fullscreen API call -
+        // keeps the OS status bar visible, and avoids any CSS specificity
+        // conflicts with existing inline styles.
         fullscreenBtn.addEventListener("click", () => {
-            wrap.classList.toggle("fm-pseudo-fs");
-            document.body.style.overflow = wrap.classList.contains("fm-pseudo-fs") ? "hidden" : "";
-            syncFullscreenSize();
+            if (pseudoFullscreenActive) {
+                exitPseudoFullscreen();
+            } else {
+                enterPseudoFullscreen();
+            }
         });
     } else if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
         fullscreenBtn.addEventListener("click", () => {
