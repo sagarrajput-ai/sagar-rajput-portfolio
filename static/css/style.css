@@ -4,6 +4,7 @@
   --shadow:0 24px 70px rgba(8,17,31,.10);--radius:22px;
 }
 *{box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100%}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,Arial,sans-serif;line-height:1.7}
 a{color:inherit}

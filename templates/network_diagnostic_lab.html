@@ -176,13 +176,13 @@ Network intelligence, diagnostics and troubleshooting tools in one unified brows
                     <button type="button" class="diagnostic-tool" data-tool="ping">
                         <span class="diagnostic-tool-icon">PING</span>
                         <h3>Advanced Ping</h3>
-                        <p>Bulk target ICMP echo latency check.</p>
+                        <p>Bulk TCP reachability and latency check.</p>
                     </button>
 
                     <button type="button" class="diagnostic-tool" data-tool="traceroute">
                         <span class="diagnostic-tool-icon">TRACE</span>
                         <h3>Traceroute</h3>
-                        <p>Inspect intermediate transit hops.</p>
+                        <p>Test TCP reachability across common service ports.</p>
                     </button>
 
                     <button type="button" class="diagnostic-tool" data-tool="tcp">
@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         "traceroute": {
             title: "Traceroute",
-            description: "Trace the network path from the diagnostic server to the selected destination."
+            description: "Test TCP connectivity and latency across common service ports (443, 80, 22, 3389) on the destination."
         },
         "tcp": {
             title: "TCP Connectivity",
@@ -496,6 +496,44 @@ document.addEventListener("DOMContentLoaded", function () {
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+    }
+
+    function renderValueCard(key, value) {
+        const isPlainObject = value !== null && typeof value === "object" && !Array.isArray(value);
+        const isFlatObject = isPlainObject && Object.values(value).every(
+            v => v === null || typeof v !== "object"
+        );
+
+        let bodyHtml;
+        let wide = false;
+
+        if (isFlatObject && Object.keys(value).length > 0) {
+            // Flat key:value object (e.g. HTTP response headers) -> readable list, not raw JSON
+            bodyHtml = `<div style="display:flex; flex-direction:column; gap:6px;">` +
+                Object.entries(value).map(([hk, hv]) => `
+                    <div style="display:flex; justify-content:space-between; gap:14px; font-size:13px;">
+                        <span style="color:#94a3b8;">${escapeHtml(hk)}</span>
+                        <span style="font-family:monospace; color:var(--accent, #28d7c5); text-align:right; word-break:break-all;">${escapeHtml(String(hv))}</span>
+                    </div>
+                `).join("") +
+                `</div>`;
+            wide = true;
+        } else if (typeof value === "object" && value !== null) {
+            // Nested/array data (e.g. RDAP entities) -> pretty-printed, scrollable JSON
+            bodyHtml = `<pre style="margin:0; white-space:pre-wrap; word-break:break-all; font-family:monospace; font-size:12px; color:var(--accent, #28d7c5); max-height:320px; overflow:auto;">${escapeHtml(JSON.stringify(value, null, 2))}</pre>`;
+            wide = true;
+        } else {
+            bodyHtml = `<strong style="font-family: monospace; font-size: 14px; word-break: break-all; color: var(--accent, #28d7c5);">${escapeHtml(String(value))}</strong>`;
+        }
+
+        return `
+            <div class="result-card" style="padding: 16px; border: 1px solid var(--line, #e2e8f0); border-radius: 12px; background: rgba(255,255,255,0.03); ${wide ? "grid-column: 1 / -1;" : ""}">
+                <span style="display: block; font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;">
+                    ${escapeHtml(formatLabel(key))}
+                </span>
+                ${bodyHtml}
+            </div>
+        `;
     }
 
     function formatLabel(key) {
@@ -576,7 +614,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             ${isOnline ? 'ONLINE' : 'OFFLINE'}
                         </td>
                         <td style="padding: 10px;">${item.elapsed_ms !== undefined ? escapeHtml(item.elapsed_ms) + ' ms' : '-'}</td>
-                        <td style="padding: 10px;">${escapeHtml(item.error || (isOnline ? 'Echo Reply OK' : 'No Response'))}</td>
+                        <td style="padding: 10px;">${escapeHtml(item.error || (isOnline ? 'TCP Handshake OK' : 'No Response'))}</td>
                     </tr>
                 `;
             });
@@ -619,17 +657,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         Object.entries(sourceObject).forEach(([k, v]) => {
             if (k === "success" || k === "raw") return;
-            let displayVal = (typeof v === "object" && v !== null) ? JSON.stringify(v) : String(v);
-            cardsHtml += `
-                <div class="result-card" style="padding: 16px; border: 1px solid var(--line, #e2e8f0); border-radius: 12px; background: rgba(255,255,255,0.03);">
-                    <span style="display: block; font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;">
-                        ${escapeHtml(formatLabel(k))}
-                    </span>
-                    <strong style="font-family: monospace; font-size: 14px; word-break: break-all; color: var(--accent, #28d7c5);">
-                        ${escapeHtml(displayVal)}
-                    </strong>
-                </div>
-            `;
+            cardsHtml += renderValueCard(k, v);
         });
         cardsHtml += `</div>`;
         visualOutput.innerHTML = cardsHtml;
@@ -655,7 +683,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Server returned status ${response.status}`);
+                    let serverMessage = `Server returned status ${response.status}`;
+                    try {
+                        const errorBody = await response.json();
+                        if (errorBody && errorBody.error) {
+                            serverMessage = errorBody.error;
+                        }
+                    } catch (parseErr) {
+                        // response wasn't JSON; keep the generic message
+                    }
+                    throw new Error(serverMessage);
                 }
 
                 const data = await response.json();
