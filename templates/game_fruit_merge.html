@@ -116,6 +116,11 @@ A free physics-based fruit merging game by Sagar Rajput.
 
         <div id="fm-wrap" style="position: relative;">
 
+            <div id="fm-fs-topbar" style="display: none; width: 100%; max-width: 520px; text-align: center; padding: 6px 4px 14px;">
+                <div style="font: 500 11px 'DM Mono', monospace; color: #7ee9db; letter-spacing: .08em;">BEST SCORE</div>
+                <div id="fm-fs-best" style="font-size: 24px; font-weight: 800; color: #fff;">0</div>
+            </div>
+
             <div id="fm-card" style="
                 position: relative;
                 width: 100%;
@@ -362,32 +367,19 @@ A free physics-based fruit merging game by Sagar Rajput.
     renderLeaderboard();
 
     function resize() {
-        // If the card hasn't actually been laid out yet (clientWidth is 0,
-        // common on first load before CSS/fonts settle), wait a frame and
-        // try again instead of falling back to a guessed width - a wrong
-        // guess here is what was causing the mobile sizing bug.
+        // If the card hasn't actually been laid out yet, wait a frame.
         if (!card.clientWidth) {
             requestAnimationFrame(resize);
             return;
         }
 
+        // The game board is always sized the same way, fullscreen or not -
+        // fullscreen only changes the surrounding layout (centering +
+        // extra space for the Best Score bar), never the board itself.
         const prevW = WIDTH, prevH = HEIGHT;
-        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement) || pseudoFullscreenActive;
-        const mobileFullscreen = isFullscreen && isMobileDevice;
+        WIDTH = Math.min(card.clientWidth, 520);
+        HEIGHT = Math.round(WIDTH * 1.3);
 
-        if (mobileFullscreen) {
-            let w = window.innerWidth;
-            let h = Math.round(w * 1.3);
-            if (h > window.innerHeight) {
-                h = window.innerHeight;
-                w = Math.round(h / 1.3);
-            }
-            WIDTH = w;
-            HEIGHT = h;
-        } else {
-            WIDTH = Math.min(card.clientWidth, 520);
-            HEIGHT = Math.round(WIDTH * 1.3);
-        }
         canvas.width = WIDTH;
         canvas.height = HEIGHT;
         canvas.style.width = WIDTH + "px";
@@ -513,6 +505,7 @@ A free physics-based fruit merging game by Sagar Rajput.
         nameInputEl.value = "";
         renderBest();
         renderLeaderboard();
+        if (pseudoFullscreenActive) fsBestEl.textContent = topScores[0].score;
     }
 
     function resetGame() {
@@ -628,22 +621,28 @@ A free physics-based fruit merging game by Sagar Rajput.
     }
 
     let pseudoFullscreenActive = false;
+    const fsTopbar = document.getElementById("fm-fs-topbar");
+    const fsBestEl = document.getElementById("fm-fs-best");
 
     function enterPseudoFullscreen() {
         pseudoFullscreenActive = true;
+
+        // Card itself is never resized - only the wrapper becomes a
+        // fixed, full-viewport flex column that centers the (unchanged)
+        // card, with room above it for the status bar gap + Best Score.
         wrap.style.position = "fixed";
         wrap.style.inset = "0";
         wrap.style.zIndex = "2000";
         wrap.style.background = "#f4f7fb";
         wrap.style.display = "flex";
+        wrap.style.flexDirection = "column";
         wrap.style.alignItems = "center";
         wrap.style.justifyContent = "center";
+        wrap.style.paddingTop = "env(safe-area-inset-top, 24px)";
+        wrap.style.boxSizing = "border-box";
 
-        card.style.width = "100vw";
-        card.style.height = "100vh";
-        card.style.maxWidth = "none";
-        card.style.borderRadius = "0";
-        card.style.margin = "0";
+        fsBestEl.textContent = topScores.length ? topScores[0].score : 0;
+        fsTopbar.style.display = "block";
 
         document.body.style.overflow = "hidden";
         syncFullscreenSize();
@@ -651,19 +650,19 @@ A free physics-based fruit merging game by Sagar Rajput.
 
     function exitPseudoFullscreen() {
         pseudoFullscreenActive = false;
+
         wrap.style.position = "relative";
         wrap.style.inset = "";
         wrap.style.zIndex = "";
         wrap.style.background = "";
         wrap.style.display = "";
+        wrap.style.flexDirection = "";
         wrap.style.alignItems = "";
         wrap.style.justifyContent = "";
+        wrap.style.paddingTop = "";
+        wrap.style.boxSizing = "";
 
-        card.style.width = "100%";
-        card.style.height = "";
-        card.style.maxWidth = "520px";
-        card.style.borderRadius = "20px";
-        card.style.margin = "0 auto";
+        fsTopbar.style.display = "none";
 
         document.body.style.overflow = "";
         syncFullscreenSize();
