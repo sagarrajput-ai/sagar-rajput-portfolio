@@ -620,20 +620,24 @@ A free physics-based fruit merging game by Sagar Rajput.
         setTimeout(resize, 50);
     }
 
-    let pseudoFullscreenActive = false;
+let pseudoFullscreenActive = false;
+    let isHandlingPopstate = false;
     const fsTopbar = document.getElementById("fm-fs-topbar");
     const fsBestEl = document.getElementById("fm-fs-best");
 
     function enterPseudoFullscreen() {
+        if (pseudoFullscreenActive) return;
         pseudoFullscreenActive = true;
 
-        // Card itself is never resized - only the wrapper becomes a
-        // fixed, full-viewport flex column that centers the (unchanged)
-        // card, with room above it for the status bar gap + Best Score.
+        // Push state to browser history so the hardware/browser Back button closes fullscreen instead of leaving the page
+        if (!window.location.hash.includes("fullscreen")) {
+            history.pushState({ fullscreen: true }, "", "#fullscreen");
+        }
+
         wrap.style.position = "fixed";
         wrap.style.inset = "0";
         wrap.style.zIndex = "2000";
-        wrap.style.background = "#f4f7fb";
+        wrap.style.background = "#060d19";
         wrap.style.display = "flex";
         wrap.style.flexDirection = "column";
         wrap.style.alignItems = "center";
@@ -648,7 +652,8 @@ A free physics-based fruit merging game by Sagar Rajput.
         syncFullscreenSize();
     }
 
-    function exitPseudoFullscreen() {
+    function exitPseudoFullscreen(fromPopstate = false) {
+        if (!pseudoFullscreenActive) return;
         pseudoFullscreenActive = false;
 
         wrap.style.position = "relative";
@@ -663,15 +668,35 @@ A free physics-based fruit merging game by Sagar Rajput.
         wrap.style.boxSizing = "";
 
         fsTopbar.style.display = "none";
-
         document.body.style.overflow = "";
+
+        // If closed via button instead of Back key, revert the history state cleanly
+        if (!fromPopstate && window.location.hash.includes("fullscreen")) {
+            isHandlingPopstate = true;
+            history.back();
+            setTimeout(() => { isHandlingPopstate = false; }, 100);
+        }
+
         syncFullscreenSize();
     }
 
+    // Intercept Back button (hardware back, swipe back, browser back)
+    window.addEventListener("popstate", () => {
+        if (isHandlingPopstate) return;
+
+        // If in mobile pseudo-fullscreen, exit it without reloading
+        if (pseudoFullscreenActive) {
+            exitPseudoFullscreen(true);
+            return;
+        }
+
+        // If in native desktop HTML5 fullscreen, exit it
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        }
+    });
+
     if (isMobileDevice) {
-        // Mobile: direct inline-style toggle, no Fullscreen API call -
-        // keeps the OS status bar visible, and avoids any CSS specificity
-        // conflicts with existing inline styles.
         fullscreenBtn.addEventListener("click", () => {
             if (pseudoFullscreenActive) {
                 exitPseudoFullscreen();
@@ -682,13 +707,29 @@ A free physics-based fruit merging game by Sagar Rajput.
     } else if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
         fullscreenBtn.addEventListener("click", () => {
             if (!document.fullscreenElement) {
+                if (!window.location.hash.includes("fullscreen")) {
+                    history.pushState({ fullscreen: true }, "", "#fullscreen");
+                }
                 (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
             } else {
                 (document.exitFullscreen || document.webkitExitFullscreen).call(document);
             }
         });
-        document.addEventListener("fullscreenchange", syncFullscreenSize);
-        document.addEventListener("webkitfullscreenchange", syncFullscreenSize);
+
+        function handleNativeFullscreenChange() {
+            syncFullscreenSize();
+            // If exited native fullscreen using Esc key, pop the history hash cleanly
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (window.location.hash.includes("fullscreen")) {
+                    isHandlingPopstate = true;
+                    history.back();
+                    setTimeout(() => { isHandlingPopstate = false; }, 100);
+                }
+            }
+        }
+
+        document.addEventListener("fullscreenchange", handleNativeFullscreenChange);
+        document.addEventListener("webkitfullscreenchange", handleNativeFullscreenChange);
     } else {
         fullscreenBtn.style.display = "none";
     }
