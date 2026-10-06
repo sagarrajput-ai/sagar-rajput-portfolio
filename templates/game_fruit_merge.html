@@ -329,7 +329,7 @@ A free physics-based fruit merging game by Sagar Rajput.
 
     let engine, world, runner, leftWall, rightWall, floor;
     let score = 0;
-    let topScores = JSON.parse(localStorage.getItem("fruitMergeTopScores") || "[]");
+    let topScores = []; // {name, value}[] - fetched from the server, not localStorage
     let pendingScore = null;
     let dropX = WIDTH / 2;
     let nextTier = Math.floor(Math.random() * SPAWN_POOL);
@@ -347,7 +347,9 @@ A free physics-based fruit merging game by Sagar Rajput.
     }
 
     function renderBest() {
-        bestEl.textContent = topScores.length ? topScores[0].score : 0;
+        const best = topScores.length ? parseInt(topScores[0].value, 10) : 0;
+        bestEl.textContent = best;
+        if (fsBestEl) fsBestEl.textContent = best;
     }
 
     function renderLeaderboard() {
@@ -357,14 +359,25 @@ A free physics-based fruit merging game by Sagar Rajput.
             return `
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; color:${entry ? '#fff' : 'rgba(255,255,255,.4)'};">
                 <span>${medals[i]} ${entry ? escapeHtmlFM(entry.name) : "- - -"}</span>
-                <span style="font-family:'DM Mono', monospace; color:#7ee9db;">${entry ? entry.score : "-"}</span>
+                <span style="font-family:'DM Mono', monospace; color:#7ee9db;">${entry ? entry.value : "-"}</span>
             </div>
         `;
         }).join("");
     }
 
-    renderBest();
-    renderLeaderboard();
+    async function loadLeaderboard() {
+        try {
+            const res = await fetch("/api/games/score?game=fruit-merge");
+            const data = await res.json();
+            topScores = data.leaderboard || [];
+        } catch (e) {
+            topScores = [];
+        }
+        renderBest();
+        renderLeaderboard();
+    }
+
+    loadLeaderboard();
 
     function resize() {
         // If the card hasn't actually been laid out yet, wait a frame.
@@ -481,7 +494,7 @@ A free physics-based fruit merging game by Sagar Rajput.
         gameOver = true;
         finalScoreEl.textContent = score;
 
-        const qualifies = score > 0 && (topScores.length < 3 || score > topScores[topScores.length - 1].score);
+        const qualifies = score > 0 && (topScores.length < 3 || score > parseInt(topScores[topScores.length - 1].value, 10));
 
         if (qualifies) {
             pendingScore = score;
@@ -493,19 +506,27 @@ A free physics-based fruit merging game by Sagar Rajput.
         gameOverEl.style.display = "flex";
     }
 
-    function saveNamedScore() {
+    async function saveNamedScore() {
         if (pendingScore === null) return;
         const name = (nameInputEl.value || "").trim().slice(0, 12) || "Player";
-        topScores.push({ name, score: pendingScore });
-        topScores.sort((a, b) => b.score - a.score);
-        topScores = topScores.slice(0, 3);
-        localStorage.setItem("fruitMergeTopScores", JSON.stringify(topScores));
+
+        try {
+            const res = await fetch("/api/games/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ game: "fruit-merge", name, sort_value: pendingScore, display_value: String(pendingScore) }),
+            });
+            const data = await res.json();
+            topScores = data.leaderboard || topScores;
+        } catch (e) {
+            // Submission failed (offline, etc). Leaderboard just won't update this time.
+        }
+
         pendingScore = null;
         nameEntryEl.style.display = "none";
         nameInputEl.value = "";
         renderBest();
         renderLeaderboard();
-        if (pseudoFullscreenActive) fsBestEl.textContent = topScores[0].score;
     }
 
     function resetGame() {
@@ -645,7 +666,7 @@ let pseudoFullscreenActive = false;
         wrap.style.paddingTop = "env(safe-area-inset-top, 24px)";
         wrap.style.boxSizing = "border-box";
 
-        fsBestEl.textContent = topScores.length ? topScores[0].score : 0;
+        fsBestEl.textContent = topScores.length ? topScores[0].value : 0;
         fsTopbar.style.display = "block";
 
         document.body.style.overflow = "hidden";
