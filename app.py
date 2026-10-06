@@ -16,9 +16,11 @@ import urllib.request
 import urllib.error
 import http.client
 import concurrent.futures
+import sqlite3
 
 from port_scanner import port_scanner_bp
 from tavily import TavilyClient
+from datetime import datetime
 
 
 
@@ -1633,6 +1635,7 @@ def sitemap_xml():
         "network_toolkit",
         "games_hub",
         "game_fruit_merge",
+        "game_memory_match",
         "ip_calculator",
         "subnet_planner",
         "ip_range",
@@ -1675,16 +1678,17 @@ def games_hub():
 def game_fruit_merge():
     return render_template("game_fruit_merge.html")
 
+@app.route("/games/memory-match")
+def game_memory_match():
+    return render_template("game_memory_match.html")
 
 @app.route("/network-diagnostic-lab")
 def network_diagnostic_lab():
     return render_template("network_diagnostic_lab.html")
 
-
 @app.route("/projects/network-toolkit")
 def network_toolkit_project():
     return render_template("network_toolkit_project.html")
-
 
 @app.route("/projects/noida-sez-network")
 def noida_sez_project():
@@ -1708,6 +1712,83 @@ def healthz():
 # Network Engineering Tools
 # ---------------------------------------------------------------------------
 
+GAMES_DB_PATH = os.path.join(app.instance_path, "games.db")
+
+# Whether a lower or higher sort_value counts as "better" per game.
+GAME_SORT_DIRECTION = {
+    "fruit-merge": "DESC",   # higher score is better
+    "memory-match": "ASC",   # fewer moves is better
+}
+
+def ensure_games_database():
+    os.makedirs(app.instance_path, exist_ok=True)
+    conn = sqlite3.connect(GAMES_DB_PATH)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS game_scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_slug TEXT NOT NULL,
+            player_name TEXT NOT NULL,
+            sort_value INTEGER NOT NULL,
+            display_value TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+ensure_games_database()
+
+
+@app.route("/api/games/score", methods=["GET", "POST"])
+def games_score():
+    game = request.values.get("game", "").strip()
+
+    if game not in GAME_SORT_DIRECTION:
+        return jsonify({"error": "Unknown game"}), 400
+
+    conn = sqlite3.connect(GAMES_DB_PATH)
+    conn.row_factory = sqlite3.Row
+
+    if request.method == "POST":
+        data = request.get_json(silent=True) or {}
+
+        name = str(data.get("name", "")).strip()
+        name = re.sub(r"[^\w\s\-\.]", "", name)[:12] or "Player"
+
+        try:
+            sort_value = int(data.get("sort_value"))
+        except (TypeError, ValueError):
+            conn.close()
+            return jsonify({"error": "Invalid score"}), 400
+
+        display_value = str(data.get("display_value", sort_value))[:40]
+
+        # Basic sanity bounds per game, to filter obviously fake submissions.
+        # This can't stop a determined cheater on a client-side game, but it
+        # blocks accidental garbage and casual tampering.
+        if game == "fruit-merge" and not (0 < sort_value <= 100000):
+            conn.close()
+            return jsonify({"error": "Score out of range"}), 400
+        if game == "memory-match" and not (8 <= sort_value <= 9999):
+            conn.close()
+            return jsonify({"error": "Score out of range"}), 400
+
+        conn.execute(
+            "INSERT INTO game_scores (game_slug, player_name, sort_value, display_value, created_at) VALUES (?, ?, ?, ?, ?)",
+            (game, name, sort_value, display_value, datetime.utcnow().isoformat())
+        )
+        conn.commit()
+
+    direction = GAME_SORT_DIRECTION[game]
+    rows = conn.execute(
+        f"SELECT player_name, display_value FROM game_scores WHERE game_slug = ? ORDER BY sort_value {direction} LIMIT 3",
+        (game,)
+    ).fetchall()
+    conn.close()
+
+    return jsonify({
+        "leaderboard": [{"name": r["player_name"], "value": r["display_value"]} for r in rows]
+    })
 
 @app.route(
     "/api/diagnostic/reverse-dns",

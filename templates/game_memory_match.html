@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Memory Match | Free IT Hardware Card Game | Sagar Rajput{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Play Memory Match, a free IT hardware and networking themed memory card game by Sagar Rajput. Flip cards, find pairs, beat your best time.">
+{% endblock %}
+
+{% block og_title %}Memory Match | Sagar Rajput{% endblock %}
+{% block og_description %}
+A free IT hardware themed memory card game. Flip cards, find matching pairs, beat your best score.
+{% endblock %}
+{% block twitter_title %}Memory Match | Sagar Rajput{% endblock %}
+{% block twitter_description %}
+A free IT hardware themed memory card game by Sagar Rajput.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Memory Match",
+  "url": "https://sagarrajput.com/games/memory-match",
+  "genre": "Puzzle",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "CollectionPage",
+    "name": "Games by Sagar Rajput",
+    "url": "https://sagarrajput.com/games"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero">
+
+    <canvas class="network-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    CARD GAME · FREE TO PLAY
+                </div>
+
+                <h1>
+                    Memory
+                    <span>Match.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    Flip two cards at a time and find every matching pair of
+                    IT hardware icons. Fewer moves, faster time, better score.
+                </p>
+
+                <div class="toolkit-actions">
+                    <a href="{{ url_for('games_hub') }}" class="btn btn-secondary">← All Games</a>
+                </div>
+
+            </div>
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+                    <div>
+                        <span class="status-label">LEADERBOARD</span>
+                        <h3>Best Run</h3>
+                    </div>
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="network-line"></div>
+
+                <div id="mm-leaderboard" style="display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 2px;"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section" style="padding-top: 50px;">
+
+    <div class="container" style="max-width: 560px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <div>
+                <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em;">MOVES</div>
+                <div id="mm-moves" style="font-size: 24px; font-weight: 800;">0</div>
+            </div>
+            <div>
+                <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em;">TIME</div>
+                <div id="mm-time" style="font-size: 24px; font-weight: 800;">0:00</div>
+            </div>
+            <button id="mm-restart" class="btn btn-secondary" type="button">Restart ↻</button>
+        </div>
+
+        <div id="mm-board" style="
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            perspective: 1000px;
+        "></div>
+
+        <div id="mm-win" style="
+            display: none;
+            margin-top: 20px;
+            padding: 24px;
+            border-radius: 16px;
+            background: var(--dark);
+            color: #fff;
+            text-align: center;
+        ">
+            <div style="font-size: 32px; margin-bottom: 8px;">🏆</div>
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">You matched them all!</div>
+            <p id="mm-win-stats" style="color: var(--muted); margin: 0 0 16px;"></p>
+
+            <div id="mm-name-entry" style="display: none; flex-direction: column; gap: 10px; max-width: 240px; margin: 0 auto 16px;">
+                <div style="font-size: 13px; color: var(--accent);">🏆 New best run! Enter your name:</div>
+                <input id="mm-name-input" type="text" maxlength="12" placeholder="Your name" style="
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 10px 14px;
+                    border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,.2);
+                    background: rgba(255,255,255,.06);
+                    color: #fff;
+                    font-size: 14px;
+                ">
+                <button id="mm-name-save" class="btn btn-primary" type="button">Save Score</button>
+            </div>
+
+            <button id="mm-play-again" class="btn btn-primary" type="button">Play Again →</button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO PLAY</p>
+            <h2>How to play Memory Match</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Flip a card.</strong>
+                <p>Click or tap any face-down card to reveal its icon.</p>
+            </li>
+            <li>
+                <strong>Flip a second card.</strong>
+                <p>If the two icons match, both stay revealed. If not, they flip back after a moment.</p>
+            </li>
+            <li>
+                <strong>Clear the board.</strong>
+                <p>Keep finding pairs until every card is matched. Fewer moves and less time means a better score.</p>
+            </li>
+        </ol>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    "use strict";
+
+    const ICONS = [
+        { key: "router",   emoji: "📡", label: "Router" },
+        { key: "switch",   emoji: "🔀", label: "Switch" },
+        { key: "firewall", emoji: "🧱", label: "Firewall" },
+        { key: "server",   emoji: "🖥️", label: "Server" },
+        { key: "cable",    emoji: "🔌", label: "Cable" },
+        { key: "cloud",    emoji: "☁️", label: "Cloud" },
+        { key: "lock",     emoji: "🔒", label: "Security" },
+        { key: "database", emoji: "🗄️", label: "Database" },
+    ];
+
+    const boardEl = document.getElementById("mm-board");
+    const movesEl = document.getElementById("mm-moves");
+    const timeEl = document.getElementById("mm-time");
+    const restartBtn = document.getElementById("mm-restart");
+    const winEl = document.getElementById("mm-win");
+    const winStatsEl = document.getElementById("mm-win-stats");
+    const playAgainBtn = document.getElementById("mm-play-again");
+    const leaderboardEl = document.getElementById("mm-leaderboard");
+    const nameEntryEl = document.getElementById("mm-name-entry");
+    const nameInputEl = document.getElementById("mm-name-input");
+    const nameSaveBtn = document.getElementById("mm-name-save");
+
+    let cards = [];
+    let flipped = [];
+    let matchedCount = 0;
+    let moves = 0;
+    let lockBoard = false;
+    let timerInterval = null;
+    let seconds = 0;
+    let bestRuns = []; // {name, value}[] - fetched from the server, not localStorage
+    let pendingResult = null;
+
+    function escapeHtmlMM(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderLeaderboard() {
+        const medals = ["🥇", "🥈", "🥉"];
+        leaderboardEl.innerHTML = [0, 1, 2].map((i) => {
+            const entry = bestRuns[i];
+            return `
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; color:${entry ? 'var(--text, #0b1220)' : 'rgba(100,116,139,.5)'};">
+                <span>${medals[i]} ${entry ? escapeHtmlMM(entry.name) : "- - -"}</span>
+                <span style="font-family:'DM Mono', monospace; color:var(--accent);">${entry ? entry.value : "-"}</span>
+            </div>
+        `;
+        }).join("");
+    }
+
+    async function loadLeaderboard() {
+        try {
+            const res = await fetch("/api/games/score?game=memory-match");
+            const data = await res.json();
+            bestRuns = data.leaderboard || [];
+        } catch (e) {
+            bestRuns = [];
+        }
+        renderLeaderboard();
+    }
+
+    function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${m}:${sec.toString().padStart(2, "0")}`;
+    }
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function buildBoard() {
+        boardEl.innerHTML = "";
+        cards = shuffle([...ICONS, ...ICONS].map((icon, i) => ({ ...icon, id: i })));
+        flipped = [];
+        matchedCount = 0;
+        moves = 0;
+        lockBoard = false;
+        seconds = 0;
+        movesEl.textContent = "0";
+        timeEl.textContent = "0:00";
+        winEl.style.display = "none";
+        nameEntryEl.style.display = "none";
+
+        clearInterval(timerInterval);
+        timerInterval = null;
+
+        cards.forEach((card) => {
+            const cardEl = document.createElement("div");
+            cardEl.className = "mm-card";
+            cardEl.dataset.key = card.key;
+            cardEl.dataset.id = card.id;
+            cardEl.style.cssText = `
+                aspect-ratio: 1;
+                position: relative;
+                cursor: pointer;
+                transform-style: preserve-3d;
+                transition: transform .4s;
+            `;
+            cardEl.innerHTML = `
+                <div class="mm-face mm-front" style="
+                    position:absolute; inset:0; border-radius:12px; backface-visibility:hidden;
+                    background: var(--dark); display:flex; align-items:center; justify-content:center;
+                    font-size: 22px; color: var(--accent); font-weight:800;
+                ">?</div>
+                <div class="mm-face mm-back" style="
+                    position:absolute; inset:0; border-radius:12px; backface-visibility:hidden;
+                    background: #fff; border: 2px solid var(--line); display:flex; align-items:center; justify-content:center;
+                    font-size: 32px; transform: rotateY(180deg);
+                ">${card.emoji}</div>
+            `;
+            cardEl.addEventListener("click", () => flipCard(cardEl, card));
+            boardEl.appendChild(cardEl);
+        });
+    }
+
+    function startTimerIfNeeded() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => {
+            seconds++;
+            timeEl.textContent = formatTime(seconds);
+        }, 1000);
+    }
+
+    function flipCard(cardEl, card) {
+        if (lockBoard) return;
+        if (cardEl.style.transform === "rotateY(180deg)") return;
+        if (flipped.some(f => f.el === cardEl)) return;
+
+        startTimerIfNeeded();
+        cardEl.style.transform = "rotateY(180deg)";
+        flipped.push({ el: cardEl, card });
+
+        if (flipped.length === 2) {
+            moves++;
+            movesEl.textContent = moves;
+            lockBoard = true;
+
+            const [a, b] = flipped;
+            if (a.card.key === b.card.key) {
+                matchedCount++;
+                flipped = [];
+                lockBoard = false;
+                if (matchedCount === ICONS.length) {
+                    endGame();
+                }
+            } else {
+                setTimeout(() => {
+                    a.el.style.transform = "";
+                    b.el.style.transform = "";
+                    flipped = [];
+                    lockBoard = false;
+                }, 800);
+            }
+        }
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        winStatsEl.textContent = `${moves} moves · ${formatTime(seconds)}`;
+        winEl.style.display = "block";
+
+        const qualifies = bestRuns.length < 3 || moves <= 9999;
+
+        if (qualifies) {
+            pendingResult = { moves, seconds };
+            nameEntryEl.style.display = "flex";
+            setTimeout(() => nameInputEl.focus(), 50);
+        }
+    }
+
+    async function saveNamedResult() {
+        if (!pendingResult) return;
+        const name = (nameInputEl.value || "").trim().slice(0, 12) || "Player";
+        const displayValue = `${pendingResult.moves} mv / ${formatTime(pendingResult.seconds)}`;
+
+        try {
+            const res = await fetch("/api/games/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ game: "memory-match", name, sort_value: pendingResult.moves, display_value: displayValue }),
+            });
+            const data = await res.json();
+            bestRuns = data.leaderboard || bestRuns;
+        } catch (e) {
+            // Submission failed - leaderboard just won't update this time.
+        }
+
+        pendingResult = null;
+        nameEntryEl.style.display = "none";
+        nameInputEl.value = "";
+        renderLeaderboard();
+    }
+
+    nameSaveBtn.addEventListener("click", saveNamedResult);
+    nameInputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") saveNamedResult(); });
+    restartBtn.addEventListener("click", buildBoard);
+    playAgainBtn.addEventListener("click", buildBoard);
+
+    loadLeaderboard();
+    buildBoard();
+})();
+</script>
+{% endblock %}
