@@ -110,8 +110,19 @@ A free physics-based fruit merging game by Sagar Rajput.
             height: 100vh;
             background: var(--bg);
         }
-        #fm-wrap.fm-mobile-fs:fullscreen #fm-card,
-        #fm-wrap.fm-mobile-fs:-webkit-full-screen #fm-card {
+
+        /* Mobile: CSS-only "fullscreen" instead of the real Fullscreen API,
+           so the phone's status bar (clock/signal/battery) stays visible. */
+        #fm-wrap.fm-pseudo-fs {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #fm-wrap.fm-pseudo-fs #fm-card {
             width: 100vw;
             height: 100vh;
             max-width: none;
@@ -379,7 +390,8 @@ A free physics-based fruit merging game by Sagar Rajput.
         }
 
         const prevW = WIDTH, prevH = HEIGHT;
-        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        const isPseudoFullscreen = wrap.classList.contains("fm-pseudo-fs");
+        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement) || isPseudoFullscreen;
         const mobileFullscreen = isFullscreen && isMobileDevice;
 
         if (mobileFullscreen) {
@@ -634,19 +646,23 @@ A free physics-based fruit merging game by Sagar Rajput.
         setTimeout(resize, 50);
     }
 
-    if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
+    if (isMobileDevice) {
+        // Mobile: CSS-only pseudo-fullscreen, no Fullscreen API call -
+        // keeps the OS status bar visible, as requested.
+        fullscreenBtn.addEventListener("click", () => {
+            wrap.classList.toggle("fm-pseudo-fs");
+            document.body.style.overflow = wrap.classList.contains("fm-pseudo-fs") ? "hidden" : "";
+            syncFullscreenSize();
+        });
+    } else if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
         fullscreenBtn.addEventListener("click", () => {
             if (!document.fullscreenElement) {
-                if (isMobileDevice) wrap.classList.add("fm-mobile-fs");
                 (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
             } else {
                 (document.exitFullscreen || document.webkitExitFullscreen).call(document);
             }
         });
-        document.addEventListener("fullscreenchange", () => {
-            if (!document.fullscreenElement) wrap.classList.remove("fm-mobile-fs");
-            syncFullscreenSize();
-        });
+        document.addEventListener("fullscreenchange", syncFullscreenSize);
         document.addEventListener("webkitfullscreenchange", syncFullscreenSize);
     } else {
         fullscreenBtn.style.display = "none";
