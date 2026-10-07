@@ -422,7 +422,7 @@ A free retro snake game by Sagar Rajput.
         resetGame();
         gameStarted = true;
         clearInterval(loopTimer);
-        loopTimer = setInterval(tick, 110);
+        loopTimer = setInterval(tick, 150);
         draw();
     });
     nameSaveBtn.addEventListener("click", saveNamedScore);
@@ -433,7 +433,7 @@ A free retro snake game by Sagar Rajput.
         startOverlay.style.display = "none";
         resetGame();
         draw();
-        loopTimer = setInterval(tick, 110);
+        loopTimer = setInterval(tick, 150);
     });
 
     window.addEventListener("resize", resize);

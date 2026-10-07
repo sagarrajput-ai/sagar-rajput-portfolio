@@ -1723,6 +1723,7 @@ GAMES_DB_PATH = os.path.join(app.instance_path, "games.db")
 GAME_SORT_DIRECTION = {
     "fruit-merge": "DESC",   # higher score is better
     "memory-match": "ASC",   # fewer moves is better
+    "cyber-snake": "DESC",   # higher score is better
 }
 
 def ensure_games_database():
@@ -1746,7 +1747,12 @@ ensure_games_database()
 
 @app.route("/api/games/score", methods=["GET", "POST"])
 def games_score():
-    game = request.values.get("game", "").strip()
+    if request.method == "POST":
+        data = request.get_json(silent=True) or {}
+        game = str(data.get("game", "")).strip()
+    else:
+        data = {}
+        game = request.values.get("game", "").strip()
 
     if game not in GAME_SORT_DIRECTION:
         return jsonify({"error": "Unknown game"}), 400
@@ -1755,8 +1761,6 @@ def games_score():
     conn.row_factory = sqlite3.Row
 
     if request.method == "POST":
-        data = request.get_json(silent=True) or {}
-
         name = str(data.get("name", "")).strip()
         name = re.sub(r"[^\w\s\-\.]", "", name)[:12] or "Player"
 
