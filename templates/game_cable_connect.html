@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block title %}Cable Connect | Free Network Topology Puzzle | Sagar Rajput{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Play Cable Connect, a free network topology puzzle. Rotate cable tiles to route a complete path from the core switch to every endpoint. Built by Sagar Rajput.">
+{% endblock %}
+
+{% block og_title %}Cable Connect | Sagar Rajput{% endblock %}
+{% block og_description %}
+A free network topology puzzle. Rotate cables to route a path from the core switch to every endpoint.
+{% endblock %}
+{% block twitter_title %}Cable Connect | Sagar Rajput{% endblock %}
+{% block twitter_description %}
+A free network topology puzzle by Sagar Rajput.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Cable Connect",
+  "url": "https://sagarrajput.com/games/cable-connect",
+  "genre": "Puzzle",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "CollectionPage",
+    "name": "Games by Sagar Rajput",
+    "url": "https://sagarrajput.com/games"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero">
+
+    <canvas class="network-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    TOPOLOGY PUZZLE · FREE TO PLAY
+                </div>
+
+                <h1>
+                    Cable
+                    <span>Connect.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    Rotate each cable tile to route a complete path from the
+                    Core Switch to every Endpoint. Fewer rotations, better score.
+                </p>
+
+                <div class="toolkit-actions">
+                    <a href="{{ url_for('games_hub') }}" class="btn btn-secondary">← All Games</a>
+                </div>
+
+            </div>
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+                    <div>
+                        <span class="status-label">LEADERBOARD</span>
+                        <h3>Best Run</h3>
+                    </div>
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="network-line"></div>
+
+                <div id="cc-leaderboard" style="display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 2px;"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section" style="padding-top: 50px;">
+
+    <div class="container" style="max-width: 560px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <div>
+                <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em;">ROTATIONS</div>
+                <div id="cc-moves" style="font-size: 24px; font-weight: 800;">0</div>
+            </div>
+            <div>
+                <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em;">ENDPOINTS</div>
+                <div id="cc-endpoints" style="font-size: 24px; font-weight: 800;">0 / 2</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button id="cc-mute" class="btn btn-secondary" type="button" style="padding: 10px 14px;" title="Toggle sound">🔊</button>
+                <button id="cc-new" class="btn btn-secondary" type="button">New Puzzle ↻</button>
+            </div>
+        </div>
+
+        <div id="cc-board" style="
+            display: grid;
+            gap: 4px;
+            background: var(--dark);
+            padding: 10px;
+            border-radius: 16px;
+        "></div>
+
+        <div id="cc-win" style="
+            display: none;
+            margin-top: 20px;
+            padding: 24px;
+            border-radius: 16px;
+            background: var(--dark);
+            color: #fff;
+            text-align: center;
+        ">
+            <div style="font-size: 32px; margin-bottom: 8px;">🏆</div>
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Network fully connected!</div>
+            <p id="cc-win-stats" style="color: var(--muted); margin: 0 0 16px;"></p>
+
+            <div id="cc-name-entry" style="display: none; flex-direction: column; gap: 10px; max-width: 240px; margin: 0 auto 16px;">
+                <div style="font-size: 13px; color: var(--accent);">🏆 New best run! Enter your name:</div>
+                <input id="cc-name-input" type="text" maxlength="12" placeholder="Your name" style="
+                    width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; font-size: 14px;
+                ">
+                <button id="cc-name-save" class="btn btn-primary" type="button">Save Score</button>
+            </div>
+
+            <button id="cc-play-again" class="btn btn-primary" type="button">Play Again →</button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO PLAY</p>
+            <h2>How to play Cable Connect</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Rotate the tiles.</strong>
+                <p>Click or tap any cable tile to rotate it 90 degrees.</p>
+            </li>
+            <li>
+                <strong>Build the circuit.</strong>
+                <p>Connect cable ends together, starting from the Core Switch, to form an unbroken path.</p>
+            </li>
+            <li>
+                <strong>Light up every Endpoint.</strong>
+                <p>A path turns green when it's live. Reach every Endpoint to win - fewer rotations means a better score.</p>
+            </li>
+        </ol>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/game-audio.js') }}"></script>
+<script>
+(function () {
+    "use strict";
+
+    const COLS = 6, ROWS = 5;
+    const DIRS = ["N", "E", "S", "W"];
+    const OPPOSITE = { N: "S", S: "N", E: "W", W: "E" };
+    const DELTA = { N: [0, -1], S: [0, 1], E: [1, 0], W: [-1, 0] };
+
+    const boardEl = document.getElementById("cc-board");
+    const movesEl = document.getElementById("cc-moves");
+    const endpointsEl = document.getElementById("cc-endpoints");
+    const newBtn = document.getElementById("cc-new");
+    const muteBtn = document.getElementById("cc-mute");
+    const winEl = document.getElementById("cc-win");
+    const winStatsEl = document.getElementById("cc-win-stats");
+    const playAgainBtn = document.getElementById("cc-play-again");
+    const leaderboardEl = document.getElementById("cc-leaderboard");
+    const nameEntryEl = document.getElementById("cc-name-entry");
+    const nameInputEl = document.getElementById("cc-name-input");
+    const nameSaveBtn = document.getElementById("cc-name-save");
+
+    muteBtn.textContent = GameAudio.isMuted() ? "🔇" : "🔊";
+    muteBtn.addEventListener("click", () => {
+        muteBtn.textContent = GameAudio.toggleMuted() ? "🔇" : "🔊";
+    });
+
+    let cells;        // key -> { solved: Set<dir>, rotation: 0-3, kind: "path"|"source"|"endpoint" }
+    let source, endpoints;
+    let moves, won, startTime, pendingResult;
+    let topScores = [];
+
+    function key(x, y) { return x + "," + y; }
+    function inBounds(x, y) { return x >= 0 && x < COLS && y >= 0 && y < ROWS; }
+
+    function escapeHtmlCC(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderLeaderboard() {
+        const medals = ["🥇", "🥈", "🥉"];
+        leaderboardEl.innerHTML = [0, 1, 2].map((i) => {
+            const entry = topScores[i];
+            return `<div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; color:${entry ? '#fff' : 'rgba(255,255,255,.4)'};">
+                <span>${medals[i]} ${entry ? escapeHtmlCC(entry.name) : "- - -"}</span>
+                <span style="font-family:'DM Mono', monospace; color:var(--accent);">${entry ? entry.value : "-"}</span>
+            </div>`;
+        }).join("");
+    }
+
+    async function loadLeaderboard() {
+        try {
+            const res = await fetch("/api/games/score?game=cable-connect");
+            const data = await res.json();
+            topScores = data.leaderboard || [];
+        } catch (e) { topScores = []; }
+        renderLeaderboard();
+    }
+
+    function addConnection(map, x, y, dir) {
+        const k = key(x, y);
+        if (!map.has(k)) map.set(k, new Set());
+        map.get(k).add(dir);
+    }
+
+    function generatePuzzle() {
+        source = { x: 0, y: 2 };
+        endpoints = [{ x: COLS - 1, y: 0 }, { x: COLS - 1, y: ROWS - 1 }];
+
+        const connMap = new Map();
+        addConnection(connMap, source.x, source.y, "E"); // source always opens East into the grid
+
+        endpoints.forEach((ep) => {
+            addConnection(connMap, ep.x, ep.y, "W"); // endpoints always open West, receiving from the grid
+
+            let current = { x: source.x, y: source.y };
+            let steps = 0;
+            const blocked = new Set([key(source.x, source.y)]);
+            endpoints.forEach(e => { if (e !== ep) blocked.add(key(e.x, e.y)); });
+
+            while ((current.x !== ep.x || current.y !== ep.y) && steps < 80) {
+                steps++;
+                const dx = ep.x - current.x, dy = ep.y - current.y;
+                let options = [];
+                if (dx > 0) options.push("E");
+                if (dx < 0) options.push("W");
+                if (dy > 0) options.push("S");
+                if (dy < 0) options.push("N");
+                if (Math.random() < 0.3) {
+                    const perp = (dx !== 0) ? ["N", "S"] : ["E", "W"];
+                    options.push(...perp);
+                }
+                options = options.filter((dir) => {
+                    const [ddx, ddy] = DELTA[dir];
+                    const nx = current.x + ddx, ny = current.y + ddy;
+                    return inBounds(nx, ny) && !blocked.has(key(nx, ny));
+                });
+                if (options.length === 0) {
+                    // force a direct, unblocked move toward the target
+                    const forced = dx !== 0 ? (dx > 0 ? "E" : "W") : (dy > 0 ? "S" : "N");
+                    options = [forced];
+                }
+
+                const dir = options[Math.floor(Math.random() * options.length)];
+                const [ddx, ddy] = DELTA[dir];
+                const next = { x: current.x + ddx, y: current.y + ddy };
+
+                addConnection(connMap, current.x, current.y, dir);
+                addConnection(connMap, next.x, next.y, OPPOSITE[dir]);
+
+                if (next.x !== ep.x || next.y !== ep.y) blocked.add(key(next.x, next.y));
+                current = next;
+            }
+        });
+
+        cells = new Map();
+        connMap.forEach((dirSet, k) => {
+            const [x, y] = k.split(",").map(Number);
+            let kind = "path";
+            if (x === source.x && y === source.y) kind = "source";
+            else if (endpoints.some(e => e.x === x && e.y === y)) kind = "endpoint";
+
+            cells.set(k, {
+                solved: dirSet,
+                rotation: (kind === "path") ? Math.floor(Math.random() * 4) : 0,
+                kind,
+            });
+        });
+
+        moves = 0;
+        won = false;
+        startTime = Date.now();
+        movesEl.textContent = "0";
+        winEl.style.display = "none";
+        nameEntryEl.style.display = "none";
+    }
+
+    function rotateSet(dirSet, steps) {
+        const order = ["N", "E", "S", "W"];
+        const result = new Set();
+        dirSet.forEach((d) => {
+            const idx = (order.indexOf(d) + steps) % 4;
+            result.add(order[idx]);
+        });
+        return result;
+    }
+
+    function currentDirs(cell) {
+        return rotateSet(cell.solved, cell.rotation);
+    }
+
+    function computeLitCells() {
+        const lit = new Set([key(source.x, source.y)]);
+        const queue = [{ x: source.x, y: source.y }];
+
+        while (queue.length) {
+            const { x, y } = queue.shift();
+            const cell = cells.get(key(x, y));
+            if (!cell) continue;
+            const dirs = currentDirs(cell);
+
+            dirs.forEach((dir) => {
+                const [ddx, ddy] = DELTA[dir];
+                const nx = x + ddx, ny = y + ddy;
+                const nk = key(nx, ny);
+                const neighbor = cells.get(nk);
+                if (!neighbor || lit.has(nk)) return;
+                const neighborDirs = currentDirs(neighbor);
+                if (neighborDirs.has(OPPOSITE[dir])) {
+                    lit.add(nk);
+                    queue.push({ x: nx, y: ny });
+                }
+            });
+        }
+        return lit;
+    }
+
+    function tileSvg(cell, lit) {
+        const dirs = currentDirs(cell);
+        const color = lit ? "#28d7c5" : "#5b6b85";
+        const glow = lit ? `filter:drop-shadow(0 0 5px ${color});` : "";
+        let lines = "";
+        const mid = 50;
+        const endMap = { N: [50, 0], S: [50, 100], E: [100, 50], W: [0, 50] };
+        dirs.forEach((d) => {
+            const [ex, ey] = endMap[d];
+            lines += `<line x1="${mid}" y1="${mid}" x2="${ex}" y2="${ey}" stroke="${color}" stroke-width="14" stroke-linecap="round" />`;
+        });
+        return `<svg viewBox="0 0 100 100" style="width:100%; height:100%; ${glow}">
+            <circle cx="50" cy="50" r="12" fill="${color}" />
+            ${lines}
+        </svg>`;
+    }
+
+    function iconFor(kind) {
+        return kind === "source" ? "🖥️" : "📶";
+    }
+
+    function render() {
+        const lit = computeLitCells();
+
+        boardEl.innerHTML = "";
+        boardEl.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+
+        for (let y = 0; y < ROWS; y++) {
+            for (let x = 0; x < COLS; x++) {
+                const k = key(x, y);
+                const cell = cells.get(k);
+                const tile = document.createElement("div");
+                tile.style.cssText = `
+                    aspect-ratio: 1;
+                    border-radius: 8px;
+                    background: ${cell ? "#0f1c30" : "transparent"};
+                    display: flex; align-items: center; justify-content: center;
+                    position: relative;
+                    cursor: ${cell && cell.kind === "path" ? "pointer" : "default"};
+                `;
+
+                if (cell) {
+                    const isLit = lit.has(k);
+                    tile.innerHTML = tileSvg(cell, isLit);
+                    if (cell.kind !== "path") {
+                        const badge = document.createElement("div");
+                        badge.textContent = iconFor(cell.kind);
+                        badge.style.cssText = "position:absolute; font-size: 18px;";
+                        tile.appendChild(badge);
+                    }
+                    if (cell.kind === "path") {
+                        tile.addEventListener("click", () => rotateTile(k));
+                    }
+                }
+
+                boardEl.appendChild(tile);
+            }
+        }
+
+        const reachedCount = endpoints.filter(e => lit.has(key(e.x, e.y))).length;
+        endpointsEl.textContent = `${reachedCount} / ${endpoints.length}`;
+
+        if (!won && reachedCount === endpoints.length) {
+            won = true;
+            GameAudio.win();
+            const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+            winStatsEl.textContent = `${moves} rotations · ${elapsedSeconds}s`;
+            winEl.style.display = "block";
+
+            const qualifies = topScores.length < 3 || moves <= 9999;
+            if (qualifies) {
+                pendingResult = moves;
+                nameEntryEl.style.display = "flex";
+                setTimeout(() => nameInputEl.focus(), 50);
+            }
+        }
+    }
+
+    function rotateTile(k) {
+        if (won) return;
+        const cell = cells.get(k);
+        cell.rotation = (cell.rotation + 1) % 4;
+        moves++;
+        movesEl.textContent = moves;
+        GameAudio.click();
+        render();
+        if (computeLitCells().size > 1) GameAudio.pop();
+    }
+
+    async function saveNamedResult() {
+        if (pendingResult === undefined) return;
+        const name = (nameInputEl.value || "").trim().slice(0, 12) || "Player";
+        try {
+            const res = await fetch("/api/games/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ game: "cable-connect", name, sort_value: pendingResult, display_value: `${pendingResult} rotations` }),
+            });
+            const data = await res.json();
+            topScores = data.leaderboard || topScores;
+        } catch (e) {}
+        pendingResult = undefined;
+        nameEntryEl.style.display = "none";
+        nameInputEl.value = "";
+        renderLeaderboard();
+    }
+
+    function newGame() {
+        generatePuzzle();
+        render();
+    }
+
+    newBtn.addEventListener("click", newGame);
+    playAgainBtn.addEventListener("click", newGame);
+    nameSaveBtn.addEventListener("click", saveNamedResult);
+    nameInputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") saveNamedResult(); });
+
+    loadLeaderboard();
+    newGame();
+})();
+</script>
+{% endblock %}
