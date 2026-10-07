@@ -1637,6 +1637,7 @@ def sitemap_xml():
         "game_fruit_merge",
         "game_memory_match",
         "game_cyber_snake",
+        "game_packet_runner",
         "ip_calculator",
         "subnet_planner",
         "ip_range",
@@ -1687,6 +1688,10 @@ def game_memory_match():
 def game_cyber_snake():
     return render_template("game_cyber_snake.html")
 
+@app.route("/games/packet-runner")
+def game_packet_runner():
+    return render_template("game_packet_runner.html")
+
 @app.route("/network-diagnostic-lab")
 def network_diagnostic_lab():
     return render_template("network_diagnostic_lab.html")
@@ -1724,6 +1729,7 @@ GAME_SORT_DIRECTION = {
     "fruit-merge": "DESC",   # higher score is better
     "memory-match": "ASC",   # fewer moves is better
     "cyber-snake": "DESC",   # higher score is better
+    "packet-runner": "DESC", # higher score is better
 }
 
 def ensure_games_database():

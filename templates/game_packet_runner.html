@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}Packet Runner | Free Endless Runner Game | Sagar Rajput{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Play Packet Runner, a free endless runner game where a data packet jumps firewall walls and ducks under packet-loss drops. Built by Sagar Rajput.">
+{% endblock %}
+
+{% block og_title %}Packet Runner | Sagar Rajput{% endblock %}
+{% block og_description %}
+A free endless runner game. Jump firewalls, duck packet-loss drops, keep the connection alive.
+{% endblock %}
+{% block twitter_title %}Packet Runner | Sagar Rajput{% endblock %}
+{% block twitter_description %}
+A free endless runner game by Sagar Rajput.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Packet Runner",
+  "url": "https://sagarrajput.com/games/packet-runner",
+  "genre": "Arcade",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "CollectionPage",
+    "name": "Games by Sagar Rajput",
+    "url": "https://sagarrajput.com/games"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero">
+
+    <canvas class="network-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    ENDLESS RUNNER · FREE TO PLAY
+                </div>
+
+                <h1>
+                    Packet
+                    <span>Runner.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    Keep the connection alive. Jump firewall walls, duck under
+                    packet-loss drops, and see how far your data makes it.
+                </p>
+
+                <div class="toolkit-actions">
+                    <a href="{{ url_for('games_hub') }}" class="btn btn-secondary">← All Games</a>
+                </div>
+
+            </div>
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+                    <div>
+                        <span class="status-label">LEADERBOARD</span>
+                        <h3>Top Scores</h3>
+                    </div>
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="network-line"></div>
+
+                <div id="pr-leaderboard" style="display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 2px;"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section" style="padding-top: 50px;">
+
+    <div class="container" style="max-width: 560px;">
+
+        <div style="
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0c1a2e, #081222);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 24px 60px rgba(8,17,31,.35);
+        ">
+
+            <button id="pr-mute" type="button" title="Toggle sound" style="
+                position: absolute; top: 14px; right: 16px; z-index: 5;
+                width: 34px; height: 34px; border-radius: 10px;
+                border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06);
+                color: #fff; font-size: 15px; cursor: pointer;
+            ">🔊</button>
+
+            <div style="display: flex; justify-content: space-between; padding: 16px 20px;">
+                <div>
+                    <div style="font: 500 11px 'DM Mono', monospace; color: #7ee9db; letter-spacing: .08em;">SCORE</div>
+                    <div id="pr-score" style="font-size: 26px; font-weight: 800; color: #fff;">0</div>
+                </div>
+                <div>
+                    <div style="font: 500 11px 'DM Mono', monospace; color: #7ee9db; letter-spacing: .08em;">BEST</div>
+                    <div id="pr-best" style="font-size: 26px; font-weight: 800; color: #fff; text-align: right;">0</div>
+                </div>
+            </div>
+
+            <canvas id="pr-canvas" style="display: block; width: 100%; touch-action: none;"></canvas>
+
+            <div style="display: flex; gap: 10px; padding: 14px 20px;">
+                <button id="pr-jump-btn" class="btn btn-primary" type="button" style="flex: 1;">↑ Jump</button>
+                <button id="pr-duck-btn" class="btn btn-secondary" type="button" style="flex: 1;">↓ Duck</button>
+            </div>
+
+            <div id="pr-start" style="
+                position: absolute; inset: 0; background: rgba(8,17,31,.96);
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                gap: 16px; text-align: center; padding: 20px;
+            ">
+                <div style="font-size: 40px;">📦</div>
+                <div style="font-size: 18px; color: #fff; font-weight: 700;">Ready to run?</div>
+                <p style="color: var(--muted); font-size: 13px; max-width: 260px; margin: 0;">
+                    Space/Up to jump, Down to duck on desktop. Use the buttons below on mobile.
+                </p>
+                <button id="pr-start-btn" class="btn btn-primary" type="button">Start Game →</button>
+            </div>
+
+            <div id="pr-gameover" style="
+                display: none; position: absolute; inset: 0; background: rgba(8,17,31,.92);
+                flex-direction: column; align-items: center; justify-content: center;
+                gap: 14px; text-align: center; padding: 20px;
+            ">
+                <div style="font-size: 15px; letter-spacing: .1em; color: #7ee9db; font-weight: 700;">CONNECTION LOST</div>
+                <div style="font-size: 36px; font-weight: 800; color: #fff;">Score: <span id="pr-final-score">0</span></div>
+
+                <div id="pr-name-entry" style="display: none; flex-direction: column; gap: 10px; width: 100%; max-width: 240px;">
+                    <div style="font-size: 13px; color: #7ee9db;">🏆 New top score! Enter your name:</div>
+                    <input id="pr-name-input" type="text" maxlength="12" placeholder="Your name" style="
+                        width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 10px;
+                        border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; font-size: 14px;
+                    ">
+                    <button id="pr-name-save" class="btn btn-primary" type="button">Save Score</button>
+                </div>
+
+                <button id="pr-restart" class="btn btn-primary" type="button">Play Again →</button>
+            </div>
+
+        </div>
+
+        <p style="color: var(--muted); font-size: 13px; margin-top: 16px; text-align: center;">
+            Jump orange firewall walls. Duck under red packet-loss drops.
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO PLAY</p>
+            <h2>How to play Packet Runner</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Jump firewalls.</strong>
+                <p>Press Space, Up, or tap Jump to clear orange firewall walls on the ground.</p>
+            </li>
+            <li>
+                <strong>Duck packet loss.</strong>
+                <p>Press Down or hold Duck to drop under floating red packet-loss obstacles.</p>
+            </li>
+            <li>
+                <strong>Survive as long as possible.</strong>
+                <p>Speed increases the longer you run. Your score is how far your packet travels.</p>
+            </li>
+        </ol>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/game-audio.js') }}"></script>
+<script>
+(function () {
+    "use strict";
+
+    const canvas = document.getElementById("pr-canvas");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("pr-score");
+    const bestEl = document.getElementById("pr-best");
+    const startOverlay = document.getElementById("pr-start");
+    const startBtn = document.getElementById("pr-start-btn");
+    const gameOverEl = document.getElementById("pr-gameover");
+    const finalScoreEl = document.getElementById("pr-final-score");
+    const restartBtn = document.getElementById("pr-restart");
+    const leaderboardEl = document.getElementById("pr-leaderboard");
+    const nameEntryEl = document.getElementById("pr-name-entry");
+    const nameInputEl = document.getElementById("pr-name-input");
+    const nameSaveBtn = document.getElementById("pr-name-save");
+    const muteBtn = document.getElementById("pr-mute");
+    const jumpBtn = document.getElementById("pr-jump-btn");
+    const duckBtn = document.getElementById("pr-duck-btn");
+
+    muteBtn.textContent = GameAudio.isMuted() ? "🔇" : "🔊";
+    muteBtn.addEventListener("click", () => {
+        muteBtn.textContent = GameAudio.toggleMuted() ? "🔇" : "🔊";
+    });
+
+    let WIDTH = 480, HEIGHT = 260;
+    const GROUND_Y_RATIO = 0.75;
+    const GRAVITY = 0.0028;
+    const JUMP_VELOCITY = -0.9;
+
+    let groundY;
+    let player, obstacles, speed, score, best, gameOver, gameStarted, ducking, pendingScore;
+    let spawnTimer, lastTime, rafId;
+    let topScores = [];
+
+    function escapeHtmlPR(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderLeaderboard() {
+        const medals = ["🥇", "🥈", "🥉"];
+        leaderboardEl.innerHTML = [0, 1, 2].map((i) => {
+            const entry = topScores[i];
+            return `<div style="display:flex; justify-content:space-between; font-size:14px; color:${entry ? '#fff' : 'rgba(255,255,255,.4)'};">
+                <span>${medals[i]} ${entry ? escapeHtmlPR(entry.name) : "- - -"}</span>
+                <span style="font-family:'DM Mono', monospace; color:#7ee9db;">${entry ? entry.value : "-"}</span>
+            </div>`;
+        }).join("");
+    }
+
+    async function loadLeaderboard() {
+        try {
+            const res = await fetch("/api/games/score?game=packet-runner");
+            const data = await res.json();
+            topScores = data.leaderboard || [];
+        } catch (e) { topScores = []; }
+        bestEl.textContent = topScores.length ? topScores[0].value : 0;
+        renderLeaderboard();
+    }
+
+    function resize() {
+        WIDTH = Math.min(canvas.parentElement.clientWidth, 560);
+        HEIGHT = Math.round(WIDTH * 0.52);
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
+        groundY = HEIGHT * GROUND_Y_RATIO;
+    }
+
+    function resetGame() {
+        player = { x: 50, y: groundY - 24, w: 24, h: 24, vy: 0, grounded: true };
+        obstacles = [];
+        speed = 0.22;
+        score = 0;
+        gameOver = false;
+        ducking = false;
+        spawnTimer = 0;
+        scoreEl.textContent = "0";
+        gameOverEl.style.display = "none";
+        nameEntryEl.style.display = "none";
+    }
+
+    function jump() {
+        if (!gameStarted || gameOver) return;
+        if (!player.grounded) return;
+        player.vy = JUMP_VELOCITY;
+        player.grounded = false;
+        GameAudio.pop();
+    }
+
+    function setDuck(active) {
+        if (!gameStarted || gameOver) return;
+        ducking = active;
+    }
+
+    function spawnObstacle() {
+        const type = Math.random() < 0.6 ? "wall" : "drop";
+        if (type === "wall") {
+            const h = 26 + Math.random() * 24;
+            obstacles.push({ type, x: WIDTH + 10, y: groundY - h, w: 18, h });
+        } else {
+            obstacles.push({ type, x: WIDTH + 10, y: groundY - 64, w: 26, h: 20 });
+        }
+    }
+
+    function update(dt) {
+        if (gameOver || !gameStarted) return;
+
+        speed = Math.min(speed + dt * 0.000004, 0.55);
+        score += dt * speed * 0.03;
+        scoreEl.textContent = Math.floor(score);
+
+        player.vy += GRAVITY * dt;
+        player.y += player.vy * dt;
+        const standY = groundY - (ducking ? 14 : 24);
+        if (player.y >= standY) {
+            player.y = standY;
+            player.vy = 0;
+            player.grounded = true;
+        }
+        player.h = ducking && player.grounded ? 14 : 24;
+
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+            spawnObstacle();
+            spawnTimer = 900 + Math.random() * 700 - speed * 400;
+        }
+
+        obstacles.forEach(o => { o.x -= speed * dt; });
+        obstacles = obstacles.filter(o => o.x + o.w > -10);
+
+        const px = player.x, py = player.y, pw = player.w, ph = player.h;
+        for (const o of obstacles) {
+            if (px < o.x + o.w && px + pw > o.x && py < o.y + o.h && py + ph > o.y) {
+                endGame();
+                return;
+            }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        // fiber cable ground line
+        ctx.strokeStyle = "rgba(40,215,197,.5)";
+        ctx.lineWidth = 2;
+        ctx.shadowColor = "#28d7c5";
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.lineTo(WIDTH, groundY);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // obstacles
+        obstacles.forEach(o => {
+            ctx.fillStyle = o.type === "wall" ? "#f3a712" : "#e0483f";
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 8;
+            ctx.fillRect(o.x, o.y, o.w, o.h);
+        });
+        ctx.shadowBlur = 0;
+
+        // player packet
+        ctx.fillStyle = "#7c8cff";
+        ctx.shadowColor = "#7c8cff";
+        ctx.shadowBlur = 10;
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+        ctx.shadowBlur = 0;
+    }
+
+    function loop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = Math.min(timestamp - lastTime, 50);
+        lastTime = timestamp;
+
+        update(dt);
+        draw();
+
+        if (!gameOver) {
+            rafId = requestAnimationFrame(loop);
+        }
+    }
+
+    function endGame() {
+        gameOver = true;
+        GameAudio.fail();
+        const finalScore = Math.floor(score);
+        finalScoreEl.textContent = finalScore;
+
+        const qualifies = finalScore > 0 && (topScores.length < 3 || finalScore > parseInt(topScores[topScores.length - 1].value, 10));
+        if (qualifies) {
+            pendingScore = finalScore;
+            nameEntryEl.style.display = "flex";
+            setTimeout(() => nameInputEl.focus(), 50);
+        }
+        gameOverEl.style.display = "flex";
+    }
+
+    async function saveNamedScore() {
+        if (pendingScore === undefined) return;
+        const name = (nameInputEl.value || "").trim().slice(0, 12) || "Player";
+        try {
+            const res = await fetch("/api/games/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ game: "packet-runner", name, sort_value: pendingScore, display_value: String(pendingScore) }),
+            });
+            const data = await res.json();
+            topScores = data.leaderboard || topScores;
+        } catch (e) {}
+        pendingScore = undefined;
+        nameEntryEl.style.display = "none";
+        nameInputEl.value = "";
+        bestEl.textContent = topScores.length ? topScores[0].value : 0;
+        renderLeaderboard();
+    }
+
+    function startRun() {
+        resetGame();
+        gameStarted = true;
+        lastTime = 0;
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(loop);
+    }
+
+    startBtn.addEventListener("click", () => {
+        startOverlay.style.display = "none";
+        startRun();
+    });
+    restartBtn.addEventListener("click", startRun);
+    nameSaveBtn.addEventListener("click", saveNamedScore);
+    nameInputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") saveNamedScore(); });
+
+    jumpBtn.addEventListener("click", jump);
+    duckBtn.addEventListener("touchstart", (e) => { setDuck(true); e.preventDefault(); }, { passive: false });
+    duckBtn.addEventListener("touchend", (e) => { setDuck(false); e.preventDefault(); }, { passive: false });
+    duckBtn.addEventListener("mousedown", () => setDuck(true));
+    duckBtn.addEventListener("mouseup", () => setDuck(false));
+    duckBtn.addEventListener("mouseleave", () => setDuck(false));
+
+    document.addEventListener("keydown", (e) => {
+        if (["ArrowUp", " ", "Spacebar"].includes(e.key)) { jump(); e.preventDefault(); }
+        else if (e.key === "ArrowDown") { setDuck(true); e.preventDefault(); }
+    });
+    document.addEventListener("keyup", (e) => {
+        if (e.key === "ArrowDown") setDuck(false);
+    });
+
+    window.addEventListener("resize", resize);
+    resize();
+    loadLeaderboard();
+})();
+</script>
+{% endblock %}
