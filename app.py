@@ -1639,6 +1639,7 @@ def sitemap_xml():
         "game_cyber_snake",
         "game_packet_runner",
         "game_cable_connect",
+        "game_number_shooter",
         "ip_calculator",
         "subnet_planner",
         "ip_range",
@@ -1697,6 +1698,10 @@ def game_packet_runner():
 def game_cable_connect():
     return render_template("game_cable_connect.html")
 
+@app.route("/games/number-shooter")
+def game_number_shooter():
+    return render_template("game_number_shooter.html")
+
 @app.route("/network-diagnostic-lab")
 def network_diagnostic_lab():
     return render_template("network_diagnostic_lab.html")
@@ -1736,6 +1741,8 @@ GAME_SORT_DIRECTION = {
     "cyber-snake": "DESC",   # higher score is better
     "packet-runner": "DESC", # higher score is better
     "cable-connect": "ASC",  # fewer moves is better
+    "number-shooter": "DESC",  # higher score is better
+
 }
 
 def ensure_games_database():

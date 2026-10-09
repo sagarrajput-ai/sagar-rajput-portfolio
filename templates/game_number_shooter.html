@@ -1,0 +1,713 @@
+{% extends "base.html" %}
+
+{% block title %}Number Shooter | Free Number Merge Puzzle | Sagar Rajput{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Play Number Shooter, a free number merge puzzle. Shoot numbered tiles up the columns and merge matching numbers into bigger ones. Built by Sagar Rajput.">
+{% endblock %}
+
+{% block og_title %}Number Shooter | Sagar Rajput{% endblock %}
+{% block og_description %}
+A free number merge puzzle. Shoot tiles up the columns and merge matching numbers.
+{% endblock %}
+{% block twitter_title %}Number Shooter | Sagar Rajput{% endblock %}
+{% block twitter_description %}
+A free number merge puzzle game by Sagar Rajput.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Number Shooter",
+  "url": "https://sagarrajput.com/games/number-shooter",
+  "genre": "Puzzle",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Person",
+    "@id": "https://sagarrajput.com/#person",
+    "name": "Sagar Rajput",
+    "url": "https://sagarrajput.com/"
+  },
+  "isPartOf": {
+    "@type": "CollectionPage",
+    "name": "Games by Sagar Rajput",
+    "url": "https://sagarrajput.com/games"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="toolkit-hero">
+
+    <canvas class="network-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+
+        <div class="toolkit-hero-grid">
+
+            <div>
+
+                <div class="toolkit-eyebrow">
+                    <span class="status-dot"></span>
+                    PUZZLE · FREE TO PLAY
+                </div>
+
+                <h1>
+                    Number
+                    <span>Shooter.</span>
+                </h1>
+
+                <p class="toolkit-lead">
+                    Shoot numbered tiles up the columns. Matching numbers merge
+                    into bigger ones - plan your shots and chain the merges.
+                </p>
+
+                <div class="toolkit-actions">
+                    <a href="{{ url_for('games_hub') }}" class="btn btn-secondary">← All Games</a>
+                </div>
+
+            </div>
+
+            <div class="network-status-card">
+
+                <div class="status-card-top">
+                    <div>
+                        <span class="status-label">LEADERBOARD</span>
+                        <h3>Top Scores</h3>
+                    </div>
+                    <span class="live-indicator">
+                        <span></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="network-line"></div>
+
+                <div id="ns-leaderboard" style="display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 2px;"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section" style="padding-top: 50px;">
+
+    <style>
+        .ns-tile {
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 800;
+            transition: transform .2s ease, opacity .2s ease;
+            pointer-events: none;
+            will-change: transform;
+        }
+        .ns-tile.ns-pop { animation: nsPop .25s ease; }
+        @keyframes nsPop {
+            0%   { scale: .6; }
+            60%  { scale: 1.12; }
+            100% { scale: 1; }
+        }
+    </style>
+
+    <div class="container" style="max-width: 420px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px;">
+            <div>
+                <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em;">SCORE</div>
+                <div id="ns-score" style="font-size: 26px; font-weight: 800;">0</div>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="font: 500 11px 'DM Mono', monospace; color: var(--accent); letter-spacing: .08em; margin-bottom: 4px;">NEXT</div>
+                <div id="ns-next" style="
+                    width: 44px; height: 44px; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-weight: 800; color: #fff; background: #28d7c5;
+                ">2</div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button id="ns-mute" class="btn btn-secondary" type="button" style="padding: 10px 14px;" title="Toggle sound">🔊</button>
+                <button id="ns-new" class="btn btn-secondary" type="button">New Game ↻</button>
+            </div>
+        </div>
+
+        <div id="ns-board" style="
+            position: relative;
+            width: 100%;
+            background: #0b1220;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+        "></div>
+
+        <p style="color: var(--muted); font-size: 13px; margin-top: 16px; text-align: center;">
+            Move your mouse or drag your finger to aim. Click or release to shoot.
+        </p>
+
+        <div id="ns-result" style="
+            display: none;
+            margin-top: 20px;
+            padding: 24px;
+            border-radius: 16px;
+            background: var(--dark);
+            color: #fff;
+            text-align: center;
+        ">
+            <div style="font-size: 32px; margin-bottom: 8px;">💥</div>
+            <div id="ns-result-title" style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Board full</div>
+            <p id="ns-result-stats" style="color: var(--muted); margin: 0 0 16px;"></p>
+
+            <div id="ns-name-entry" style="display: none; flex-direction: column; gap: 10px; max-width: 240px; margin: 0 auto 16px;">
+                <div style="font-size: 13px; color: var(--accent);">🏆 New top score! Enter your name:</div>
+                <input id="ns-name-input" type="text" maxlength="12" placeholder="Your name" style="
+                    width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; font-size: 14px;
+                ">
+                <button id="ns-name-save" class="btn btn-primary" type="button">Save Score</button>
+            </div>
+
+            <button id="ns-play-again" class="btn btn-primary" type="button">Play Again →</button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section tool-info-section">
+
+    <div class="container tool-info-container">
+
+        <div class="tool-info-heading" data-reveal>
+            <p class="section-kicker">HOW TO PLAY</p>
+            <h2>How to play Number Shooter</h2>
+        </div>
+
+        <ol class="howto-steps">
+            <li>
+                <strong>Aim.</strong>
+                <p>Move your mouse, or drag your finger, across the columns. The highlighted lane shows where your tile will go.</p>
+            </li>
+            <li>
+                <strong>Shoot.</strong>
+                <p>Click or release to fire the tile up the lane. It sticks under the last tile in that column.</p>
+            </li>
+            <li>
+                <strong>Merge matching numbers.</strong>
+                <p>Tiles that touch a matching number merge into a bigger one. Merging three or more at once makes an even bigger tile, and merges can chain.</p>
+            </li>
+            <li>
+                <strong>Don't fill a column.</strong>
+                <p>If a column fills all the way down to the shooter, the game is over.</p>
+            </li>
+        </ol>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/game-audio.js') }}"></script>
+<script>
+(function () {
+    "use strict";
+
+    const COLS = 5;
+    const ROWS = 8;          // tiles a column can hold before the game ends
+    const GAP = 6;
+    const PAD = 8;
+    const LAUNCH_GAP = 12;
+    const MOVE_MS = 230;
+    const MERGE_MS = 240;
+
+    const COLORS = {
+        2: "#28d7c5", 4: "#4fd1c5", 8: "#7c8cff", 16: "#9f7aea",
+        32: "#f3a712", 64: "#f08c3f", 128: "#f3719f", 256: "#f3539f",
+        512: "#f53d7a", 1024: "#ffd166", 2048: "#fff176",
+    };
+    function colorFor(v) { return COLORS[v] || "#ff4fd8"; }
+
+    const boardEl = document.getElementById("ns-board");
+    const scoreEl = document.getElementById("ns-score");
+    const nextEl = document.getElementById("ns-next");
+    const muteBtn = document.getElementById("ns-mute");
+    const newBtn = document.getElementById("ns-new");
+    const resultEl = document.getElementById("ns-result");
+    const resultStatsEl = document.getElementById("ns-result-stats");
+    const nameEntryEl = document.getElementById("ns-name-entry");
+    const nameInputEl = document.getElementById("ns-name-input");
+    const nameSaveBtn = document.getElementById("ns-name-save");
+    const playAgainBtn = document.getElementById("ns-play-again");
+    const leaderboardEl = document.getElementById("ns-leaderboard");
+
+    muteBtn.textContent = GameAudio.isMuted() ? "🔇" : "🔊";
+    muteBtn.addEventListener("click", () => {
+        muteBtn.textContent = GameAudio.toggleMuted() ? "🔇" : "🔊";
+        muteBtn.blur();
+    });
+
+    let cell = 60;
+    let grid, score, over, busy, nextId, current, upcoming, aimCol, pendingScore;
+    let generation = 0;
+    let pressing = false;
+    let topScores = [];
+    let laneEl;
+    let slotEls = [];
+    const els = new Map();      // tile id -> DOM element
+    const leaving = new Set();  // tile ids currently animating out
+
+    function escapeHtmlNS(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderLeaderboard() {
+        const medals = ["🥇", "🥈", "🥉"];
+        leaderboardEl.innerHTML = [0, 1, 2].map((i) => {
+            const entry = topScores[i];
+            return `<div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; color:${entry ? '#fff' : 'rgba(255,255,255,.4)'};">
+                <span>${medals[i]} ${entry ? escapeHtmlNS(entry.name) : "- - -"}</span>
+                <span style="font-family:'DM Mono', monospace; color:#7ee9db;">${entry ? entry.value : "-"}</span>
+            </div>`;
+        }).join("");
+    }
+
+    async function loadLeaderboard() {
+        try {
+            const res = await fetch("/api/games/score?game=number-shooter");
+            const data = await res.json();
+            topScores = data.leaderboard || [];
+        } catch (e) { topScores = []; }
+        renderLeaderboard();
+    }
+
+    // ---------- layout ----------
+    function colX(c) { return PAD + c * (cell + GAP); }
+    function rowY(r) { return PAD + r * (cell + GAP) + (r === ROWS ? LAUNCH_GAP : 0); }
+
+    function buildStatic() {
+        boardEl.innerHTML = "";
+        slotEls = [];
+
+        laneEl = document.createElement("div");
+        laneEl.style.cssText = "position:absolute; left:0; top:0; border-radius:10px; background:rgba(124,140,255,.12); transition: transform .12s ease, opacity .2s ease; pointer-events:none;";
+        boardEl.appendChild(laneEl);
+
+        for (let r = 0; r <= ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const slot = document.createElement("div");
+                slot.style.cssText = "position:absolute; left:0; top:0; border-radius:10px; background:rgba(255,255,255,.035); pointer-events:none;";
+                slot.dataset.c = c;
+                slot.dataset.r = r;
+                boardEl.appendChild(slot);
+                slotEls.push(slot);
+            }
+        }
+    }
+
+    function measure() {
+        const w = boardEl.clientWidth || 360;
+        cell = Math.floor((w - PAD * 2 - GAP * (COLS - 1)) / COLS);
+        boardEl.style.height = (rowY(ROWS) + cell + PAD) + "px";
+    }
+
+    function layout() {
+        measure();
+        slotEls.forEach((slot) => {
+            const c = +slot.dataset.c;
+            const r = +slot.dataset.r;
+            slot.style.width = cell + "px";
+            slot.style.height = cell + "px";
+            slot.style.transform = `translate(${colX(c)}px, ${rowY(r)}px)`;
+        });
+        laneEl.style.width = cell + "px";
+        laneEl.style.height = (rowY(ROWS) + cell - PAD) + "px";
+        updateAim();
+        render();
+    }
+
+    function updateAim() {
+        laneEl.style.transform = `translate(${colX(aimCol)}px, ${PAD}px)`;
+        laneEl.style.opacity = over ? "0" : "1";
+        if (current) {
+            const el = els.get(current.id);
+            if (el) el.style.transform = `translate(${colX(aimCol)}px, ${rowY(ROWS)}px)`;
+        }
+    }
+
+    // ---------- tiles ----------
+    function styleTile(el, value, x, y) {
+        el.style.width = cell + "px";
+        el.style.height = cell + "px";
+        el.style.transform = `translate(${x}px, ${y}px)`;
+        el.style.background = colorFor(value);
+        el.style.boxShadow = `0 0 14px ${colorFor(value)}88`;
+        el.style.color = value >= 1024 ? "#0b1220" : "#fff";
+        el.style.fontSize = Math.round(cell * (value >= 1000 ? 0.30 : value >= 100 ? 0.36 : 0.44)) + "px";
+        el.textContent = String(value);
+    }
+
+    function syncTile(tile, x, y, popIn) {
+        let el = els.get(tile.id);
+        if (!el) {
+            el = document.createElement("div");
+            el.className = "ns-tile";
+            // place it without sliding in from the corner
+            el.style.transition = "none";
+            styleTile(el, tile.value, x, y);
+            boardEl.appendChild(el);
+            els.set(tile.id, el);
+            void el.offsetWidth;
+            el.style.transition = "";
+            if (popIn) el.classList.add("ns-pop");
+        } else {
+            styleTile(el, tile.value, x, y);
+        }
+        return el;
+    }
+
+    function render() {
+        const alive = new Set();
+
+        for (let c = 0; c < COLS; c++) {
+            grid[c].forEach((tile, r) => {
+                if (!tile) return;
+                alive.add(tile.id);
+                syncTile(tile, colX(c), rowY(r), false);
+            });
+        }
+
+        if (current) {
+            alive.add(current.id);
+            syncTile(current, colX(aimCol), rowY(ROWS), true);
+        }
+
+        els.forEach((el, id) => {
+            if (!alive.has(id) && !leaving.has(id)) {
+                el.remove();
+                els.delete(id);
+            }
+        });
+
+        nextEl.style.background = colorFor(upcoming);
+        nextEl.style.color = upcoming >= 1024 ? "#0b1220" : "#fff";
+        nextEl.textContent = String(upcoming);
+    }
+
+    // ---------- game logic ----------
+    function randomValue() {
+        let max = 2;
+        grid.forEach((col) => col.forEach((t) => { if (t && t.value > max) max = t.value; }));
+
+        const cap = Math.min(64, Math.max(4, Math.floor(max / 8)));
+        const pool = [];
+        for (let v = 2; v <= cap; v *= 2) pool.push(v);
+
+        const weights = pool.map((_, i) => Math.pow(2, pool.length - 1 - i));
+        const total = weights.reduce((a, b) => a + b, 0);
+        let roll = Math.random() * total;
+        for (let i = 0; i < pool.length; i++) {
+            roll -= weights[i];
+            if (roll < 0) return pool[i];
+        }
+        return pool[0];
+    }
+
+    function later(gen, ms, fn) {
+        setTimeout(() => { if (gen === generation) fn(); }, ms);
+    }
+
+    function findGroups() {
+        const seen = new Set();
+        const groups = [];
+        const neighbours = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+        for (let c = 0; c < COLS; c++) {
+            for (let r = 0; r < grid[c].length; r++) {
+                const startKey = c + "," + r;
+                if (seen.has(startKey)) continue;
+
+                const value = grid[c][r].value;
+                const stack = [[c, r]];
+                const group = [];
+                seen.add(startKey);
+
+                while (stack.length) {
+                    const [cc, rr] = stack.pop();
+                    group.push({ c: cc, r: rr });
+                    neighbours.forEach(([dc, dr]) => {
+                        const nc = cc + dc;
+                        const nr = rr + dr;
+                        if (nc < 0 || nc >= COLS || nr < 0 || nr >= grid[nc].length) return;
+                        const k = nc + "," + nr;
+                        if (seen.has(k)) return;
+                        if (grid[nc][nr].value !== value) return;
+                        seen.add(k);
+                        stack.push([nc, nr]);
+                    });
+                }
+
+                if (group.length >= 2) groups.push(group);
+            }
+        }
+        return groups;
+    }
+
+    function shoot(col) {
+        if (busy || over || !current) return;
+        if (grid[col].length >= ROWS) return;
+
+        busy = true;
+        GameAudio.pop();
+
+        const tile = current;
+        current = null;
+        grid[col].push(tile);
+        render();
+
+        const gen = generation;
+        later(gen, MOVE_MS, () => resolveStep(tile.id, gen));
+    }
+
+    function resolveStep(anchorId, gen) {
+        const groups = findGroups();
+        if (!groups.length) {
+            finishTurn();
+            return;
+        }
+
+        let gained = 0;
+        let biggest = 2;
+        const anchors = [];
+
+        groups.forEach((group) => {
+            const value = grid[group[0].c][group[0].r].value;
+
+            // The shot tile is the merge point when it's part of the group,
+            // otherwise the top-most (then left-most) tile.
+            let anchor = group.find((g) => grid[g.c][g.r].id === anchorId);
+            if (!anchor) {
+                anchor = group.slice().sort((a, b) => (a.r - b.r) || (a.c - b.c))[0];
+            }
+
+            // 2 tiles -> x2, 3 tiles -> x4, 4 tiles -> x8, ...
+            const newValue = value * Math.pow(2, group.length - 1);
+            gained += newValue;
+            if (newValue > biggest) biggest = newValue;
+
+            const ax = colX(anchor.c);
+            const ay = rowY(anchor.r);
+
+            group.forEach((g) => {
+                if (g === anchor) return;
+                const t = grid[g.c][g.r];
+                const el = els.get(t.id);
+                if (el) {
+                    leaving.add(t.id);
+                    el.style.transform = `translate(${ax}px, ${ay}px)`;
+                    el.style.opacity = "0";
+                }
+                grid[g.c][g.r] = null;
+            });
+
+            const anchorTile = grid[anchor.c][anchor.r];
+            anchorTile.value = newValue;
+            anchors.push(anchorTile);
+        });
+
+        score += gained;
+        scoreEl.textContent = score;
+        GameAudio.merge(Math.min(9, Math.max(0, Math.round(Math.log2(biggest)) - 1)));
+        render();
+
+        anchors.forEach((t) => {
+            const el = els.get(t.id);
+            if (el) {
+                el.classList.remove("ns-pop");
+                void el.offsetWidth;
+                el.classList.add("ns-pop");
+            }
+        });
+
+        later(gen, MERGE_MS, () => {
+            leaving.forEach((id) => {
+                const el = els.get(id);
+                if (el) el.remove();
+                els.delete(id);
+            });
+            leaving.clear();
+
+            // close the gaps: tiles slide back up toward the top
+            for (let c = 0; c < COLS; c++) grid[c] = grid[c].filter(Boolean);
+            render();
+
+            later(gen, MOVE_MS, () => resolveStep(null, gen));
+        });
+    }
+
+    function finishTurn() {
+        if (grid.some((col) => col.length >= ROWS)) {
+            endGame();
+            return;
+        }
+        current = { id: nextId++, value: upcoming };
+        upcoming = randomValue();
+        busy = false;
+        render();
+        updateAim();
+    }
+
+    function endGame() {
+        over = true;
+        busy = false;
+        GameAudio.fail();
+        updateAim();
+
+        resultStatsEl.textContent = `Final score: ${score}`;
+        resultEl.style.display = "block";
+
+        const qualifies = score > 0 && (topScores.length < 3 || score > parseInt(topScores[topScores.length - 1].value, 10));
+        if (qualifies) {
+            pendingScore = score;
+            nameEntryEl.style.display = "flex";
+            setTimeout(() => nameInputEl.focus(), 50);
+        }
+    }
+
+    async function saveNamedScore() {
+        if (pendingScore === undefined) return;
+        const name = (nameInputEl.value || "").trim().slice(0, 12) || "Player";
+        try {
+            const res = await fetch("/api/games/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ game: "number-shooter", name, sort_value: pendingScore, display_value: String(pendingScore) }),
+            });
+            const data = await res.json();
+            topScores = data.leaderboard || topScores;
+        } catch (e) {}
+        pendingScore = undefined;
+        nameEntryEl.style.display = "none";
+        nameInputEl.value = "";
+        renderLeaderboard();
+    }
+
+    function newGame() {
+        generation++;
+        els.forEach((el) => el.remove());
+        els.clear();
+        leaving.clear();
+
+        grid = Array.from({ length: COLS }, () => []);
+        score = 0;
+        over = false;
+        busy = false;
+        nextId = 1;
+        aimCol = Math.floor(COLS / 2);
+        pendingScore = undefined;
+
+        scoreEl.textContent = "0";
+        resultEl.style.display = "none";
+        nameEntryEl.style.display = "none";
+
+        current = { id: nextId++, value: randomValue() };
+        upcoming = randomValue();
+
+        render();
+        updateAim();
+    }
+
+    // ---------- input ----------
+    function colFromEvent(e) {
+        const rect = boardEl.getBoundingClientRect();
+        const x = e.clientX - rect.left - PAD;
+        const c = Math.floor(x / (cell + GAP));
+        return Math.max(0, Math.min(COLS - 1, c));
+    }
+
+    boardEl.addEventListener("pointerdown", (e) => {
+        if (over) return;
+        pressing = true;
+        try { boardEl.setPointerCapture(e.pointerId); } catch (err) {}
+        aimCol = colFromEvent(e);
+        updateAim();
+    });
+
+    boardEl.addEventListener("pointermove", (e) => {
+        if (over) return;
+        if (pressing || e.pointerType === "mouse") {
+            aimCol = colFromEvent(e);
+            updateAim();
+        }
+    });
+
+    boardEl.addEventListener("pointerup", (e) => {
+        if (!pressing) return;
+        pressing = false;
+        aimCol = colFromEvent(e);
+        updateAim();
+        shoot(aimCol);
+    });
+
+    boardEl.addEventListener("pointercancel", () => { pressing = false; });
+
+    function boardVisible() {
+        const r = boardEl.getBoundingClientRect();
+        return r.bottom > 0 && r.top < window.innerHeight;
+    }
+
+    document.addEventListener("keydown", (e) => {
+        const tag = document.activeElement ? document.activeElement.tagName : "";
+        if (tag === "INPUT" || over || !boardVisible()) return;
+
+        if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+            aimCol = Math.max(0, aimCol - 1);
+            updateAim();
+            e.preventDefault();
+        } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+            aimCol = Math.min(COLS - 1, aimCol + 1);
+            updateAim();
+            e.preventDefault();
+        } else if ((e.key === " " || e.key === "Enter") && tag !== "BUTTON") {
+            shoot(aimCol);
+            e.preventDefault();
+        }
+    });
+
+    newBtn.addEventListener("click", () => { newGame(); newBtn.blur(); });
+    playAgainBtn.addEventListener("click", () => { newGame(); playAgainBtn.blur(); });
+    nameSaveBtn.addEventListener("click", saveNamedScore);
+    nameInputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") saveNamedScore(); });
+
+    window.addEventListener("resize", layout);
+    window.addEventListener("load", layout);
+
+    buildStatic();
+    measure();
+    newGame();
+    layout();
+    loadLeaderboard();
+})();
+</script>
+{% endblock %}
